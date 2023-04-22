@@ -10,13 +10,13 @@ import CoreData
 
 struct PriceAlertListView: View {
 
-    @State private var coins: [Coin] = []
+    @StateObject private var viewModel = PriceAlertListViewModel()
 
     var body: some View {
         NavigationView {
-            List(coins) { coin in
+            List(viewModel.priceAlerts, id: \.self) { priceAlert in
                 HStack(spacing: 8) {
-                    AsyncImage(url: URL(string: coin.image)) { image in
+                    AsyncImage(url: URL(string: priceAlert.image)) { image in
                         image
                             .resizable()
                             .frame(width: 20, height: 20)
@@ -24,13 +24,11 @@ struct PriceAlertListView: View {
                         ProgressView()
                     }
 
-                    Text("\(coin.name) (\(coin.symbol.uppercased()))")
+                    Text("\(priceAlert.name) (\(priceAlert.symbol.uppercased()))")
                 }
                 .swipeActions {
                     Button(role: .destructive) {
-                        if let index = coins.firstIndex(where: { $0.id == coin.id }) {
-                            coins.remove(at: index)
-                        }
+                        viewModel.delete(priceAlert)
                     } label: {
                         Image(systemName: "trash")
                     }
@@ -41,13 +39,19 @@ struct PriceAlertListView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink {
                         AddPriceAlertView { selectedCoin in
-                            coins.append(selectedCoin)
+                            viewModel.savePriceAlert(selectedCoin)
                         }
                         .navigationBarTitle("Add Price Alert")
                     } label: {
                         Image(systemName: "plus")
                     }
                 }
+            }
+            .alert(viewModel.errorMessage ?? "", isPresented: $viewModel.showErrorAlert) {
+                Button("OK", role: .cancel) { }
+            }
+            .onAppear {
+                viewModel.fetchPriceAlerts()
             }
         }
     }

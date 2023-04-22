@@ -22,7 +22,7 @@ class CoinScannerServiceMock: CoinScannerService {
             case .failure(let error):
                 promise(.failure(error))
             case .none:
-                XCTFail("getAllPriceAlertsResult not set")
+                XCTFail("getCoinsAtPageResult not set")
             }
         }
         .eraseToAnyPublisher()
@@ -36,7 +36,7 @@ class CoinScannerServiceMock: CoinScannerService {
             case .failure(let error):
                 promise(.failure(error))
             case .none:
-                XCTFail("getAllPriceAlertsResult not set")
+                XCTFail("searchCoinsByQueryResult not set")
             }
         }
         .eraseToAnyPublisher()

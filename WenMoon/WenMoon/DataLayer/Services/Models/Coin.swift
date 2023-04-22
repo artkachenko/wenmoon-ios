@@ -49,6 +49,10 @@ struct Coin: Codable, Identifiable {
 // MARK: - Mocks
 
 extension Coin {
+    static let mock = Coin(id: "lukso-token",
+                           symbol: "LYXE",
+                           name: "LUKSO",
+                           image: "https://assets.coingecko.com/coins/images/11423/thumb/1_QAHTciwVhD7SqVmfRW70Pw.png")
     enum Page {
         case first
         case second
