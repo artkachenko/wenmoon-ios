@@ -12,7 +12,6 @@
 		FAB361FC29F447DB00A88050 /* WenMoon.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FAB361FA29F447DB00A88050 /* WenMoon.xcdatamodeld */; };
 		FAB361FE29F447DB00A88050 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB361FD29F447DB00A88050 /* ContentView.swift */; };
 		FAB3620029F447DC00A88050 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FAB361FF29F447DC00A88050 /* Assets.xcassets */; };
-		FAB3620E29F447DC00A88050 /* WenMoonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3620D29F447DC00A88050 /* WenMoonTests.swift */; };
 		FAB3623629F4513B00A88050 /* HTTPRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623529F4513B00A88050 /* HTTPRequest.swift */; };
 		FAB3623829F4514B00A88050 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623729F4514B00A88050 /* APIError.swift */; };
 		FAB3623A29F4515C00A88050 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623929F4515C00A88050 /* HTTPClient.swift */; };
@@ -21,6 +20,14 @@
 		FAB3623E29F451DB00A88050 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623929F4515C00A88050 /* HTTPClient.swift */; };
 		FAB3623F29F451E200A88050 /* HTTPRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623529F4513B00A88050 /* HTTPRequest.swift */; };
 		FAB3624029F451E400A88050 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623729F4514B00A88050 /* APIError.swift */; };
+		FAB3624429F453C700A88050 /* Coin.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3624329F453C700A88050 /* Coin.swift */; };
+		FAB3624529F453C700A88050 /* Coin.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3624329F453C700A88050 /* Coin.swift */; };
+		FAB3624729F453DD00A88050 /* CoinSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3624629F453DD00A88050 /* CoinSearchResult.swift */; };
+		FAB3624829F453DD00A88050 /* CoinSearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3624629F453DD00A88050 /* CoinSearchResult.swift */; };
+		FAB3624A29F453FC00A88050 /* CoinScannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3624929F453FC00A88050 /* CoinScannerService.swift */; };
+		FAB3624B29F453FC00A88050 /* CoinScannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3624929F453FC00A88050 /* CoinScannerService.swift */; };
+		FAB3625029F4547100A88050 /* HTTPClientMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3624F29F4547100A88050 /* HTTPClientMock.swift */; };
+		FAB3625329F4549800A88050 /* CoinScannerServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3625229F4549800A88050 /* CoinScannerServiceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,11 +49,15 @@
 		FAB361FF29F447DC00A88050 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FAB3620129F447DC00A88050 /* WenMoon.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WenMoon.entitlements; sourceTree = "<group>"; };
 		FAB3620929F447DC00A88050 /* WenMoonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WenMoonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		FAB3620D29F447DC00A88050 /* WenMoonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WenMoonTests.swift; sourceTree = "<group>"; };
 		FAB3623529F4513B00A88050 /* HTTPRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPRequest.swift; sourceTree = "<group>"; };
 		FAB3623729F4514B00A88050 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
 		FAB3623929F4515C00A88050 /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
 		FAB3623B29F4517800A88050 /* BaseBackendService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseBackendService.swift; sourceTree = "<group>"; };
+		FAB3624329F453C700A88050 /* Coin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coin.swift; sourceTree = "<group>"; };
+		FAB3624629F453DD00A88050 /* CoinSearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinSearchResult.swift; sourceTree = "<group>"; };
+		FAB3624929F453FC00A88050 /* CoinScannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinScannerService.swift; sourceTree = "<group>"; };
+		FAB3624F29F4547100A88050 /* HTTPClientMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClientMock.swift; sourceTree = "<group>"; };
+		FAB3625229F4549800A88050 /* CoinScannerServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinScannerServiceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,7 +110,7 @@
 		FAB3620C29F447DC00A88050 /* WenMoonTests */ = {
 			isa = PBXGroup;
 			children = (
-				FAB3620D29F447DC00A88050 /* WenMoonTests.swift */,
+				FAB3624C29F4544100A88050 /* DataLayer */,
 			);
 			path = WenMoonTests;
 			sourceTree = "<group>";
@@ -126,6 +137,7 @@
 			children = (
 				FAB3622929F4484300A88050 /* CoreData */,
 				FAB3623229F4510D00A88050 /* Base */,
+				FAB3624129F453A400A88050 /* Services */,
 			);
 			path = DataLayer;
 			sourceTree = "<group>";
@@ -196,6 +208,49 @@
 				FAB3623729F4514B00A88050 /* APIError.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		FAB3624129F453A400A88050 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				FAB3624229F453BB00A88050 /* Models */,
+				FAB3624929F453FC00A88050 /* CoinScannerService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		FAB3624229F453BB00A88050 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				FAB3624329F453C700A88050 /* Coin.swift */,
+				FAB3624629F453DD00A88050 /* CoinSearchResult.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		FAB3624C29F4544100A88050 /* DataLayer */ = {
+			isa = PBXGroup;
+			children = (
+				FAB3624E29F4546100A88050 /* Mocks */,
+				FAB3625129F4548300A88050 /* Services */,
+			);
+			path = DataLayer;
+			sourceTree = "<group>";
+		};
+		FAB3624E29F4546100A88050 /* Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				FAB3624F29F4547100A88050 /* HTTPClientMock.swift */,
+			);
+			path = Mocks;
+			sourceTree = "<group>";
+		};
+		FAB3625129F4548300A88050 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				FAB3625229F4549800A88050 /* CoinScannerServiceTests.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -297,13 +352,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FAB3624429F453C700A88050 /* Coin.swift in Sources */,
 				FAB361FC29F447DB00A88050 /* WenMoon.xcdatamodeld in Sources */,
 				FAB361F729F447DB00A88050 /* WenMoonApp.swift in Sources */,
+				FAB3624729F453DD00A88050 /* CoinSearchResult.swift in Sources */,
 				FAB3623629F4513B00A88050 /* HTTPRequest.swift in Sources */,
 				FAB3623A29F4515C00A88050 /* HTTPClient.swift in Sources */,
 				FAB361FE29F447DB00A88050 /* ContentView.swift in Sources */,
 				FAB361F929F447DB00A88050 /* Persistence.swift in Sources */,
 				FAB3623829F4514B00A88050 /* APIError.swift in Sources */,
+				FAB3624A29F453FC00A88050 /* CoinScannerService.swift in Sources */,
 				FAB3623C29F4517800A88050 /* BaseBackendService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -312,11 +370,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FAB3620E29F447DC00A88050 /* WenMoonTests.swift in Sources */,
+				FAB3624529F453C700A88050 /* Coin.swift in Sources */,
+				FAB3625329F4549800A88050 /* CoinScannerServiceTests.swift in Sources */,
 				FAB3623F29F451E200A88050 /* HTTPRequest.swift in Sources */,
 				FAB3623D29F451D700A88050 /* BaseBackendService.swift in Sources */,
 				FAB3624029F451E400A88050 /* APIError.swift in Sources */,
 				FAB3623E29F451DB00A88050 /* HTTPClient.swift in Sources */,
+				FAB3624829F453DD00A88050 /* CoinSearchResult.swift in Sources */,
+				FAB3624B29F453FC00A88050 /* CoinScannerService.swift in Sources */,
+				FAB3625029F4547100A88050 /* HTTPClientMock.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
