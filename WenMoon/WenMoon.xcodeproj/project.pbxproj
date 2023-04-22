@@ -13,6 +13,14 @@
 		FAB361FE29F447DB00A88050 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB361FD29F447DB00A88050 /* ContentView.swift */; };
 		FAB3620029F447DC00A88050 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FAB361FF29F447DC00A88050 /* Assets.xcassets */; };
 		FAB3620E29F447DC00A88050 /* WenMoonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3620D29F447DC00A88050 /* WenMoonTests.swift */; };
+		FAB3623629F4513B00A88050 /* HTTPRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623529F4513B00A88050 /* HTTPRequest.swift */; };
+		FAB3623829F4514B00A88050 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623729F4514B00A88050 /* APIError.swift */; };
+		FAB3623A29F4515C00A88050 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623929F4515C00A88050 /* HTTPClient.swift */; };
+		FAB3623C29F4517800A88050 /* BaseBackendService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623B29F4517800A88050 /* BaseBackendService.swift */; };
+		FAB3623D29F451D700A88050 /* BaseBackendService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623B29F4517800A88050 /* BaseBackendService.swift */; };
+		FAB3623E29F451DB00A88050 /* HTTPClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623929F4515C00A88050 /* HTTPClient.swift */; };
+		FAB3623F29F451E200A88050 /* HTTPRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623529F4513B00A88050 /* HTTPRequest.swift */; };
+		FAB3624029F451E400A88050 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623729F4514B00A88050 /* APIError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +43,10 @@
 		FAB3620129F447DC00A88050 /* WenMoon.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WenMoon.entitlements; sourceTree = "<group>"; };
 		FAB3620929F447DC00A88050 /* WenMoonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WenMoonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FAB3620D29F447DC00A88050 /* WenMoonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WenMoonTests.swift; sourceTree = "<group>"; };
+		FAB3623529F4513B00A88050 /* HTTPRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPRequest.swift; sourceTree = "<group>"; };
+		FAB3623729F4514B00A88050 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
+		FAB3623929F4515C00A88050 /* HTTPClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClient.swift; sourceTree = "<group>"; };
+		FAB3623B29F4517800A88050 /* BaseBackendService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseBackendService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +125,7 @@
 			isa = PBXGroup;
 			children = (
 				FAB3622929F4484300A88050 /* CoreData */,
+				FAB3623229F4510D00A88050 /* Base */,
 			);
 			path = DataLayer;
 			sourceTree = "<group>";
@@ -156,6 +169,33 @@
 				FAB3622D29F4488300A88050 /* Views */,
 			);
 			path = Main;
+			sourceTree = "<group>";
+		};
+		FAB3623229F4510D00A88050 /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				FAB3623329F4512100A88050 /* HTTPClient */,
+				FAB3623B29F4517800A88050 /* BaseBackendService.swift */,
+			);
+			path = Base;
+			sourceTree = "<group>";
+		};
+		FAB3623329F4512100A88050 /* HTTPClient */ = {
+			isa = PBXGroup;
+			children = (
+				FAB3623429F4512900A88050 /* Models */,
+				FAB3623929F4515C00A88050 /* HTTPClient.swift */,
+			);
+			path = HTTPClient;
+			sourceTree = "<group>";
+		};
+		FAB3623429F4512900A88050 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				FAB3623529F4513B00A88050 /* HTTPRequest.swift */,
+				FAB3623729F4514B00A88050 /* APIError.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -259,8 +299,12 @@
 			files = (
 				FAB361FC29F447DB00A88050 /* WenMoon.xcdatamodeld in Sources */,
 				FAB361F729F447DB00A88050 /* WenMoonApp.swift in Sources */,
+				FAB3623629F4513B00A88050 /* HTTPRequest.swift in Sources */,
+				FAB3623A29F4515C00A88050 /* HTTPClient.swift in Sources */,
 				FAB361FE29F447DB00A88050 /* ContentView.swift in Sources */,
 				FAB361F929F447DB00A88050 /* Persistence.swift in Sources */,
+				FAB3623829F4514B00A88050 /* APIError.swift in Sources */,
+				FAB3623C29F4517800A88050 /* BaseBackendService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,6 +313,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				FAB3620E29F447DC00A88050 /* WenMoonTests.swift in Sources */,
+				FAB3623F29F451E200A88050 /* HTTPRequest.swift in Sources */,
+				FAB3623D29F451D700A88050 /* BaseBackendService.swift in Sources */,
+				FAB3624029F451E400A88050 /* APIError.swift in Sources */,
+				FAB3623E29F451DB00A88050 /* HTTPClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
