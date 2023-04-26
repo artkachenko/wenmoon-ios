@@ -61,6 +61,10 @@ final class AddPriceAlertViewModel: ObservableObject {
     }
     
     func searchCoins(by query: String) {
+        guard !query.isEmpty else {
+            fetchCoins()
+            return
+        }
         if query.count % 3 == .zero {
             isLoading = true
             service.searchCoins(by: query)

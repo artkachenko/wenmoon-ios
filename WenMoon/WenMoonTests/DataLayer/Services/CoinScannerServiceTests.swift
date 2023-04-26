@@ -55,10 +55,12 @@ class CoinScannerServiceTests: XCTestCase {
             }, receiveValue: { value in
                 XCTAssertFalse(value.isEmpty)
                 XCTAssertEqual(value.count, 2)
+
                 XCTAssertEqual(value.first?.id, response.first?.id)
                 XCTAssertEqual(value.first?.symbol, response.first?.symbol)
                 XCTAssertEqual(value.first?.name, response.first?.name)
                 XCTAssertEqual(value.first?.image, response.first?.image)
+
                 XCTAssertEqual(value.last?.id, response.last?.id)
                 XCTAssertEqual(value.last?.symbol, response.last?.symbol)
                 XCTAssertEqual(value.last?.name, response.last?.name)
@@ -89,10 +91,12 @@ class CoinScannerServiceTests: XCTestCase {
             }, receiveValue: { value in
                 XCTAssertFalse(value.isEmpty)
                 XCTAssertEqual(value.count, 2)
+
                 XCTAssertEqual(value.first?.id, response.first?.id)
                 XCTAssertEqual(value.first?.symbol, response.first?.symbol)
                 XCTAssertEqual(value.first?.name, response.first?.name)
                 XCTAssertEqual(value.first?.image, response.first?.image)
+
                 XCTAssertEqual(value.last?.id, response.last?.id)
                 XCTAssertEqual(value.last?.symbol, response.last?.symbol)
                 XCTAssertEqual(value.last?.name, response.last?.name)
@@ -123,10 +127,12 @@ class CoinScannerServiceTests: XCTestCase {
             }, receiveValue: { value in
                 XCTAssertFalse(value.coins.isEmpty)
                 XCTAssertEqual(value.coins.count, 2)
+
                 XCTAssertEqual(value.coins.first?.id, response.coins.first?.id)
                 XCTAssertEqual(value.coins.first?.symbol, response.coins.first?.symbol)
                 XCTAssertEqual(value.coins.first?.name, response.coins.first?.name)
                 XCTAssertEqual(value.coins.first?.image, response.coins.first?.image)
+
                 XCTAssertEqual(value.coins.last?.id, response.coins.last?.id)
                 XCTAssertEqual(value.coins.last?.symbol, response.coins.last?.symbol)
                 XCTAssertEqual(value.coins.last?.name, response.coins.last?.name)
@@ -156,6 +162,43 @@ class CoinScannerServiceTests: XCTestCase {
                 }
             }, receiveValue: { value in
                 XCTAssert(value.coins.isEmpty)
+            })
+            .store(in: &cancellables)
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testGetMarketDataForCoinIDs() {
+        let response = ["bitcoin": CoinMarketData(usd: 28345, usd24HChange: 3.82),
+                        "ethereum": CoinMarketData(usd: 1862.09, usd24HChange: 2.60),
+                        "lukso-token": CoinMarketData(usd: 14.49, usd24HChange: 4.78)]
+        do {
+            httpClient.getResponse = .success(try JSONEncoder().encode(response))
+        } catch {
+            XCTFail("Failed to encode response: \(error.localizedDescription)")
+        }
+
+        let expectation = XCTestExpectation(description: "Get market data for coin IDs")
+        service.getMarketData(for: ["bitcoin", "ethereum", "lukso-token"])
+            .sink(receiveCompletion: { result in
+                switch result {
+                case .failure(let error):
+                    XCTFail("Failed to get market data: \(error.errorDescription ?? error.localizedDescription)")
+                case .finished:
+                    expectation.fulfill()
+                }
+            }, receiveValue: { value in
+                XCTAssertFalse(value.isEmpty)
+                XCTAssertEqual(value.count, 3)
+
+                XCTAssertEqual(value["bitcoin"]?.usd, response["bitcoin"]?.usd)
+                XCTAssertEqual(value["bitcoin"]?.usd24HChange, response["bitcoin"]?.usd24HChange)
+
+                XCTAssertEqual(value["ethereum"]?.usd, response["ethereum"]?.usd)
+                XCTAssertEqual(value["ethereum"]?.usd24HChange, response["ethereum"]?.usd24HChange)
+
+                XCTAssertEqual(value["lukso-token"]?.usd, response["lukso-token"]?.usd)
+                XCTAssertEqual(value["lukso-token"]?.usd24HChange, response["lukso-token"]?.usd24HChange)
             })
             .store(in: &cancellables)
 

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FA07AC2629F91120008F6484 /* CoinMarketData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA07AC2529F91120008F6484 /* CoinMarketData.swift */; };
+		FA07AC2729F91120008F6484 /* CoinMarketData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA07AC2529F91120008F6484 /* CoinMarketData.swift */; };
 		FAB361F729F447DB00A88050 /* WenMoonApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB361F629F447DB00A88050 /* WenMoonApp.swift */; };
 		FAB361F929F447DB00A88050 /* PersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB361F829F447DB00A88050 /* PersistenceManager.swift */; };
 		FAB361FC29F447DB00A88050 /* WenMoon.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FAB361FA29F447DB00A88050 /* WenMoon.xcdatamodeld */; };
@@ -57,6 +59,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		FA07AC2529F91120008F6484 /* CoinMarketData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinMarketData.swift; sourceTree = "<group>"; };
 		FAB361F329F447DB00A88050 /* WenMoon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WenMoon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FAB361F629F447DB00A88050 /* WenMoonApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WenMoonApp.swift; sourceTree = "<group>"; };
 		FAB361F829F447DB00A88050 /* PersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManager.swift; sourceTree = "<group>"; };
@@ -253,6 +256,7 @@
 			children = (
 				FAB3624329F453C700A88050 /* Coin.swift */,
 				FAB3624629F453DD00A88050 /* CoinSearchResult.swift */,
+				FA07AC2529F91120008F6484 /* CoinMarketData.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -460,6 +464,7 @@
 			files = (
 				FAB3624429F453C700A88050 /* Coin.swift in Sources */,
 				FAB361FC29F447DB00A88050 /* WenMoon.xcdatamodeld in Sources */,
+				FA07AC2629F91120008F6484 /* CoinMarketData.swift in Sources */,
 				FAB3626529F464BE00A88050 /* PersistenceError.swift in Sources */,
 				FAB361F729F447DB00A88050 /* WenMoonApp.swift in Sources */,
 				FAB3624729F453DD00A88050 /* CoinSearchResult.swift in Sources */,
@@ -484,6 +489,7 @@
 			files = (
 				FAB3624529F453C700A88050 /* Coin.swift in Sources */,
 				FAB3626729F464C200A88050 /* PersistenceManager.swift in Sources */,
+				FA07AC2729F91120008F6484 /* CoinMarketData.swift in Sources */,
 				FAB3625329F4549800A88050 /* CoinScannerServiceTests.swift in Sources */,
 				FAB3623F29F451E200A88050 /* HTTPRequest.swift in Sources */,
 				FAB3625B29F4580C00A88050 /* AddPriceAlertViewModel.swift in Sources */,

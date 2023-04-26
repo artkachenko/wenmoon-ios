@@ -71,10 +71,12 @@ class PriceAlertListViewModelTests: XCTestCase {
 
         XCTAssertFalse(receivedEntities.isEmpty)
         XCTAssertEqual(receivedEntities.count, 2)
+
         XCTAssertEqual(receivedEntities.first?.id, coins.first?.id)
         XCTAssertEqual(receivedEntities.first?.symbol, coins.first?.symbol)
         XCTAssertEqual(receivedEntities.first?.name, coins.first?.name)
         XCTAssertEqual(receivedEntities.first?.image, coins.first?.image)
+
         XCTAssertEqual(receivedEntities.last?.id, coins.last?.id)
         XCTAssertEqual(receivedEntities.last?.symbol, coins.last?.symbol)
         XCTAssertEqual(receivedEntities.last?.name, coins.last?.name)
@@ -104,6 +106,7 @@ class PriceAlertListViewModelTests: XCTestCase {
 
         XCTAssertFalse(receivedEntities.isEmpty)
         XCTAssertEqual(receivedEntities.count, 1)
+        
         XCTAssertEqual(receivedEntities.first?.id, coin.id)
         XCTAssertEqual(receivedEntities.first?.symbol, coin.symbol)
         XCTAssertEqual(receivedEntities.first?.name, coin.name)

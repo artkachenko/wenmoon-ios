@@ -13,6 +13,7 @@ class CoinScannerServiceMock: CoinScannerService {
 
     var getCoinsAtPageResult: Result<[Coin], APIError>!
     var searchCoinsByQueryResult: Result<CoinSearchResult, APIError>!
+    var getMarketDataForCoinIDsResult: Result<[String: CoinMarketData], APIError>!
 
     func getCoins(at page: Int) -> AnyPublisher<[Coin], APIError> {
         Future { [weak self] promise in
@@ -37,6 +38,20 @@ class CoinScannerServiceMock: CoinScannerService {
                 promise(.failure(error))
             case .none:
                 XCTFail("searchCoinsByQueryResult not set")
+            }
+        }
+        .eraseToAnyPublisher()
+    }
+
+    func getMarketData(for coinIDs: [String]) -> AnyPublisher<[String: CoinMarketData], APIError> {
+        Future { [weak self] promise in
+            switch self?.getMarketDataForCoinIDsResult {
+            case .success(let marketData):
+                promise(.success(marketData))
+            case .failure(let error):
+                promise(.failure(error))
+            case .none:
+                XCTFail("getMarketDataForCoinIDsResult not set")
             }
         }
         .eraseToAnyPublisher()

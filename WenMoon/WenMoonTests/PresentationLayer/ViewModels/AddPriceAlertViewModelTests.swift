@@ -43,12 +43,14 @@ class AddPriceAlertViewModelTests: XCTestCase {
         viewModel.$coins
             .dropFirst()
             .sink { coins in
-                XCTAssert(!coins.isEmpty)
+                XCTAssertFalse(coins.isEmpty)
                 XCTAssertEqual(coins.count, 2)
+
                 XCTAssertEqual(coins.first?.id, response.first?.id)
                 XCTAssertEqual(coins.first?.symbol, response.first?.symbol)
                 XCTAssertEqual(coins.first?.name, response.first?.name)
                 XCTAssertEqual(coins.first?.image, response.first?.image)
+
                 XCTAssertEqual(coins.last?.id, response.last?.id)
                 XCTAssertEqual(coins.last?.symbol, response.last?.symbol)
                 XCTAssertEqual(coins.last?.name, response.last?.name)
@@ -74,12 +76,14 @@ class AddPriceAlertViewModelTests: XCTestCase {
         viewModel.$coins
             .dropFirst()
             .sink { coins in
-                XCTAssert(!coins.isEmpty)
+                XCTAssertFalse(coins.isEmpty)
                 XCTAssertEqual(coins.count, 2)
+
                 XCTAssertEqual(coins.first?.id, response.first?.id)
                 XCTAssertEqual(coins.first?.symbol, response.first?.symbol)
                 XCTAssertEqual(coins.first?.name, response.first?.name)
                 XCTAssertEqual(coins.first?.image, response.first?.image)
+
                 XCTAssertEqual(coins.last?.id, response.last?.id)
                 XCTAssertEqual(coins.last?.symbol, response.last?.symbol)
                 XCTAssertEqual(coins.last?.name, response.last?.name)
@@ -107,10 +111,12 @@ class AddPriceAlertViewModelTests: XCTestCase {
             .sink { coins in
                 XCTAssertFalse(coins.isEmpty)
                 XCTAssertEqual(coins.count, 2)
+
                 XCTAssertEqual(coins.first?.id, response.coins.first?.id)
                 XCTAssertEqual(coins.first?.symbol, response.coins.first?.symbol)
                 XCTAssertEqual(coins.first?.name, response.coins.first?.name)
                 XCTAssertEqual(coins.first?.image, response.coins.first?.image)
+                
                 XCTAssertEqual(coins.last?.id, response.coins.last?.id)
                 XCTAssertEqual(coins.last?.symbol, response.coins.last?.symbol)
                 XCTAssertEqual(coins.last?.name, response.coins.last?.name)
