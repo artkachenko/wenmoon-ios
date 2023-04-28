@@ -18,6 +18,8 @@ final class PriceAlertListViewModel: ObservableObject {
 
     private let service: CoinScannerService
     private let persistence: PersistenceManager
+
+    private var timer: Timer?
     private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initializers
@@ -40,6 +42,12 @@ final class PriceAlertListViewModel: ObservableObject {
 
     func fetchMarketData(for coins: [Coin]) {
         let coinIDs = coins.map { $0.id }
+        let existingMarketData = coinIDs.compactMap { marketData[$0] }
+
+        if existingMarketData.count == coins.count {
+            return
+        }
+
         service.getMarketData(for: coinIDs)
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completion in
@@ -49,8 +57,9 @@ final class PriceAlertListViewModel: ObservableObject {
                 case .finished: break
                 }
             }, receiveValue: { [weak self] marketData in
-                self?.marketData = marketData
+                self?.marketData.merge(marketData, uniquingKeysWith: { $1 })
                 self?.savePriceAlerts(coins, marketData)
+                self?.scheduleClearCache()
             })
             .store(in: &cancellables)
     }
@@ -133,6 +142,16 @@ final class PriceAlertListViewModel: ObservableObject {
             }.resume()
         } else {
             errorMessage = "Invalid image URL for \(coin.name)"
+        }
+    }
+
+    private func scheduleClearCache() {
+        if timer == nil {
+            timer = Timer.scheduledTimer(withTimeInterval: 20, repeats: false) { [weak self] _ in
+                self?.marketData.removeAll()
+                self?.timer?.invalidate()
+                self?.timer = nil
+            }
         }
     }
 }

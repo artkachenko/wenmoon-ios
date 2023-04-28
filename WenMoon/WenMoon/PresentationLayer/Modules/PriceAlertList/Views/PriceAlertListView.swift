@@ -10,14 +10,15 @@ import CoreData
 
 struct PriceAlertListView: View {
 
-    @StateObject private var viewModel = PriceAlertListViewModel()
+    @StateObject private var priceAlertListViewModel = PriceAlertListViewModel()
+    @StateObject private var addPriceAlertViewModel = AddPriceAlertViewModel()
 
     @State private var showAddPriceAlertView = false
     @State private var showErrorAlert = false
 
     var body: some View {
         NavigationView {
-            List(viewModel.priceAlerts, id: \.self) { priceAlert in
+            List(priceAlertListViewModel.priceAlerts, id: \.self) { priceAlert in
                 HStack(spacing: 16) {
                     if let uiImage = UIImage(data: priceAlert.imageData) {
                         Image(uiImage: uiImage)
@@ -43,7 +44,7 @@ struct PriceAlertListView: View {
                 }
                 .swipeActions {
                     Button(role: .destructive) {
-                        viewModel.delete(priceAlert)
+                        priceAlertListViewModel.delete(priceAlert)
                     } label: {
                         Image(systemName: "trash")
                     }
@@ -51,7 +52,7 @@ struct PriceAlertListView: View {
             }
             .navigationTitle("Price Alerts")
             .refreshable {
-                viewModel.fetchPriceAlerts()
+                priceAlertListViewModel.fetchPriceAlerts()
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -62,19 +63,20 @@ struct PriceAlertListView: View {
                     }
                 }
             }
-            .onChange(of: viewModel.errorMessage) { errorMessage in
+            .onChange(of: priceAlertListViewModel.errorMessage) { errorMessage in
                 showErrorAlert = errorMessage != nil
             }
-            .alert(viewModel.errorMessage ?? "", isPresented: $showErrorAlert) {
+            .alert(priceAlertListViewModel.errorMessage ?? "", isPresented: $showErrorAlert) {
                 Button("OK", role: .cancel) { }
             }
             .sheet(isPresented: $showAddPriceAlertView) {
                 AddPriceAlertView { selectedCoin in
-                    viewModel.fetchMarketData(for: [selectedCoin])
+                    priceAlertListViewModel.fetchMarketData(for: [selectedCoin])
                 }
+                .environmentObject(addPriceAlertViewModel)
             }
             .onAppear {
-                viewModel.fetchPriceAlerts()
+                priceAlertListViewModel.fetchPriceAlerts()
             }
         }
     }
