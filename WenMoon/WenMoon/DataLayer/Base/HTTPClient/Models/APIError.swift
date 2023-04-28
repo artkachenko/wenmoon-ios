@@ -7,13 +7,13 @@
 
 import Foundation
 
-enum APIError: LocalizedError, Equatable {
+public enum APIError: LocalizedError, Equatable {
     case apiError(error: URLError?, description: String)
     case invalidEndpoint(endpoint: String)
     case noNetworkConnection
     case unknown(response: URLResponse)
 
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case let .apiError(_, description):
             return description

@@ -36,7 +36,7 @@ class CoinScannerServiceTests: XCTestCase {
     // MARK: - Tests
 
     func testGetCoinsAtFirstPageSuccess() {
-        let response = Coin.Page.first.mock
+        let response: [Coin] = [.btc, .eth]
         do {
             httpClient.getResponse = .success(try JSONEncoder().encode(response))
         } catch {
@@ -54,15 +54,13 @@ class CoinScannerServiceTests: XCTestCase {
                 }
             }, receiveValue: { value in
                 XCTAssertFalse(value.isEmpty)
-                XCTAssertEqual(value.count, 2)
+                XCTAssertEqual(value.count, response.count)
 
                 XCTAssertEqual(value.first?.id, response.first?.id)
-                XCTAssertEqual(value.first?.symbol, response.first?.symbol)
                 XCTAssertEqual(value.first?.name, response.first?.name)
                 XCTAssertEqual(value.first?.image, response.first?.image)
 
                 XCTAssertEqual(value.last?.id, response.last?.id)
-                XCTAssertEqual(value.last?.symbol, response.last?.symbol)
                 XCTAssertEqual(value.last?.name, response.last?.name)
                 XCTAssertEqual(value.last?.image, response.last?.image)
             })
@@ -72,7 +70,7 @@ class CoinScannerServiceTests: XCTestCase {
     }
 
     func testGetCoinsAtSecondPageSuccess() {
-        let response = Coin.Page.second.mock
+        let response: [Coin] = [.bnb, .lyxe]
         do {
             httpClient.getResponse = .success(try JSONEncoder().encode(response))
         } catch {
@@ -90,18 +88,38 @@ class CoinScannerServiceTests: XCTestCase {
                 }
             }, receiveValue: { value in
                 XCTAssertFalse(value.isEmpty)
-                XCTAssertEqual(value.count, 2)
+                XCTAssertEqual(value.count, response.count)
 
                 XCTAssertEqual(value.first?.id, response.first?.id)
-                XCTAssertEqual(value.first?.symbol, response.first?.symbol)
                 XCTAssertEqual(value.first?.name, response.first?.name)
                 XCTAssertEqual(value.first?.image, response.first?.image)
 
                 XCTAssertEqual(value.last?.id, response.last?.id)
-                XCTAssertEqual(value.last?.symbol, response.last?.symbol)
                 XCTAssertEqual(value.last?.name, response.last?.name)
                 XCTAssertEqual(value.last?.image, response.last?.image)
             })
+            .store(in: &cancellables)
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testGetCoinsAtPageFailure() {
+        let apiError: APIError = .apiError(error: .init(.badServerResponse),
+                                           description: "Mocked API error description")
+        httpClient.getResponse = .failure(apiError)
+
+        let expectation = XCTestExpectation(description: "Get a failure with API error")
+        service.getCoins(at: 1)
+            .sink(receiveCompletion: { result in
+                switch result {
+                case .failure(let error):
+                    XCTAssertNotNil(error)
+                    XCTAssertEqual(error, apiError)
+                    expectation.fulfill()
+                case .finished:
+                    XCTFail("Expected failure but got success")
+                }
+            }, receiveValue: { _ in })
             .store(in: &cancellables)
 
         wait(for: [expectation], timeout: 1)
@@ -126,15 +144,13 @@ class CoinScannerServiceTests: XCTestCase {
                 }
             }, receiveValue: { value in
                 XCTAssertFalse(value.coins.isEmpty)
-                XCTAssertEqual(value.coins.count, 2)
+                XCTAssertEqual(value.coins.count, response.coins.count)
 
                 XCTAssertEqual(value.coins.first?.id, response.coins.first?.id)
-                XCTAssertEqual(value.coins.first?.symbol, response.coins.first?.symbol)
                 XCTAssertEqual(value.coins.first?.name, response.coins.first?.name)
                 XCTAssertEqual(value.coins.first?.image, response.coins.first?.image)
 
                 XCTAssertEqual(value.coins.last?.id, response.coins.last?.id)
-                XCTAssertEqual(value.coins.last?.symbol, response.coins.last?.symbol)
                 XCTAssertEqual(value.coins.last?.name, response.coins.last?.name)
                 XCTAssertEqual(value.coins.last?.image, response.coins.last?.image)
             })
@@ -168,50 +184,12 @@ class CoinScannerServiceTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    func testGetMarketDataForCoinIDs() {
-        let response = ["bitcoin": CoinMarketData(usd: 28345, usd24HChange: 3.82),
-                        "ethereum": CoinMarketData(usd: 1862.09, usd24HChange: 2.60),
-                        "lukso-token": CoinMarketData(usd: 14.49, usd24HChange: 4.78)]
-        do {
-            httpClient.getResponse = .success(try JSONEncoder().encode(response))
-        } catch {
-            XCTFail("Failed to encode response: \(error.localizedDescription)")
-        }
-
-        let expectation = XCTestExpectation(description: "Get market data for coin IDs")
-        service.getMarketData(for: ["bitcoin", "ethereum", "lukso-token"])
-            .sink(receiveCompletion: { result in
-                switch result {
-                case .failure(let error):
-                    XCTFail("Failed to get market data: \(error.errorDescription ?? error.localizedDescription)")
-                case .finished:
-                    expectation.fulfill()
-                }
-            }, receiveValue: { value in
-                XCTAssertFalse(value.isEmpty)
-                XCTAssertEqual(value.count, 3)
-
-                XCTAssertEqual(value["bitcoin"]?.usd, response["bitcoin"]?.usd)
-                XCTAssertEqual(value["bitcoin"]?.usd24HChange, response["bitcoin"]?.usd24HChange)
-
-                XCTAssertEqual(value["ethereum"]?.usd, response["ethereum"]?.usd)
-                XCTAssertEqual(value["ethereum"]?.usd24HChange, response["ethereum"]?.usd24HChange)
-
-                XCTAssertEqual(value["lukso-token"]?.usd, response["lukso-token"]?.usd)
-                XCTAssertEqual(value["lukso-token"]?.usd24HChange, response["lukso-token"]?.usd24HChange)
-            })
-            .store(in: &cancellables)
-
-        wait(for: [expectation], timeout: 1)
-    }
-
-    func testGetCoinsAtPageFailure() {
-        let apiError: APIError = .apiError(error: .init(.badServerResponse),
-                                           description: "Mocked API error description")
+    func testSearchCoinsByQueryFailure() {
+        let apiError: APIError = .invalidEndpoint(endpoint: "https://test.com")
         httpClient.getResponse = .failure(apiError)
 
-        let expectation = XCTestExpectation(description: "Get a failure with API error")
-        service.getCoins(at: 1)
+        let expectation = XCTestExpectation(description: "Get a failure with invalid endpoint error")
+        service.searchCoins(by: "bit")
             .sink(receiveCompletion: { result in
                 switch result {
                 case .failure(let error):
@@ -227,12 +205,46 @@ class CoinScannerServiceTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    func testSearchCoinsByQueryFailure() {
-        let apiError: APIError = .invalidEndpoint(endpoint: "https://test.com")
+    func testGetMarketDataForCoinIDsSuccess() {
+        let coinIDs = [Coin.btc.id, Coin.eth.id]
+        let response = CoinMarketData.mock
+        do {
+            httpClient.getResponse = .success(try JSONEncoder().encode(response))
+        } catch {
+            XCTFail("Failed to encode response: \(error.localizedDescription)")
+        }
+
+        let expectation = XCTestExpectation(description: "Get market data for coin IDs")
+        service.getMarketData(for: coinIDs)
+            .sink(receiveCompletion: { result in
+                switch result {
+                case .failure(let error):
+                    XCTFail("Failed to get market data: \(error.errorDescription ?? error.localizedDescription)")
+                case .finished:
+                    expectation.fulfill()
+                }
+            }, receiveValue: { value in
+                XCTAssertFalse(value.isEmpty)
+                XCTAssertEqual(value.count, response.count)
+
+                XCTAssertEqual(value[coinIDs.first!]?.usd, response[coinIDs.first!]?.usd)
+                XCTAssertEqual(value[coinIDs.first!]?.usd24HChange, response[coinIDs.first!]?.usd24HChange)
+
+                XCTAssertEqual(value[coinIDs.last!]?.usd, response[coinIDs.last!]?.usd)
+                XCTAssertEqual(value[coinIDs.last!]?.usd24HChange, response[coinIDs.last!]?.usd24HChange)
+            })
+            .store(in: &cancellables)
+
+        wait(for: [expectation], timeout: 1)
+    }
+
+    func testGetMarketDataForCoinIDsFailure() {
+        let coinIDs = [Coin.btc.id, Coin.eth.id]
+        let apiError: APIError = .noNetworkConnection
         httpClient.getResponse = .failure(apiError)
 
-        let expectation = XCTestExpectation(description: "Get a failure with invalid endpoint error")
-        service.searchCoins(by: "bit")
+        let expectation = XCTestExpectation(description: "Get a failure with no network connection error")
+        service.getMarketData(for: coinIDs)
             .sink(receiveCompletion: { result in
                 switch result {
                 case .failure(let error):

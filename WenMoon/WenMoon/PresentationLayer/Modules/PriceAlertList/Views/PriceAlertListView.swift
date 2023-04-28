@@ -10,48 +10,73 @@ import CoreData
 
 struct PriceAlertListView: View {
 
-    @StateObject private var viewModel = PriceAlertListViewModel()
+    @StateObject private var priceAlertListViewModel = PriceAlertListViewModel()
+    @StateObject private var addPriceAlertViewModel = AddPriceAlertViewModel()
+
+    @State private var showAddPriceAlertView = false
+    @State private var showErrorAlert = false
 
     var body: some View {
         NavigationView {
-            List(viewModel.priceAlerts, id: \.self) { priceAlert in
-                HStack(spacing: 8) {
-                    AsyncImage(url: URL(string: priceAlert.image)) { image in
-                        image
+            List(priceAlertListViewModel.priceAlerts, id: \.self) { priceAlert in
+                HStack(spacing: 16) {
+                    if let uiImage = UIImage(data: priceAlert.imageData) {
+                        Image(uiImage: uiImage)
                             .resizable()
-                            .frame(width: 20, height: 20)
-                    } placeholder: {
-                        ProgressView()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 48, height: 48)
                     }
 
-                    Text("\(priceAlert.name) (\(priceAlert.symbol.uppercased()))")
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(priceAlert.name).font(.headline)
+
+                        HStack(spacing: 4) {
+                            Text("\(priceAlert.currentPrice.formatValue()) $")
+                                .foregroundColor(.gray)
+                                .font(.caption)
+                            Text("\(priceAlert.priceChange.formatValue(shouldShowPrefix: true))%")
+                                .foregroundColor(priceAlert.priceChange.isNegative ? .red : .green)
+                                .font(.caption2)
+                        }
+                    }
+
+                    Spacer()
                 }
                 .swipeActions {
                     Button(role: .destructive) {
-                        viewModel.delete(priceAlert)
+                        priceAlertListViewModel.delete(priceAlert)
                     } label: {
                         Image(systemName: "trash")
                     }
                 }
             }
             .navigationTitle("Price Alerts")
+            .refreshable {
+                priceAlertListViewModel.fetchPriceAlerts()
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink {
-                        AddPriceAlertView { selectedCoin in
-                            viewModel.savePriceAlert(selectedCoin)
-                        }
-                        .navigationBarTitle("Add Price Alert")
+                    Button {
+                        showAddPriceAlertView = true
                     } label: {
                         Image(systemName: "plus")
                     }
                 }
             }
-            .alert(viewModel.errorMessage ?? "", isPresented: $viewModel.showErrorAlert) {
+            .onChange(of: priceAlertListViewModel.errorMessage) { errorMessage in
+                showErrorAlert = errorMessage != nil
+            }
+            .alert(priceAlertListViewModel.errorMessage ?? "", isPresented: $showErrorAlert) {
                 Button("OK", role: .cancel) { }
             }
+            .sheet(isPresented: $showAddPriceAlertView) {
+                AddPriceAlertView { selectedCoin in
+                    priceAlertListViewModel.fetchMarketData(for: [selectedCoin])
+                }
+                .environmentObject(addPriceAlertViewModel)
+            }
             .onAppear {
-                viewModel.fetchPriceAlerts()
+                priceAlertListViewModel.fetchPriceAlerts()
             }
         }
     }

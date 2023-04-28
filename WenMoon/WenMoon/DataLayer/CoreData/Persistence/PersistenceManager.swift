@@ -6,22 +6,62 @@
 //
 
 import CoreData
+import Combine
 
-struct PersistenceManager {
-    static let shared = PersistenceManager()
+protocol PersistenceManager {
+    var context: NSManagedObjectContext { get }
+    var errorPublisher: AnyPublisher<PersistenceError, Never> { get }
+    
+    func fetch<T: NSFetchRequestResult>(_ request: NSFetchRequest<T>) -> [T]?
+    func save()
+    func delete(_ object: NSManagedObject)
+}
 
-    let container: NSPersistentContainer
+final class PersistenceManagerImpl: PersistenceManager {
 
-    private init(inMemory: Bool = false) {
+    private let container: NSPersistentContainer
+    private let errorSubject = PassthroughSubject<PersistenceError, Never>()
+
+    var context: NSManagedObjectContext {
+        container.viewContext
+    }
+
+    var errorPublisher: AnyPublisher<PersistenceError, Never> {
+        errorSubject.eraseToAnyPublisher()
+    }
+
+    init() {
         container = NSPersistentContainer(name: "WenMoon")
-        if inMemory {
-            container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
-        }
-        container.loadPersistentStores(completionHandler: { (_, error) in
+        container.loadPersistentStores(completionHandler: { [weak self] (_, error) in
             if let nsError = error as? NSError {
-                print("Unresolved error \(nsError), \(nsError.userInfo)")
+                self?.errorSubject.send(.failedToLoadPersistentStore(error: nsError))
             }
         })
         container.viewContext.automaticallyMergesChangesFromParent = true
+    }
+
+    func fetch<T: NSFetchRequestResult>(_ request: NSFetchRequest<T>) -> [T]? {
+        do {
+            let result = try context.fetch(request)
+            return result
+        } catch {
+            errorSubject.send(.failedToFetchEntities(error: error as NSError))
+            return nil
+        }
+    }
+
+    func save() {
+        if context.hasChanges {
+            do {
+                try context.save()
+            } catch {
+                errorSubject.send(.failedToSaveEntity(error: error as NSError))
+            }
+        }
+    }
+
+    func delete(_ object: NSManagedObject) {
+        context.delete(object)
+        save()
     }
 }

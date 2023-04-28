@@ -13,62 +13,73 @@ struct AddPriceAlertView: View {
 
     @Environment(\.presentationMode) var presentationMode
 
-    @StateObject private var viewModel = AddPriceAlertViewModel()
+    @EnvironmentObject private var viewModel: AddPriceAlertViewModel
 
     @State private var searchText = ""
+    @State private var showErrorAlert = false
 
     private(set) var didSelectCoin: ((Coin) -> Void)?
 
     // MARK: - Body
 
     var body: some View {
-        ZStack {
-            List(viewModel.coins) { coin in
-                HStack(spacing: 8) {
-                    AsyncImage(url: URL(string: coin.image)) { image in
-                        image
-                            .resizable()
-                            .frame(width: 20, height: 20)
-                    } placeholder: {
-                        ProgressView()
+        NavigationView {
+            ZStack {
+                List(viewModel.coins, id: \.self) { coin in
+                    HStack(spacing: 16) {
+                        AsyncImage(url: URL(string: coin.image)) { image in
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(width: 24, height: 24)
+                        } placeholder: {
+                            ProgressView()
+                        }
+
+                        Text(coin.name).font(.headline)
+
+                        Spacer()
                     }
-
-                    Text("\(coin.name) (\(coin.symbol.uppercased()))")
-
-                    Spacer()
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        didSelectCoin?(coin)
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                    .onAppear {
+                        if searchText.isEmpty && coin.id == viewModel.coins.last?.id {
+                            viewModel.fetchCoinsOnNextPage()
+                        }
+                    }
                 }
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    didSelectCoin?(coin)
-                    presentationMode.wrappedValue.dismiss()
+                .searchable(text: $searchText,
+                            placement: .toolbar,
+                            prompt: "e.g. Bitcoin")
+
+                if viewModel.isLoading {
+                    ProgressView()
                 }
-                .onAppear {
-                    if searchText.isEmpty && coin.id == viewModel.coins.last?.id {
-                        viewModel.fetchCoinsOnNextPage()
+            }
+            .navigationTitle("Add Price Alert")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        presentationMode.wrappedValue.dismiss()
                     }
                 }
             }
-            .refreshable {
-                if searchText.isEmpty {
-                    viewModel.fetchCoins()
-                }
+            .onChange(of: searchText) { query in
+                viewModel.searchCoins(by: query)
             }
-            .searchable(text: $searchText,
-                        placement: .navigationBarDrawer(displayMode: .always),
-                        prompt: "e.g. Bitcoin")
-
-            if viewModel.isLoading {
-                ProgressView()
+            .onChange(of: viewModel.errorMessage) { errorMessage in
+                showErrorAlert = errorMessage != nil
             }
-        }
-        .alert(viewModel.errorMessage ?? "", isPresented: $viewModel.showErrorAlert) {
-            Button("OK", role: .cancel) { }
-        }
-        .onChange(of: searchText) { query in
-            viewModel.searchCoins(by: query)
-        }
-        .onAppear {
-            viewModel.fetchCoins()
+            .alert(viewModel.errorMessage ?? "", isPresented: $showErrorAlert) {
+                Button("OK", role: .cancel) { }
+            }
+            .onAppear {
+                viewModel.fetchCoins()
+            }
         }
     }
 }

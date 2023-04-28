@@ -15,52 +15,119 @@ class PriceAlertListViewModelTests: XCTestCase {
     // MARK: - Properties
 
     var viewModel: PriceAlertListViewModel!
-    var context: NSManagedObjectContext!
+    var service: CoinScannerServiceMock!
+    var persistence: PersistenceManagerMock!
     var cancellables: Set<AnyCancellable>!
 
     // MARK: - Setup
 
     override func setUp() {
         super.setUp()
-        let container = NSPersistentContainer(name: "WenMoon")
-        let description = NSPersistentStoreDescription()
-        description.type = NSInMemoryStoreType
-        container.persistentStoreDescriptions = [description]
-        container.loadPersistentStores { (_, error) in
-            if let error = error {
-                XCTFail("Failed to create in-memory persistent store: \(error.localizedDescription)")
-            }
-        }
-
-        context = container.newBackgroundContext()
-        viewModel = PriceAlertListViewModel(context: context)
+        service = CoinScannerServiceMock()
+        persistence = PersistenceManagerMock()
+        viewModel = PriceAlertListViewModel(service: service, persistence: persistence)
         cancellables = Set<AnyCancellable>()
     }
 
     override func tearDown() {
         viewModel = nil
-        context = nil
+        service = nil
+        persistence = nil
         cancellables = nil
         super.tearDown()
     }
 
     // MARK: - Tests
 
+    func testFetchMarketDataForCoinsSuccess() {
+        let coins: [Coin] = [.btc, .eth]
+        let response = CoinMarketData.mock
+        service.getMarketDataForCoinIDsResult = .success(response)
+
+        let expectation = XCTestExpectation(description: "Fetch market data for coins")
+        viewModel.$marketData
+            .dropFirst()
+            .sink { marketData in
+                XCTAssertFalse(marketData.isEmpty)
+                XCTAssertEqual(marketData.count, coins.count)
+
+                XCTAssertEqual(marketData[coins.first!.id]?.usd, response[coins.first!.id]?.usd)
+                XCTAssertEqual(marketData[coins.first!.id]?.usd24HChange, response[coins.first!.id]?.usd24HChange)
+
+                XCTAssertEqual(marketData[coins.last!.id]?.usd, response[coins.last!.id]?.usd)
+                XCTAssertEqual(marketData[coins.last!.id]?.usd24HChange, response[coins.last!.id]?.usd24HChange)
+
+                expectation.fulfill()
+            }
+            .store(in: &cancellables)
+
+        viewModel.fetchMarketData(for: coins)
+
+        wait(for: [expectation], timeout: 1)
+
+        XCTAssertNil(viewModel.errorMessage)
+    }
+
+    func testFetchMarketDataForCoinsFailure() {
+        let coins: [Coin] = [.btc, .eth]
+        let apiError: APIError = .apiError(error: .init(.badServerResponse), description: "Mocked server error")
+        service.getMarketDataForCoinIDsResult = .failure(apiError)
+
+        let expectation = XCTestExpectation(description: "Get a failure with API error")
+        viewModel.$errorMessage
+            .dropFirst()
+            .sink { errorMessage in
+                XCTAssertNotNil(errorMessage)
+                XCTAssertEqual(errorMessage, apiError.errorDescription)
+                expectation.fulfill()
+            }
+            .store(in: &cancellables)
+
+        viewModel.fetchMarketData(for: coins)
+
+        wait(for: [expectation], timeout: 1)
+    }
+
     func testFetchPriceAlerts() {
-        let coins = Coin.Page.first.mock
-        coins.forEach { _ = PriceAlert(coin: $0, context: context) }
-        do {
-            try context.save()
-        } catch {
-            XCTFail("Failed to save entity: \(error.localizedDescription)")
+        let coins: [Coin] = [.btc, .eth]
+        let marketData = CoinMarketData.mock
+        service.getMarketDataForCoinIDsResult = .success(marketData)
+
+        for coin in coins {
+            let newPriceAlert = PriceAlert(context: persistence.context)
+            newPriceAlert.id = coin.id
+            newPriceAlert.name = coin.name
+            newPriceAlert.image = coin.image
+            newPriceAlert.rank = coin.marketCapRank
+            newPriceAlert.currentPrice = marketData[coin.id]!.usd
+            newPriceAlert.priceChange = marketData[coin.id]!.usd24HChange
+
+            persistence.fetchRequestResult.append(newPriceAlert)
         }
 
-        let expectation = XCTestExpectation(description: "Fetch saved price alerts")
-        var receivedEntities = [AnyObject]()
+        let expectation = XCTestExpectation(description: "Fetch price alerts")
         viewModel.$priceAlerts
             .dropFirst()
             .sink { priceAlerts in
-                receivedEntities = priceAlerts
+                XCTAssertFalse(priceAlerts.isEmpty)
+                XCTAssertEqual(priceAlerts.count, coins.count)
+
+                XCTAssertEqual(priceAlerts.first?.id, coins.first?.id)
+                XCTAssertEqual(priceAlerts.first?.name, coins.first?.name)
+                XCTAssertEqual(priceAlerts.first?.image, coins.first?.image)
+                XCTAssertEqual(priceAlerts.first?.rank, coins.first?.marketCapRank)
+                XCTAssertEqual(priceAlerts.first?.currentPrice, marketData[coins.first!.id]?.usd)
+                XCTAssertEqual(priceAlerts.first?.priceChange, marketData[coins.first!.id]?.usd24HChange)
+                XCTAssertNotNil(priceAlerts.first?.imageData)
+
+                XCTAssertEqual(priceAlerts.last?.id, coins.last?.id)
+                XCTAssertEqual(priceAlerts.last?.name, coins.last?.name)
+                XCTAssertEqual(priceAlerts.last?.image, coins.last?.image)
+                XCTAssertEqual(priceAlerts.last?.rank, coins.last?.marketCapRank)
+                XCTAssertEqual(priceAlerts.last?.currentPrice, marketData[coins.last!.id]?.usd)
+                XCTAssertEqual(priceAlerts.last?.priceChange, marketData[coins.last!.id]?.usd24HChange)
+                XCTAssertNotNil(priceAlerts.last?.imageData)
+
                 expectation.fulfill()
             }
             .store(in: &cancellables)
@@ -69,68 +136,28 @@ class PriceAlertListViewModelTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1)
 
-        XCTAssertFalse(receivedEntities.isEmpty)
-        XCTAssertEqual(receivedEntities.count, 2)
-
-        XCTAssertEqual(receivedEntities.first?.id, coins.first?.id)
-        XCTAssertEqual(receivedEntities.first?.symbol, coins.first?.symbol)
-        XCTAssertEqual(receivedEntities.first?.name, coins.first?.name)
-        XCTAssertEqual(receivedEntities.first?.image, coins.first?.image)
-
-        XCTAssertEqual(receivedEntities.last?.id, coins.last?.id)
-        XCTAssertEqual(receivedEntities.last?.symbol, coins.last?.symbol)
-        XCTAssertEqual(receivedEntities.last?.name, coins.last?.name)
-        XCTAssertEqual(receivedEntities.last?.image, coins.last?.image)
-
+        XCTAssert(persistence.fetchMethodCalled)
         XCTAssertNil(viewModel.errorMessage)
-        XCTAssertFalse(viewModel.showErrorAlert)
     }
 
-    func testSavePriceAlert() {
-        let coin = Coin.mock
-        viewModel.savePriceAlert(coin)
+    func testFetchPriceAlertsEmptyResult() {
+        let coins: [Coin] = []
+        let marketData = CoinMarketData.mock
+        service.getMarketDataForCoinIDsResult = .success(marketData)
 
-        let expectation = XCTestExpectation(description: "Save price alert")
-        var receivedEntities = [AnyObject]()
-        viewModel.$priceAlerts
-            .dropFirst()
-            .sink { priceAlerts in
-                receivedEntities = priceAlerts
-                expectation.fulfill()
-            }
-            .store(in: &cancellables)
+        for coin in coins {
+            let newPriceAlert = PriceAlert(context: persistence.context)
+            newPriceAlert.id = coin.id
+            newPriceAlert.name = coin.name
+            newPriceAlert.image = coin.image
+            newPriceAlert.rank = coin.marketCapRank
+            newPriceAlert.currentPrice = marketData[coin.id]!.usd
+            newPriceAlert.priceChange = marketData[coin.id]!.usd24HChange
 
-        viewModel.fetchPriceAlerts()
-
-        wait(for: [expectation], timeout: 1)
-
-        XCTAssertFalse(receivedEntities.isEmpty)
-        XCTAssertEqual(receivedEntities.count, 1)
-        
-        XCTAssertEqual(receivedEntities.first?.id, coin.id)
-        XCTAssertEqual(receivedEntities.first?.symbol, coin.symbol)
-        XCTAssertEqual(receivedEntities.first?.name, coin.name)
-        XCTAssertEqual(receivedEntities.first?.image, coin.image)
-
-        XCTAssertNil(viewModel.errorMessage)
-        XCTAssertFalse(viewModel.showErrorAlert)
-    }
-
-
-    func testDeletePriceAlert() {
-        let coin = Coin.mock
-        let priceAlert = PriceAlert(coin: coin, context: context)
-        do {
-            try context.save()
-        } catch {
-            XCTFail("Failed to save entity: \(error.localizedDescription)")
+            persistence.fetchRequestResult.append(newPriceAlert)
         }
 
-        XCTAssertNotNil(priceAlert.objectID.isTemporaryID)
-
-        viewModel.delete(priceAlert)
-
-        let expectation = XCTestExpectation(description: "Delete price alert")
+        let expectation = XCTestExpectation(description: "Fetch empty price alerts")
         viewModel.$priceAlerts
             .dropFirst()
             .sink { priceAlerts in
@@ -142,18 +169,67 @@ class PriceAlertListViewModelTests: XCTestCase {
         viewModel.fetchPriceAlerts()
 
         wait(for: [expectation], timeout: 1)
-
-        XCTAssertNil(viewModel.errorMessage)
-        XCTAssertFalse(viewModel.showErrorAlert)
     }
 
-    func testErrorConfiguration() {
-        let nsError = NSError(domain: "com.test.error", code: 123)
-        let error: PersistenceError = .failedToSaveEntity(error: nsError)
+    func testSavePriceAlerts() {
+        let coins: [Coin] = [.btc, .eth]
+        let marketData = CoinMarketData.mock
 
-        viewModel.configureError(error)
+        let expectation = XCTestExpectation(description: "Save price alerts")
+        viewModel.$priceAlerts
+            .dropFirst(3)
+            .sink { priceAlerts in
+                XCTAssertFalse(priceAlerts.isEmpty)
+                XCTAssertEqual(priceAlerts.count, coins.count)
 
-        XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
-        XCTAssertTrue(viewModel.showErrorAlert)
+                XCTAssertEqual(priceAlerts.first?.id, coins.first?.id)
+                XCTAssertEqual(priceAlerts.first?.name, coins.first?.name)
+                XCTAssertEqual(priceAlerts.first?.image, coins.first?.image)
+                XCTAssertEqual(priceAlerts.first?.rank, coins.first?.marketCapRank)
+                XCTAssertEqual(priceAlerts.first?.currentPrice, marketData[coins.first!.id]?.usd)
+                XCTAssertEqual(priceAlerts.first?.priceChange, marketData[coins.first!.id]?.usd24HChange)
+                XCTAssertNotNil(priceAlerts.first?.imageData)
+
+                XCTAssertEqual(priceAlerts.last?.id, coins.last?.id)
+                XCTAssertEqual(priceAlerts.last?.name, coins.last?.name)
+                XCTAssertEqual(priceAlerts.last?.image, coins.last?.image)
+                XCTAssertEqual(priceAlerts.last?.rank, coins.last?.marketCapRank)
+                XCTAssertEqual(priceAlerts.last?.currentPrice, marketData[coins.last!.id]?.usd)
+                XCTAssertEqual(priceAlerts.last?.priceChange, marketData[coins.last!.id]?.usd24HChange)
+                XCTAssertNotNil(priceAlerts.last?.imageData)
+
+                expectation.fulfill()
+            }
+            .store(in: &cancellables)
+
+        viewModel.savePriceAlerts(coins, marketData)
+
+        wait(for: [expectation], timeout: 1)
+
+        XCTAssert(persistence.saveMethodCalled)
+        XCTAssertNil(viewModel.errorMessage)
+    }
+
+    func testDeletePriceAlert() {
+        let coin = Coin.btc
+        let marketData = CoinMarketData.mock
+
+        let priceAlert = PriceAlert(context: persistence.context)
+        priceAlert.id = coin.id
+        priceAlert.name = coin.name
+        priceAlert.image = coin.image
+        priceAlert.currentPrice = marketData[coin.id]!.usd
+        priceAlert.priceChange = marketData[coin.id]!.usd24HChange
+
+        persistence.save()
+
+        XCTAssert(persistence.saveMethodCalled)
+
+        viewModel.delete(priceAlert)
+
+        XCTAssert(persistence.deleteMethodCalled)
+        XCTAssertEqual(persistence.deletedObject, priceAlert)
+
+        XCTAssertNil(viewModel.errorMessage)
     }
 }

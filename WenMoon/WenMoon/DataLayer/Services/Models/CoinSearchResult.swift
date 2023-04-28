@@ -14,13 +14,6 @@ struct CoinSearchResult: Codable {
 // MARK: - Mocks
 
 extension CoinSearchResult {
-    static let mock = CoinSearchResult(coins: [Coin(id: "bitcoin",
-                                                    symbol: "btc",
-                                                    name: "Bitcoin",
-                                                    image: "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579"),
-                                               Coin(id: "ethereum",
-                                                    symbol: "eth",
-                                                    name: "Ethereum",
-                                                    image: "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880")])
+    static let mock = CoinSearchResult(coins: [.btc, .eth])
     static let emptyMock = CoinSearchResult(coins: [])
 }
