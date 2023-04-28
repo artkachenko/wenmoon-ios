@@ -15,6 +15,7 @@ final class PriceAlertListViewModel: ObservableObject {
     @Published private(set) var priceAlerts: [PriceAlert] = []
     @Published private(set) var marketData: [String: CoinMarketData] = [:]
     @Published private(set) var errorMessage: String?
+    @Published private(set) var isLoading = false
 
     private let service: CoinScannerService
     private let persistence: PersistenceManager
@@ -48,9 +49,11 @@ final class PriceAlertListViewModel: ObservableObject {
             return
         }
 
+        isLoading = true
         service.getMarketData(for: coinIDs)
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completion in
+                self?.isLoading = false
                 switch completion {
                 case .failure(let error):
                     self?.errorMessage = error.errorDescription
