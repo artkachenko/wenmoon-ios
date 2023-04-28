@@ -13,7 +13,7 @@ struct AddPriceAlertView: View {
 
     @Environment(\.presentationMode) var presentationMode
 
-    @EnvironmentObject private var viewModel: AddPriceAlertViewModel
+    @StateObject private var viewModel = AddPriceAlertViewModel()
 
     @State private var searchText = ""
     @State private var showErrorAlert = false
