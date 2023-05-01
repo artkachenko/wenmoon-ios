@@ -18,47 +18,41 @@ struct PriceAlertListView: View {
 
     var body: some View {
         NavigationView {
-            ZStack {
-                List(priceAlertListViewModel.priceAlerts, id: \.self) { priceAlert in
-                    HStack(spacing: 16) {
-                        if let uiImage = UIImage(data: priceAlert.imageData) {
-                            Image(uiImage: uiImage)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(width: 48, height: 48)
-                        }
-
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(priceAlert.name).font(.headline)
-
-                            HStack(spacing: 4) {
-                                Text("\(priceAlert.currentPrice.formatValue()) $")
-                                    .foregroundColor(.gray)
-                                    .font(.caption)
-                                Text("\(priceAlert.priceChange.formatValue(shouldShowPrefix: true))%")
-                                    .foregroundColor(priceAlert.priceChange.isNegative ? .red : .green)
-                                    .font(.caption2)
-                            }
-                        }
-
-                        Spacer()
+            List(priceAlertListViewModel.priceAlerts, id: \.self) { priceAlert in
+                HStack(spacing: 16) {
+                    if let uiImage = UIImage(data: priceAlert.imageData) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 48, height: 48)
                     }
-                    .swipeActions {
-                        Button(role: .destructive) {
-                            priceAlertListViewModel.delete(priceAlert)
-                        } label: {
-                            Image(systemName: "trash")
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(priceAlert.name).font(.headline)
+
+                        HStack(spacing: 4) {
+                            Text("\(priceAlert.currentPrice.formatValue()) $")
+                                .foregroundColor(.gray)
+                                .font(.caption)
+                            Text("\(priceAlert.priceChange.formatValue(shouldShowPrefix: true))%")
+                                .foregroundColor(priceAlert.priceChange.isNegative ? .red : .green)
+                                .font(.caption2)
                         }
                     }
-                }
-                .navigationTitle("Price Alerts")
-                .refreshable {
-                    priceAlertListViewModel.fetchPriceAlerts()
-                }
 
-                if priceAlertListViewModel.isLoading {
-                    ProgressView()
+                    Spacer()
                 }
+                .swipeActions {
+                    Button(role: .destructive) {
+                        priceAlertListViewModel.delete(priceAlert)
+                    } label: {
+                        Image(systemName: "trash")
+                    }
+                }
+            }
+            .navigationTitle("Price Alerts")
+            .refreshable {
+                priceAlertListViewModel.fetchPriceAlerts()
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {

@@ -61,6 +61,7 @@ class AddPriceAlertViewModelTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1)
 
+        XCTAssertFalse(viewModel.isLoading)
         XCTAssertNil(viewModel.errorMessage)
     }
 
@@ -81,6 +82,8 @@ class AddPriceAlertViewModelTests: XCTestCase {
         viewModel.fetchCoins()
 
         wait(for: [expectation], timeout: 1)
+
+        XCTAssertFalse(viewModel.isLoading)
     }
 
     func testFetchCoinsOnNextPageSuccess() {
@@ -109,6 +112,7 @@ class AddPriceAlertViewModelTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1)
 
+        XCTAssertFalse(viewModel.isLoading)
         XCTAssertNil(viewModel.errorMessage)
     }
 
@@ -129,6 +133,8 @@ class AddPriceAlertViewModelTests: XCTestCase {
         viewModel.fetchCoinsOnNextPage()
 
         wait(for: [expectation], timeout: 1)
+
+        XCTAssertFalse(viewModel.isLoading)
     }
 
     func testSearchCoinByQuerySuccess() {
@@ -157,6 +163,7 @@ class AddPriceAlertViewModelTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1)
 
+        XCTAssertFalse(viewModel.isLoading)
         XCTAssertNil(viewModel.errorMessage)
     }
 
@@ -176,6 +183,7 @@ class AddPriceAlertViewModelTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1)
 
+        XCTAssertFalse(viewModel.isLoading)
         XCTAssertNil(viewModel.errorMessage)
     }
 
@@ -196,5 +204,7 @@ class AddPriceAlertViewModelTests: XCTestCase {
         viewModel.searchCoins(by: "bit")
 
         wait(for: [expectation], timeout: 1)
+
+        XCTAssertFalse(viewModel.isLoading)
     }
 }
