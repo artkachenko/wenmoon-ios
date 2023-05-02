@@ -55,6 +55,7 @@ struct AddPriceAlertView: View {
                 .searchable(text: $searchText,
                             placement: .toolbar,
                             prompt: "e.g. Bitcoin")
+                .scrollDismissesKeyboard(.immediately)
 
                 if viewModel.isLoading {
                     ProgressView()
