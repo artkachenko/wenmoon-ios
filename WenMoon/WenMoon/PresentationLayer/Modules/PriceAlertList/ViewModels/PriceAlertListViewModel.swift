@@ -40,6 +40,19 @@ final class PriceAlertListViewModel: ObservableObject {
 
     // MARK: - Methods
 
+    func fetchPriceAlerts() {
+        let sortDescriptors = [NSSortDescriptor(keyPath: \PriceAlert.rank, ascending: true)]
+        let request = PriceAlert.fetchRequest(sortDescriptors: sortDescriptors)
+        if let priceAlerts = persistence.fetch(request) {
+            self.priceAlerts = priceAlerts
+        }
+
+        if !priceAlerts.isEmpty {
+            let coins = priceAlerts.map { Coin(priceAlert: $0) }
+            fetchMarketData(for: coins)
+        }
+    }
+
     func fetchMarketData(for coins: [Coin]) {
         let coinIDs = coins.map { $0.id }
         let existingMarketData = coinIDs.compactMap { marketData[$0] }
@@ -64,19 +77,6 @@ final class PriceAlertListViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    func fetchPriceAlerts() {
-        let sortDescriptors = [NSSortDescriptor(keyPath: \PriceAlert.rank, ascending: true)]
-        let request = PriceAlert.fetchRequest(sortDescriptors: sortDescriptors)
-        if let priceAlerts = persistence.fetch(request) {
-            self.priceAlerts = priceAlerts
-        }
-
-        if !priceAlerts.isEmpty {
-            let coins = priceAlerts.map { Coin(priceAlert: $0) }
-            fetchMarketData(for: coins)
-        }
-    }
-
     func delete(_ priceAlert: PriceAlert) {
         persistence.delete(priceAlert)
         if let index = priceAlerts.firstIndex(of: priceAlert) {
@@ -84,7 +84,7 @@ final class PriceAlertListViewModel: ObservableObject {
         }
     }
 
-    func savePriceAlerts(_ coins: [Coin], _ marketData: [String: CoinMarketData]) {
+    func savePriceAlerts(_ coins: [Coin], _ marketData: [String: CoinMarketData]? = nil) {
         persistence.context.perform { [weak self] in
             let batchSize = 50
             var offset = 0
@@ -96,8 +96,7 @@ final class PriceAlertListViewModel: ObservableObject {
                 let existingPriceAlerts = self?.persistence.fetch(request)
 
                 for coin in batchCoins {
-                    guard let marketData = marketData[coin.id] else { continue }
-
+                    let marketData = marketData?[coin.id]
                     if let existingPriceAlert = existingPriceAlerts?.first(where: { $0.id == coin.id }) {
                         self?.setData(for: existingPriceAlert, with: coin, marketData)
                     } else {
@@ -110,7 +109,7 @@ final class PriceAlertListViewModel: ObservableObject {
         }
     }
 
-    private func createNewPriceAlert(_ coin: Coin, _ marketData: CoinMarketData) {
+    private func createNewPriceAlert(_ coin: Coin, _ marketData: CoinMarketData?) {
         let newPriceAlert = PriceAlert(context: persistence.context)
         setData(for: newPriceAlert, with: coin, marketData) { [weak self] in
             self?.priceAlerts.append(newPriceAlert)
@@ -120,14 +119,19 @@ final class PriceAlertListViewModel: ObservableObject {
 
     private func setData(for priceAlert: PriceAlert,
                          with coin: Coin,
-                         _ marketData: CoinMarketData,
+                         _ marketData: CoinMarketData?,
                          completion: (() -> Void)? = nil) {
         priceAlert.id = coin.id
         priceAlert.name = coin.name
         priceAlert.image = coin.image
-        priceAlert.rank = coin.marketCapRank
-        priceAlert.currentPrice = marketData.usd
-        priceAlert.priceChange = marketData.usd24HChange
+        priceAlert.rank = coin.marketCapRank ?? .max
+        if let marketData {
+            priceAlert.currentPrice = marketData.currentPrice ?? .zero
+            priceAlert.priceChange = marketData.priceChange ?? .zero
+        } else {
+            priceAlert.currentPrice = coin.currentPrice ?? .zero
+            priceAlert.priceChange = coin.priceChangePercentage24H ?? .zero
+        }
 
         if let url = URL(string: coin.image) {
             URLSession.shared.dataTask(with: url) { [weak self] (imageData, _, error) in

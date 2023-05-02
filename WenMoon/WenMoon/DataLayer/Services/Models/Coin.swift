@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Coin: Codable, Identifiable, Hashable {
+struct Coin: Codable {
 
     struct Image: Codable {
         let large: String
@@ -16,17 +16,26 @@ struct Coin: Codable, Identifiable, Hashable {
     var id: String
     var name: String
     var image: String
-    var marketCapRank: Int16
+    var marketCapRank: Int16?
+    var currentPrice: Double?
+    var priceChangePercentage24H: Double?
 
-    enum CodingKeys: String, CodingKey {
-        case id, name, image, large, marketCapRank
+    private enum CodingKeys: String, CodingKey {
+        case id, name, image, large, marketCapRank, currentPrice, priceChangePercentage24H
     }
 
-    init(id: String, name: String, image: String, marketCapRank: Int16) {
+    init(id: String,
+         name: String,
+         image: String,
+         marketCapRank: Int16?,
+         currentPrice: Double?,
+         priceChangePercentage24H: Double?) {
         self.id = id
         self.name = name
         self.image = image
         self.marketCapRank = marketCapRank
+        self.currentPrice = currentPrice
+        self.priceChangePercentage24H = priceChangePercentage24H
     }
 
     init(priceAlert: PriceAlert) {
@@ -34,13 +43,17 @@ struct Coin: Codable, Identifiable, Hashable {
         name = priceAlert.name
         image = priceAlert.image
         marketCapRank = priceAlert.rank
+        currentPrice = priceAlert.currentPrice
+        priceChangePercentage24H = priceAlert.priceChange
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
-        marketCapRank = try container.decode(Int16.self, forKey: .marketCapRank)
+        marketCapRank = try? container.decodeIfPresent(Int16.self, forKey: .marketCapRank)
+        currentPrice = try? container.decodeIfPresent(Double.self, forKey: .currentPrice)
+        priceChangePercentage24H = try? container.decodeIfPresent(Double.self, forKey: .priceChangePercentage24H)
 
         if let image = try? container.decodeIfPresent(String.self, forKey: .image) {
             self.image = image
@@ -49,7 +62,6 @@ struct Coin: Codable, Identifiable, Hashable {
         } else {
             self.image = try container.decode(String.self, forKey: .large)
         }
-
     }
 
     func encode(to encoder: Encoder) throws {
@@ -58,8 +70,12 @@ struct Coin: Codable, Identifiable, Hashable {
         try container.encode(name, forKey: .name)
         try container.encode(image, forKey: .image)
         try container.encode(marketCapRank, forKey: .marketCapRank)
+        try container.encode(currentPrice, forKey: .currentPrice)
+        try container.encode(priceChangePercentage24H, forKey: .priceChangePercentage24H)
     }
 }
+
+extension Coin: Hashable {}
 
 // MARK: - Mocks
 
@@ -67,17 +83,13 @@ extension Coin {
     static let btc = Coin(id: "bitcoin",
                           name: "Bitcoin",
                           image: "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579",
-                          marketCapRank: 1)
+                          marketCapRank: 1,
+                          currentPrice: 28543,
+                          priceChangePercentage24H: -2.39)
     static let eth = Coin(id: "ethereum",
                           name: "Ethereum",
                           image: "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880",
-                          marketCapRank: 2)
-    static let bnb = Coin(id: "binancecoin",
-                          name: "BNB",
-                          image: "https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png?1644979850",
-                          marketCapRank: 4)
-    static let lyxe = Coin(id: "lukso-token",
-                           name: "LUKSO",
-                           image: "https://assets.coingecko.com/coins/images/11423/thumb/1_QAHTciwVhD7SqVmfRW70Pw.png",
-                           marketCapRank: 173)
+                          marketCapRank: 2,
+                          currentPrice: 1847.33,
+                          priceChangePercentage24H: -3.01)
 }

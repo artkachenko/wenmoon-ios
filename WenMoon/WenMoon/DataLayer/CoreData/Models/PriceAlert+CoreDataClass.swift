@@ -2,7 +2,7 @@
 //  PriceAlert+CoreDataClass.swift
 //  WenMoon
 //
-//  Created by Artur Tkachenko on 27.04.23.
+//  Created by Artur Tkachenko on 01.05.23.
 //
 //
 

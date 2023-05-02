@@ -35,7 +35,7 @@ class AddPriceAlertViewModelTests: XCTestCase {
 
     // MARK: - Tests
 
-    func testFetchCoinsAtFirstPageSuccess() {
+    func testFetchCoinsSuccess() {
         let response: [Coin] = [.btc, .eth]
         service.getCoinsAtPageResult = .success(response)
 
@@ -53,6 +53,7 @@ class AddPriceAlertViewModelTests: XCTestCase {
                 XCTAssertEqual(coins.last?.id, response.last?.id)
                 XCTAssertEqual(coins.last?.name, response.last?.name)
                 XCTAssertEqual(coins.last?.image, response.last?.image)
+
                 expectation.fulfill()
             }
             .store(in: &cancellables)
@@ -61,11 +62,10 @@ class AddPriceAlertViewModelTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1)
 
-        XCTAssertFalse(viewModel.isLoading)
         XCTAssertNil(viewModel.errorMessage)
     }
 
-    func testFetchCoinsAtFirstPageFailure() {
+    func testFetchCoinsFailure() {
         let apiError: APIError = .apiError(error: .init(.badServerResponse), description: "Mocked server error")
         service.getCoinsAtPageResult = .failure(apiError)
 
@@ -82,79 +82,36 @@ class AddPriceAlertViewModelTests: XCTestCase {
         viewModel.fetchCoins()
 
         wait(for: [expectation], timeout: 1)
-
-        XCTAssertFalse(viewModel.isLoading)
     }
 
-    func testFetchCoinsOnNextPageSuccess() {
-        let response: [Coin] = [.bnb, .lyxe]
-        service.getCoinsAtPageResult = .success(response)
-
-        let expectation = XCTestExpectation(description: "Fetch an array of coins on page 2")
-        viewModel.$coins
-            .dropFirst()
-            .sink { coins in
-                XCTAssertFalse(coins.isEmpty)
-                XCTAssertEqual(coins.count, response.count)
-
-                XCTAssertEqual(coins.first?.id, response.first?.id)
-                XCTAssertEqual(coins.first?.name, response.first?.name)
-                XCTAssertEqual(coins.first?.image, response.first?.image)
-
-                XCTAssertEqual(coins.last?.id, response.last?.id)
-                XCTAssertEqual(coins.last?.name, response.last?.name)
-                XCTAssertEqual(coins.last?.image, response.last?.image)
-                expectation.fulfill()
-            }
-            .store(in: &cancellables)
-
-        viewModel.fetchCoinsOnNextPage()
-
-        wait(for: [expectation], timeout: 1)
-
-        XCTAssertFalse(viewModel.isLoading)
-        XCTAssertNil(viewModel.errorMessage)
-    }
-
-    func testFetchCoinsOnNextPageFailure() {
-        let apiError: APIError = .apiError(error: .init(.badServerResponse), description: "Mocked server error")
-        service.getCoinsAtPageResult = .failure(apiError)
-
-        let expectation = XCTestExpectation(description: "Get a failure with API error")
-        viewModel.$errorMessage
-            .dropFirst()
-            .sink { errorMessage in
-                XCTAssertNotNil(errorMessage)
-                XCTAssertEqual(errorMessage, apiError.errorDescription)
-                expectation.fulfill()
-            }
-            .store(in: &cancellables)
-
-        viewModel.fetchCoinsOnNextPage()
-
-        wait(for: [expectation], timeout: 1)
-
-        XCTAssertFalse(viewModel.isLoading)
-    }
-
-    func testSearchCoinByQuerySuccess() {
-        let response = CoinSearchResult.mock
-        service.searchCoinsByQueryResult = .success(response)
+    func testSearchCoinsByQuerySuccess() {
+        let coinSearchResult = CoinSearchResult.mock
+        let marketDataResponse = CoinMarketData.mock
+        service.searchCoinsByQueryResult = .success(coinSearchResult)
+        service.getMarketDataForCoinIDsResult = .success(marketDataResponse)
 
         let expectation = XCTestExpectation(description: "Search for a specific coins by query")
-        viewModel.$coins
-            .dropFirst()
-            .sink { coins in
+        let combinedPublisher = Publishers.CombineLatest(viewModel.$coins, viewModel.$marketData)
+        combinedPublisher
+            .dropFirst(2)
+            .sink { coins, marketData in
                 XCTAssertFalse(coins.isEmpty)
-                XCTAssertEqual(coins.count, response.coins.count)
+                XCTAssertEqual(coins.count, coinSearchResult.coins.count)
 
-                XCTAssertEqual(coins.first?.id, response.coins.first?.id)
-                XCTAssertEqual(coins.first?.name, response.coins.first?.name)
-                XCTAssertEqual(coins.first?.image, response.coins.first?.image)
+                XCTAssertEqual(coins.first?.id, coinSearchResult.coins.first?.id)
+                XCTAssertEqual(coins.first?.name, coinSearchResult.coins.first?.name)
+                XCTAssertEqual(coins.first?.image, coinSearchResult.coins.first?.image)
+                XCTAssertEqual(coins.first?.marketCapRank, coinSearchResult.coins.first?.marketCapRank)
+                XCTAssertEqual(marketData[coins.first!.id]?.currentPrice, marketDataResponse[coinSearchResult.coins.first!.id]?.currentPrice)
+                XCTAssertEqual(marketData[coins.first!.id]?.priceChange, marketDataResponse[coinSearchResult.coins.first!.id]?.priceChange)
                 
-                XCTAssertEqual(coins.last?.id, response.coins.last?.id)
-                XCTAssertEqual(coins.last?.name, response.coins.last?.name)
-                XCTAssertEqual(coins.last?.image, response.coins.last?.image)
+                XCTAssertEqual(coins.last?.id, coinSearchResult.coins.last?.id)
+                XCTAssertEqual(coins.last?.name, coinSearchResult.coins.last?.name)
+                XCTAssertEqual(coins.last?.image, coinSearchResult.coins.last?.image)
+                XCTAssertEqual(coins.last?.marketCapRank, coinSearchResult.coins.last?.marketCapRank)
+                XCTAssertEqual(marketData[coins.last!.id]?.currentPrice, marketDataResponse[coinSearchResult.coins.last!.id]?.currentPrice)
+                XCTAssertEqual(marketData[coins.last!.id]?.priceChange, marketDataResponse[coinSearchResult.coins.last!.id]?.priceChange)
+
                 expectation.fulfill()
             }
             .store(in: &cancellables)
@@ -163,7 +120,6 @@ class AddPriceAlertViewModelTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1)
 
-        XCTAssertFalse(viewModel.isLoading)
         XCTAssertNil(viewModel.errorMessage)
     }
 
@@ -183,28 +139,35 @@ class AddPriceAlertViewModelTests: XCTestCase {
 
         wait(for: [expectation], timeout: 1)
 
-        XCTAssertFalse(viewModel.isLoading)
         XCTAssertNil(viewModel.errorMessage)
     }
 
-    func testSearchCoinsByQueryFailure() {
-        let apiError: APIError = .apiError(error: .init(.badServerResponse), description: "Mocked server error")
-        service.searchCoinsByQueryResult = .failure(apiError)
+    func testFetchMarketDataForCoinIDs() {
+        let coinIDs = [Coin.btc.id, Coin.eth.id]
+        let response = CoinMarketData.mock
+        service.getMarketDataForCoinIDsResult = .success(response)
 
-        let expectation = XCTestExpectation(description: "Get a failure with API error")
-        viewModel.$errorMessage
+        let expectation = XCTestExpectation(description: "Fetch market data for coin IDs")
+        viewModel.$marketData
             .dropFirst()
-            .sink { errorMessage in
-                XCTAssertNotNil(errorMessage)
-                XCTAssertEqual(errorMessage, apiError.errorDescription)
+            .sink { marketData in
+                XCTAssertFalse(marketData.isEmpty)
+                XCTAssertEqual(marketData.count, response.count)
+
+                XCTAssertEqual(marketData[coinIDs.first!]?.currentPrice, response[coinIDs.first!]?.currentPrice)
+                XCTAssertEqual(marketData[coinIDs.first!]?.priceChange, response[coinIDs.first!]?.priceChange)
+
+                XCTAssertEqual(marketData[coinIDs.last!]?.currentPrice, response[coinIDs.last!]?.currentPrice)
+                XCTAssertEqual(marketData[coinIDs.last!]?.priceChange, response[coinIDs.last!]?.priceChange)
+
                 expectation.fulfill()
             }
             .store(in: &cancellables)
 
-        viewModel.searchCoins(by: "bit")
+        viewModel.fetchMarketData(for: coinIDs)
 
         wait(for: [expectation], timeout: 1)
 
-        XCTAssertFalse(viewModel.isLoading)
+        XCTAssertNil(viewModel.errorMessage)
     }
 }

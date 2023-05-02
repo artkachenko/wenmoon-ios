@@ -17,7 +17,7 @@ struct AddPriceAlertView: View {
     @State private var searchText = ""
     @State private var showErrorAlert = false
 
-    private(set) var didSelectCoin: ((Coin) -> Void)?
+    private(set) var didSelectCoin: ((Coin, CoinMarketData?) -> Void)?
 
     // MARK: - Body
 
@@ -25,13 +25,15 @@ struct AddPriceAlertView: View {
         NavigationView {
             ZStack {
                 List(viewModel.coins, id: \.self) { coin in
-                    HStack(spacing: 16) {
+                    HStack(spacing: 12) {
                         AsyncImage(url: URL(string: coin.image)) { image in
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                         } placeholder: {
-                            ProgressView()
+                            Image(systemName: "photo")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
                         }
                         .frame(width: 24, height: 24)
 
@@ -41,7 +43,7 @@ struct AddPriceAlertView: View {
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        didSelectCoin?(coin)
+                        didSelectCoin?(coin, viewModel.marketData[coin.id])
                         presentationMode.wrappedValue.dismiss()
                     }
                     .onAppear {

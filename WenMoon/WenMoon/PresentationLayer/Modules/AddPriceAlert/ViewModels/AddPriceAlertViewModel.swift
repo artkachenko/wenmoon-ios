@@ -13,6 +13,7 @@ final class AddPriceAlertViewModel: ObservableObject {
     // MARK: - Properties
 
     @Published private(set) var coins: [Coin] = []
+    @Published private(set) var marketData: [String: CoinMarketData] = [:]
     @Published private(set) var currentPage = 1
     @Published private(set) var errorMessage: String?
     @Published private(set) var isLoading = false
@@ -89,14 +90,34 @@ final class AddPriceAlertViewModel: ObservableObject {
                     switch completion {
                     case .failure(let error):
                         self?.errorMessage = error.errorDescription
-                    case .finished:
-                        break
+                    case .finished: break
                     }
                 }, receiveValue: { [weak self] coinSearchResult in
-                    self?.searchCoinsCache[query] = coinSearchResult.coins
-                    self?.coins = coinSearchResult.coins
+                    let coins = coinSearchResult.coins
+                    self?.searchCoinsCache[query] = coins
+                    self?.coins = coins
+
+                    let coinIDs = coins.map { $0.id }
+                    self?.fetchMarketData(for: coinIDs)
                 })
                 .store(in: &cancellables)
         }
+    }
+
+    func fetchMarketData(for coinIDs: [String]) {
+        isLoading = true
+        service.getMarketData(for: coinIDs)
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { [weak self] completion in
+                self?.isLoading = false
+                switch completion {
+                case .failure(let error):
+                    self?.errorMessage = error.errorDescription
+                case .finished: break
+                }
+            }, receiveValue: { [weak self] marketData in
+                self?.marketData.merge(marketData, uniquingKeysWith: { $1 })
+            })
+            .store(in: &cancellables)
     }
 }

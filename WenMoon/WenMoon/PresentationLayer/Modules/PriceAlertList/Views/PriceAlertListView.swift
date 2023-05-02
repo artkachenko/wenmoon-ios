@@ -70,14 +70,20 @@ struct PriceAlertListView: View {
                 Button("OK", role: .cancel) { }
             }
             .sheet(isPresented: $showAddPriceAlertView) {
-                AddPriceAlertView { selectedCoin in
-                    priceAlertListViewModel.fetchMarketData(for: [selectedCoin])
-                }
-                .environmentObject(addPriceAlertViewModel)
+                AddPriceAlertView(didSelectCoin: didSelectCoin)
+                    .environmentObject(addPriceAlertViewModel)
             }
             .onAppear {
                 priceAlertListViewModel.fetchPriceAlerts()
             }
         }
+    }
+
+    private func didSelectCoin(coin: Coin, marketData: CoinMarketData?) {
+        guard let marketData else {
+            priceAlertListViewModel.savePriceAlerts([coin])
+            return
+        }
+        priceAlertListViewModel.savePriceAlerts([coin], [coin.id: marketData])
     }
 }
