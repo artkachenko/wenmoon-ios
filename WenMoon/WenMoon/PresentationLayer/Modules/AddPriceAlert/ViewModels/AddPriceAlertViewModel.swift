@@ -104,7 +104,7 @@ final class AddPriceAlertViewModel: ObservableObject {
         }
     }
 
-    func fetchMarketData(for coinIDs: [String]) {
+    private func fetchMarketData(for coinIDs: [String]) {
         isLoading = true
         service.getMarketData(for: coinIDs)
             .receive(on: RunLoop.main)

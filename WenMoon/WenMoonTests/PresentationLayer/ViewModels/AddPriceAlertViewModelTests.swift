@@ -141,33 +141,4 @@ class AddPriceAlertViewModelTests: XCTestCase {
 
         XCTAssertNil(viewModel.errorMessage)
     }
-
-    func testFetchMarketDataForCoinIDs() {
-        let coinIDs = [Coin.btc.id, Coin.eth.id]
-        let response = CoinMarketData.mock
-        service.getMarketDataForCoinIDsResult = .success(response)
-
-        let expectation = XCTestExpectation(description: "Fetch market data for coin IDs")
-        viewModel.$marketData
-            .dropFirst()
-            .sink { marketData in
-                XCTAssertFalse(marketData.isEmpty)
-                XCTAssertEqual(marketData.count, response.count)
-
-                XCTAssertEqual(marketData[coinIDs.first!]?.currentPrice, response[coinIDs.first!]?.currentPrice)
-                XCTAssertEqual(marketData[coinIDs.first!]?.priceChange, response[coinIDs.first!]?.priceChange)
-
-                XCTAssertEqual(marketData[coinIDs.last!]?.currentPrice, response[coinIDs.last!]?.currentPrice)
-                XCTAssertEqual(marketData[coinIDs.last!]?.priceChange, response[coinIDs.last!]?.priceChange)
-
-                expectation.fulfill()
-            }
-            .store(in: &cancellables)
-
-        viewModel.fetchMarketData(for: coinIDs)
-
-        wait(for: [expectation], timeout: 1)
-
-        XCTAssertNil(viewModel.errorMessage)
-    }
 }

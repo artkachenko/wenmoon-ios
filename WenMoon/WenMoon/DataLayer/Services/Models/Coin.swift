@@ -38,15 +38,6 @@ struct Coin: Codable {
         self.priceChangePercentage24H = priceChangePercentage24H
     }
 
-    init(priceAlert: PriceAlert) {
-        id = priceAlert.id
-        name = priceAlert.name
-        image = priceAlert.image
-        marketCapRank = priceAlert.rank
-        currentPrice = priceAlert.currentPrice
-        priceChangePercentage24H = priceAlert.priceChange
-    }
-
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)

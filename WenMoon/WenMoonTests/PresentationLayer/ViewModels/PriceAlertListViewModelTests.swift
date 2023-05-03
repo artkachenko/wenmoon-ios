@@ -124,87 +124,38 @@ class PriceAlertListViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
 
-    func testFetchMarketDataForCoinsSuccess() {
-        let coins: [Coin] = [.btc, .eth]
-        let response = CoinMarketData.mock
-        service.getMarketDataForCoinIDsResult = .success(response)
+    func testCreateNewPriceAlert() {
+        let coin = Coin.btc
+        let marketData = CoinMarketData.mock[coin.id]
 
-        let expectation = XCTestExpectation(description: "Fetch market data for coins")
-        viewModel.$marketData
-            .dropFirst()
-            .sink { marketData in
-                XCTAssertNotNil(marketData.isEmpty)
-                XCTAssertEqual(marketData.count, response.count)
-
-                XCTAssertEqual(marketData[coins.first!.id]?.currentPrice, response[coins.first!.id]?.currentPrice)
-                XCTAssertEqual(marketData[coins.first!.id]?.priceChange, response[coins.first!.id]?.priceChange)
-
-                XCTAssertEqual(marketData[coins.last!.id]?.currentPrice, response[coins.last!.id]?.currentPrice)
-                XCTAssertEqual(marketData[coins.last!.id]?.priceChange, response[coins.last!.id]?.priceChange)
-
-                expectation.fulfill()
-            }
-            .store(in: &cancellables)
-
-        viewModel.fetchMarketData(for: coins)
-
-        wait(for: [expectation], timeout: 1)
-
-        XCTAssertNil(viewModel.errorMessage)
-    }
-
-    func testFetchMarketDataForCoinsFailure() {
-        let coins: [Coin] = [.btc, .eth]
-        let apiError: APIError = .apiError(error: .init(.badServerResponse), description: "Mocked server error")
-        service.getMarketDataForCoinIDsResult = .failure(apiError)
-
-        let expectation = XCTestExpectation(description: "Get a failure with API error")
-        viewModel.$errorMessage
-            .dropFirst()
-            .sink { errorMessage in
-                XCTAssertNotNil(errorMessage)
-                XCTAssertEqual(errorMessage, apiError.errorDescription)
-                expectation.fulfill()
-            }
-            .store(in: &cancellables)
-
-        viewModel.fetchMarketData(for: coins)
-
-        wait(for: [expectation], timeout: 1)
-    }
-
-    func testSavePriceAlerts() {
-        let coins: [Coin] = [.btc, .eth]
-        let marketData = CoinMarketData.mock
-
-        let expectation = XCTestExpectation(description: "Save price alerts")
+        let expectation = XCTestExpectation(description: "Create new price alert")
         viewModel.$priceAlerts
-            .dropFirst(3)
+            .dropFirst()
             .sink { priceAlerts in
                 XCTAssertFalse(priceAlerts.isEmpty)
-                XCTAssertEqual(priceAlerts.count, coins.count)
+                XCTAssertEqual(priceAlerts.count, 1)
 
-                XCTAssertEqual(priceAlerts.first?.id, coins.first?.id)
-                XCTAssertEqual(priceAlerts.first?.name, coins.first?.name)
-                XCTAssertEqual(priceAlerts.first?.image, coins.first?.image)
-                XCTAssertEqual(priceAlerts.first?.rank, coins.first?.marketCapRank)
-                XCTAssertEqual(priceAlerts.first?.currentPrice, marketData[coins.first!.id]?.currentPrice)
-                XCTAssertEqual(priceAlerts.first?.priceChange, marketData[coins.first!.id]?.priceChange)
+                XCTAssertEqual(priceAlerts.first?.id, coin.id)
+                XCTAssertEqual(priceAlerts.first?.name, coin.name)
+                XCTAssertEqual(priceAlerts.first?.image, coin.image)
+                XCTAssertEqual(priceAlerts.first?.rank, coin.marketCapRank)
+                XCTAssertEqual(priceAlerts.first?.currentPrice, marketData?.currentPrice)
+                XCTAssertEqual(priceAlerts.first?.priceChange, marketData?.priceChange)
                 XCTAssertNotNil(priceAlerts.first?.imageData)
 
-                XCTAssertEqual(priceAlerts.last?.id, coins.last?.id)
-                XCTAssertEqual(priceAlerts.last?.name, coins.last?.name)
-                XCTAssertEqual(priceAlerts.last?.image, coins.last?.image)
-                XCTAssertEqual(priceAlerts.last?.rank, coins.last?.marketCapRank)
-                XCTAssertEqual(priceAlerts.last?.currentPrice, marketData[coins.last!.id]?.currentPrice)
-                XCTAssertEqual(priceAlerts.last?.priceChange, marketData[coins.last!.id]?.priceChange)
+                XCTAssertEqual(priceAlerts.last?.id, coin.id)
+                XCTAssertEqual(priceAlerts.last?.name, coin.name)
+                XCTAssertEqual(priceAlerts.last?.image, coin.image)
+                XCTAssertEqual(priceAlerts.last?.rank, coin.marketCapRank)
+                XCTAssertEqual(priceAlerts.last?.currentPrice, marketData?.currentPrice)
+                XCTAssertEqual(priceAlerts.last?.priceChange, marketData?.priceChange)
                 XCTAssertNotNil(priceAlerts.last?.imageData)
 
                 expectation.fulfill()
             }
             .store(in: &cancellables)
 
-        viewModel.savePriceAlerts(coins, marketData)
+        viewModel.createNewPriceAlert(from: coin, marketData)
 
         wait(for: [expectation], timeout: 1)
 

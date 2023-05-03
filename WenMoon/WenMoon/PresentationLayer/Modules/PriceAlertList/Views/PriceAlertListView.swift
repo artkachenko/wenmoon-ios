@@ -81,9 +81,9 @@ struct PriceAlertListView: View {
 
     private func didSelectCoin(coin: Coin, marketData: CoinMarketData?) {
         guard let marketData else {
-            priceAlertListViewModel.savePriceAlerts([coin])
+            priceAlertListViewModel.createNewPriceAlert(from: coin)
             return
         }
-        priceAlertListViewModel.savePriceAlerts([coin], [coin.id: marketData])
+        priceAlertListViewModel.createNewPriceAlert(from: coin, marketData)
     }
 }

@@ -48,16 +48,58 @@ final class PriceAlertListViewModel: ObservableObject {
         }
 
         if !priceAlerts.isEmpty {
-            let coins = priceAlerts.map { Coin(priceAlert: $0) }
-            fetchMarketData(for: coins)
+            fetchMarketData(for: priceAlerts)
         }
     }
 
-    func fetchMarketData(for coins: [Coin]) {
-        let coinIDs = coins.map { $0.id }
+    func createNewPriceAlert(from coin: Coin, _ marketData: CoinMarketData? = nil) {
+        if !priceAlerts.contains(where: { $0.id == coin.id }) {
+            let newPriceAlert = PriceAlert(context: persistence.context)
+            newPriceAlert.id = coin.id
+            newPriceAlert.name = coin.name
+            newPriceAlert.image = coin.image
+            newPriceAlert.rank = coin.marketCapRank ?? .max
+            if let marketData {
+                newPriceAlert.currentPrice = marketData.currentPrice ?? .zero
+                newPriceAlert.priceChange = marketData.priceChange ?? .zero
+            } else {
+                newPriceAlert.currentPrice = coin.currentPrice ?? .zero
+                newPriceAlert.priceChange = coin.priceChangePercentage24H ?? .zero
+            }
+
+            if let url = URL(string: coin.image) {
+                URLSession.shared.dataTask(with: url) { [weak self] (imageData, _, error) in
+                    guard let imageData, error == nil else {
+                        self?.errorMessage = "Error downloading image for \(coin.name): \(error!.localizedDescription)"
+                        return
+                    }
+                    newPriceAlert.imageData = imageData
+
+                    DispatchQueue.main.async {
+                        self?.priceAlerts.append(newPriceAlert)
+                        self?.priceAlerts.sort(by: { $0.rank < $1.rank })
+                    }
+                }.resume()
+            } else {
+                errorMessage = "Invalid image URL for \(coin.name)"
+            }
+
+            persistence.save()
+        }
+    }
+
+    func delete(_ priceAlert: PriceAlert) {
+        persistence.delete(priceAlert)
+        if let index = priceAlerts.firstIndex(of: priceAlert) {
+            priceAlerts.remove(at: index)
+        }
+    }
+
+    private func fetchMarketData(for priceAlerts: [PriceAlert]) {
+        let coinIDs = priceAlerts.map { $0.id }
         let existingMarketData = coinIDs.compactMap { marketData[$0] }
 
-        if existingMarketData.count == coins.count {
+        if existingMarketData.count == priceAlerts.count {
             return
         }
 
@@ -71,81 +113,28 @@ final class PriceAlertListViewModel: ObservableObject {
                 }
             }, receiveValue: { [weak self] marketData in
                 self?.marketData.merge(marketData, uniquingKeysWith: { $1 })
-                self?.savePriceAlerts(coins, marketData)
+                self?.updatePriceAlerts(priceAlerts, marketData)
                 self?.scheduleClearCache()
             })
             .store(in: &cancellables)
     }
 
-    func delete(_ priceAlert: PriceAlert) {
-        persistence.delete(priceAlert)
-        if let index = priceAlerts.firstIndex(of: priceAlert) {
-            priceAlerts.remove(at: index)
-        }
-    }
-
-    func savePriceAlerts(_ coins: [Coin], _ marketData: [String: CoinMarketData]? = nil) {
+    private func updatePriceAlerts(_ priceAlerts: [PriceAlert], _ marketData: [String: CoinMarketData]) {
         persistence.context.perform { [weak self] in
             let batchSize = 50
             var offset = 0
 
-            while offset < coins.count {
-                let batchCoins = Array(coins[offset..<min(offset + batchSize, coins.count)])
-                let predicate = NSPredicate(format: "id IN %@", batchCoins.map { $0.id })
-                let request = PriceAlert.fetchRequest(predicate: predicate)
-                let existingPriceAlerts = self?.persistence.fetch(request)
-
-                for coin in batchCoins {
-                    let marketData = marketData?[coin.id]
-                    if let existingPriceAlert = existingPriceAlerts?.first(where: { $0.id == coin.id }) {
-                        self?.setData(for: existingPriceAlert, with: coin, marketData)
-                    } else {
-                        self?.createNewPriceAlert(coin, marketData)
+            while offset < priceAlerts.count {
+                let batchPriceAlerts = Array(priceAlerts[offset..<min(offset + batchSize, priceAlerts.count)])
+                for priceAlert in batchPriceAlerts {
+                    if let marketData = marketData[priceAlert.id] {
+                        priceAlert.currentPrice = marketData.currentPrice ?? .zero
+                        priceAlert.priceChange = marketData.priceChange ?? .zero
                     }
                 }
                 offset += batchSize
             }
             self?.persistence.save()
-        }
-    }
-
-    private func createNewPriceAlert(_ coin: Coin, _ marketData: CoinMarketData?) {
-        let newPriceAlert = PriceAlert(context: persistence.context)
-        setData(for: newPriceAlert, with: coin, marketData) { [weak self] in
-            self?.priceAlerts.append(newPriceAlert)
-            self?.priceAlerts.sort(by: { $0.rank < $1.rank })
-        }
-    }
-
-    private func setData(for priceAlert: PriceAlert,
-                         with coin: Coin,
-                         _ marketData: CoinMarketData?,
-                         completion: (() -> Void)? = nil) {
-        priceAlert.id = coin.id
-        priceAlert.name = coin.name
-        priceAlert.image = coin.image
-        priceAlert.rank = coin.marketCapRank ?? .max
-        if let marketData {
-            priceAlert.currentPrice = marketData.currentPrice ?? .zero
-            priceAlert.priceChange = marketData.priceChange ?? .zero
-        } else {
-            priceAlert.currentPrice = coin.currentPrice ?? .zero
-            priceAlert.priceChange = coin.priceChangePercentage24H ?? .zero
-        }
-
-        if let url = URL(string: coin.image) {
-            URLSession.shared.dataTask(with: url) { [weak self] (imageData, _, error) in
-                guard let imageData, error == nil else {
-                    self?.errorMessage = "Error downloading image for \(coin.name): \(error!.localizedDescription)"
-                    return
-                }
-                priceAlert.imageData = imageData
-                DispatchQueue.main.async {
-                    completion?()
-                }
-            }.resume()
-        } else {
-            errorMessage = "Invalid image URL for \(coin.name)"
         }
     }
 
