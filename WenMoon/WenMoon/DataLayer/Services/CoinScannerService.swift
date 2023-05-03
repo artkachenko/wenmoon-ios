@@ -18,6 +18,7 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
 
     func getCoins(at page: Int) -> AnyPublisher<[Coin], APIError> {
         let path = "coins/markets"
+        // TODO: - Replace the hardcoded parameters with the actual app settings
         return httpClient.get(path: path, parameters: ["vs_currency": "usd",
                                                        "order": "market_cap_desc",
                                                        "per_page": "100",
@@ -43,6 +44,7 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
 
     func getMarketData(for coinIDs: [String]) -> AnyPublisher<[String: CoinMarketData], APIError> {
         let path = "simple/price"
+        // TODO: - Replace the hardcoded parameters with the actual app settings
         return httpClient.get(path: path, parameters: ["ids": coinIDs.joined(separator: ","),
                                                        "vs_currencies": "usd",
                                                        "include_24hr_change": "true"])

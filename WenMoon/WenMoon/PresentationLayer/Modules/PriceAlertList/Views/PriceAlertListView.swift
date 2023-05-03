@@ -30,6 +30,7 @@ struct PriceAlertListView: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(priceAlert.name).font(.headline)
 
+                        // TODO: - Move the formatting of values to the PriceAlertListViewModel
                         HStack(spacing: 4) {
                             Text("\(priceAlert.currentPrice.formatValue()) $")
                                 .foregroundColor(.gray)
