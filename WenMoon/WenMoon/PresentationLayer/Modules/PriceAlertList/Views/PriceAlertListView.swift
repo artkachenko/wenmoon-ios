@@ -15,11 +15,15 @@ struct PriceAlertListView: View {
 
     @State private var showAddPriceAlertView = false
     @State private var showErrorAlert = false
+    @State private var showSetPriceAlertConfirmation = false
+
+    @State private var capturedPriceAlert: PriceAlert?
+    @State private var targetPrice: Double?
 
     var body: some View {
         NavigationView {
             List(priceAlertListViewModel.priceAlerts, id: \.self) { priceAlert in
-                HStack(spacing: 16) {
+                HStack(spacing: .zero) {
                     if let uiImage = UIImage(data: priceAlert.imageData) {
                         Image(uiImage: uiImage)
                             .resizable()
@@ -28,7 +32,8 @@ struct PriceAlertListView: View {
                     }
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(priceAlert.name).font(.headline)
+                        Text(priceAlert.name)
+                            .font(.headline)
 
                         // TODO: - Move the formatting of values to the PriceAlertListViewModel
                         HStack(spacing: 4) {
@@ -40,8 +45,32 @@ struct PriceAlertListView: View {
                                 .font(.caption2)
                         }
                     }
+                    .padding(.leading, 16)
 
                     Spacer()
+
+                    VStack(alignment: .trailing, spacing: 8) {
+                        Toggle("", isOn: Binding<Bool>(
+                            get: { priceAlert.isActive },
+                            set: { isActive in
+                                if isActive {
+                                    capturedPriceAlert = priceAlert
+                                    showSetPriceAlertConfirmation = true
+                                } else {
+                                    priceAlertListViewModel.setPriceAlert(priceAlert, targetPrice: nil)
+                                }
+                            }
+                        ))
+
+                        if let targetPrice = priceAlert.targetPrice?.doubleValue {
+                            Text("\(targetPrice.formatValue()) $")
+                                .font(.caption)
+                        } else {
+                            Text("Not set")
+                                .foregroundColor(.gray)
+                                .font(.caption)
+                        }
+                    }
                 }
                 .swipeActions {
                     Button(role: .destructive) {
@@ -70,6 +99,25 @@ struct PriceAlertListView: View {
             .alert(priceAlertListViewModel.errorMessage ?? "", isPresented: $showErrorAlert) {
                 Button("OK", role: .cancel) { }
             }
+            .alert("Set Price Alert", isPresented: $showSetPriceAlertConfirmation, actions: {
+                TextField("Target Price", value: $targetPrice, format: .number)
+                    .keyboardType(.decimalPad)
+
+                Button("Confirm") {
+                    if let priceAlert = capturedPriceAlert {
+                        priceAlertListViewModel.setPriceAlert(priceAlert, targetPrice: targetPrice)
+                        capturedPriceAlert = nil
+                        targetPrice = nil
+                    }
+                }
+
+                Button("Cancel", role: .cancel) {
+                    capturedPriceAlert = nil
+                    targetPrice = nil
+                }
+            }) {
+                Text("Please enter your target price in USD, and our system will notify you when it is reached.")
+            }
             .sheet(isPresented: $showAddPriceAlertView) {
                 AddPriceAlertView(didSelectCoin: didSelectCoin)
                     .environmentObject(addPriceAlertViewModel)
@@ -80,11 +128,13 @@ struct PriceAlertListView: View {
         }
     }
 
-    private func didSelectCoin(coin: Coin, marketData: CoinMarketData?) {
+    private func didSelectCoin(coin: Coin, marketData: CoinMarketData?, targetPrice: Double?) {
         guard let marketData else {
-            priceAlertListViewModel.createNewPriceAlert(from: coin)
+            priceAlertListViewModel.createNewPriceAlert(from: coin, targetPrice: targetPrice)
             return
         }
-        priceAlertListViewModel.createNewPriceAlert(from: coin, marketData)
+        priceAlertListViewModel.createNewPriceAlert(from: coin,
+                                                    marketData: marketData,
+                                                    targetPrice: targetPrice)
     }
 }

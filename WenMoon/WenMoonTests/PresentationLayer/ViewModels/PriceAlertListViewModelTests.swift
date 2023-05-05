@@ -125,8 +125,7 @@ class PriceAlertListViewModelTests: XCTestCase {
     }
 
     func testCreateNewPriceAlert() {
-        let coin = Coin.btc
-        let marketData = CoinMarketData.mock[coin.id]
+        let coin: Coin = .btc
 
         let expectation = XCTestExpectation(description: "Create new price alert")
         viewModel.$priceAlerts
@@ -138,29 +137,45 @@ class PriceAlertListViewModelTests: XCTestCase {
                 XCTAssertEqual(priceAlerts.first?.id, coin.id)
                 XCTAssertEqual(priceAlerts.first?.name, coin.name)
                 XCTAssertEqual(priceAlerts.first?.image, coin.image)
-                XCTAssertEqual(priceAlerts.first?.rank, coin.marketCapRank)
-                XCTAssertEqual(priceAlerts.first?.currentPrice, marketData?.currentPrice)
-                XCTAssertEqual(priceAlerts.first?.priceChange, marketData?.priceChange)
                 XCTAssertNotNil(priceAlerts.first?.imageData)
-
-                XCTAssertEqual(priceAlerts.last?.id, coin.id)
-                XCTAssertEqual(priceAlerts.last?.name, coin.name)
-                XCTAssertEqual(priceAlerts.last?.image, coin.image)
-                XCTAssertEqual(priceAlerts.last?.rank, coin.marketCapRank)
-                XCTAssertEqual(priceAlerts.last?.currentPrice, marketData?.currentPrice)
-                XCTAssertEqual(priceAlerts.last?.priceChange, marketData?.priceChange)
-                XCTAssertNotNil(priceAlerts.last?.imageData)
+                XCTAssertEqual(priceAlerts.first?.rank, coin.marketCapRank)
+                XCTAssertEqual(priceAlerts.first?.currentPrice, coin.currentPrice)
+                XCTAssertEqual(priceAlerts.first?.priceChange, coin.priceChangePercentage24H)
 
                 expectation.fulfill()
             }
             .store(in: &cancellables)
 
-        viewModel.createNewPriceAlert(from: coin, marketData)
+        viewModel.createNewPriceAlert(from: coin)
 
         wait(for: [expectation], timeout: 1)
 
         XCTAssert(persistence.saveMethodCalled)
         XCTAssertNil(viewModel.errorMessage)
+    }
+
+    func testSetPriceAlert() {
+        let coin: Coin = .btc
+        
+        let priceAlert = PriceAlert(context: persistence.context)
+        priceAlert.id = coin.id
+        priceAlert.name = coin.name
+        priceAlert.image = coin.image
+        priceAlert.rank = coin.marketCapRank!
+        priceAlert.currentPrice = coin.currentPrice!
+        priceAlert.priceChange = coin.priceChangePercentage24H!
+
+        viewModel.priceAlerts.append(priceAlert)
+
+        viewModel.setPriceAlert(priceAlert, targetPrice: 30000)
+
+        XCTAssertTrue(priceAlert.isActive)
+        XCTAssertEqual(priceAlert.targetPrice, 30000)
+
+        viewModel.setPriceAlert(priceAlert, targetPrice: nil)
+
+        XCTAssertFalse(priceAlert.isActive)
+        XCTAssertNil(priceAlert.targetPrice)
     }
 
     func testDeletePriceAlert() {

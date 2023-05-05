@@ -12,7 +12,7 @@ final class PriceAlertListViewModel: ObservableObject {
 
     // MARK: - Properties
 
-    @Published private(set) var priceAlerts: [PriceAlert] = []
+    @Published var priceAlerts: [PriceAlert] = []
     @Published private(set) var marketData: [String: CoinMarketData] = [:]
     @Published private(set) var errorMessage: String?
 
@@ -52,13 +52,23 @@ final class PriceAlertListViewModel: ObservableObject {
         }
     }
 
-    func createNewPriceAlert(from coin: Coin, _ marketData: CoinMarketData? = nil) {
-        if !priceAlerts.contains(where: { $0.id == coin.id }) {
+    func createNewPriceAlert(from coin: Coin,
+                             marketData: CoinMarketData? = nil,
+                             targetPrice: Double? = nil) {
+        guard let priceAlert = priceAlerts.first(where: { $0.id == coin.id }) else {
             let newPriceAlert = PriceAlert(context: persistence.context)
             newPriceAlert.id = coin.id
             newPriceAlert.name = coin.name
             newPriceAlert.image = coin.image
             newPriceAlert.rank = coin.marketCapRank ?? .max
+
+            if let targetPrice {
+                newPriceAlert.targetPrice = NSNumber(value: targetPrice)
+                newPriceAlert.isActive = true
+            } else {
+                newPriceAlert.isActive = false
+            }
+
             if let marketData {
                 newPriceAlert.currentPrice = marketData.currentPrice ?? .zero
                 newPriceAlert.priceChange = marketData.priceChange ?? .zero
@@ -85,6 +95,11 @@ final class PriceAlertListViewModel: ObservableObject {
             }
 
             persistence.save()
+            return
+        }
+
+        if let targetPrice {
+            setPriceAlert(priceAlert, targetPrice: targetPrice)
         }
     }
 
@@ -93,6 +108,18 @@ final class PriceAlertListViewModel: ObservableObject {
         if let index = priceAlerts.firstIndex(of: priceAlert) {
             priceAlerts.remove(at: index)
         }
+    }
+
+    func setPriceAlert(_ priceAlert: PriceAlert, targetPrice: Double?) {
+        if let targetPrice {
+            priceAlert.isActive = true
+            priceAlert.targetPrice = NSNumber(value: targetPrice)
+        } else {
+            priceAlert.isActive = false
+            priceAlert.targetPrice = nil
+        }
+        persistence.save()
+        objectWillChange.send()
     }
 
     private func fetchMarketData(for priceAlerts: [PriceAlert]) {
