@@ -17,7 +17,7 @@ struct PriceAlertListView: View {
     @State private var showErrorAlert = false
     @State private var showSetPriceAlertConfirmation = false
 
-    @State private var capturedPriceAlert: PriceAlert?
+    @State private var capturedPriceAlert: PriceAlertEntity?
     @State private var targetPrice: Double?
 
     var body: some View {

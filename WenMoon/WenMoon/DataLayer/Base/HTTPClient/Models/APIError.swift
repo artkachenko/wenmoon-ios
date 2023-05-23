@@ -10,6 +10,7 @@ import Foundation
 public enum APIError: LocalizedError, Equatable {
     case apiError(error: URLError?, description: String)
     case invalidEndpoint(endpoint: String)
+    case invalidRequestBody
     case noNetworkConnection
     case unknown(response: URLResponse)
 
@@ -19,10 +20,12 @@ public enum APIError: LocalizedError, Equatable {
             return description
         case let .invalidEndpoint(endpoint):
             return "Invalid endpoint: \(endpoint)"
+        case .invalidRequestBody:
+            return "Invalid request body"
         case .noNetworkConnection:
             return "No internet connection"
         case let .unknown(response):
-            return "Unknown error. Reason: \(response.description)"
+            return "Unknown error occured. Reason: \(response.description)"
         }
     }
 }

@@ -9,8 +9,12 @@ import UIKit
 
 class AppDelegate: NSObject, UIApplicationDelegate {
 
+    private var userDefaultsManager: UserDefaultsManager!
+    private let deviceTokenKey = "DEVICE_TOKEN_KEY"
+
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        userDefaultsManager = UserDefaultsManagerImpl()
         registerForPushNotifications()
         return true
     }
@@ -40,6 +44,9 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
         let token = tokenParts.joined()
         print("Device Token: \(token)")
+        guard userDefaultsManager.getObject(forKey: deviceTokenKey,
+                                            objectType: String.self) == nil else { return }
+        userDefaultsManager.setObject(token, forKey: deviceTokenKey)
     }
 
     func application(_ application: UIApplication,

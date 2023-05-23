@@ -16,6 +16,15 @@ protocol CoinScannerService {
 
 final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
 
+    // MARK: - Initializers
+
+    convenience init() {
+        let baseURL = URL(string: "https://api.coingecko.com/api/v3/")!
+        self.init(baseURL: baseURL)
+    }
+
+    // MARK: - CoinScannerService
+
     func getCoins(at page: Int) -> AnyPublisher<[Coin], APIError> {
         let path = "coins/markets"
         // TODO: - Replace the hardcoded parameters with the actual app settings

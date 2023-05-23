@@ -12,7 +12,7 @@ final class PriceAlertListViewModel: ObservableObject {
 
     // MARK: - Properties
 
-    @Published var priceAlerts: [PriceAlert] = []
+    @Published var priceAlerts: [PriceAlertEntity] = []
     @Published private(set) var marketData: [String: CoinMarketData] = [:]
     @Published private(set) var errorMessage: String?
 
@@ -41,8 +41,8 @@ final class PriceAlertListViewModel: ObservableObject {
     // MARK: - Methods
 
     func fetchPriceAlerts() {
-        let sortDescriptors = [NSSortDescriptor(keyPath: \PriceAlert.rank, ascending: true)]
-        let request = PriceAlert.fetchRequest(sortDescriptors: sortDescriptors)
+        let sortDescriptors = [NSSortDescriptor(keyPath: \PriceAlertEntity.rank, ascending: true)]
+        let request = PriceAlertEntity.fetchRequest(sortDescriptors: sortDescriptors)
         if let priceAlerts = persistence.fetch(request) {
             self.priceAlerts = priceAlerts
         }
@@ -56,7 +56,7 @@ final class PriceAlertListViewModel: ObservableObject {
                              marketData: CoinMarketData? = nil,
                              targetPrice: Double? = nil) {
         guard let priceAlert = priceAlerts.first(where: { $0.id == coin.id }) else {
-            let newPriceAlert = PriceAlert(context: persistence.context)
+            let newPriceAlert = PriceAlertEntity(context: persistence.context)
             newPriceAlert.id = coin.id
             newPriceAlert.name = coin.name
             newPriceAlert.image = coin.image
@@ -103,14 +103,14 @@ final class PriceAlertListViewModel: ObservableObject {
         }
     }
 
-    func delete(_ priceAlert: PriceAlert) {
+    func delete(_ priceAlert: PriceAlertEntity) {
         persistence.delete(priceAlert)
         if let index = priceAlerts.firstIndex(of: priceAlert) {
             priceAlerts.remove(at: index)
         }
     }
 
-    func setPriceAlert(_ priceAlert: PriceAlert, targetPrice: Double?) {
+    func setPriceAlert(_ priceAlert: PriceAlertEntity, targetPrice: Double?) {
         if let targetPrice {
             priceAlert.isActive = true
             priceAlert.targetPrice = NSNumber(value: targetPrice)
@@ -122,7 +122,7 @@ final class PriceAlertListViewModel: ObservableObject {
         objectWillChange.send()
     }
 
-    private func fetchMarketData(for priceAlerts: [PriceAlert]) {
+    private func fetchMarketData(for priceAlerts: [PriceAlertEntity]) {
         let coinIDs = priceAlerts.map { $0.id }
         let existingMarketData = coinIDs.compactMap { marketData[$0] }
 
@@ -146,7 +146,7 @@ final class PriceAlertListViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
-    private func updatePriceAlerts(_ priceAlerts: [PriceAlert], _ marketData: [String: CoinMarketData]) {
+    private func updatePriceAlerts(_ priceAlerts: [PriceAlertEntity], _ marketData: [String: CoinMarketData]) {
         persistence.context.perform { [weak self] in
             let batchSize = 50
             var offset = 0
