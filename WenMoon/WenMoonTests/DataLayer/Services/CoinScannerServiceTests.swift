@@ -22,7 +22,7 @@ class CoinScannerServiceTests: XCTestCase {
     override func setUp() {
         super.setUp()
         httpClient = HTTPClientMock()
-        service = CoinScannerServiceImpl(httpClient: httpClient)
+        service = CoinScannerServiceImpl(httpClient: httpClient, baseURL: URL(string: "https://example.com/")!)
         cancellables = []
     }
 
@@ -37,7 +37,7 @@ class CoinScannerServiceTests: XCTestCase {
 
     func testGetCoinsSuccess() {
         let response: [Coin] = [.btc, .eth]
-        httpClient.getResponse = .success(try! JSONEncoder().encode(response))
+        httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
 
         let expectation = XCTestExpectation(description: "Get an array of coins on page 1")
         service.getCoins(at: 1)
@@ -89,7 +89,7 @@ class CoinScannerServiceTests: XCTestCase {
 
     func testSearchCoinsByQuerySuccess() {
         let response = CoinSearchResult.mock
-        httpClient.getResponse = .success(try! JSONEncoder().encode(response))
+        httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
 
         let expectation = XCTestExpectation(description: "Search for a specific coins by query")
         service.searchCoins(by: "bit")
@@ -119,7 +119,7 @@ class CoinScannerServiceTests: XCTestCase {
 
     func testSearchCoinsByQueryEmptyResult() {
         let response = CoinSearchResult.emptyMock
-        httpClient.getResponse = .success(try! JSONEncoder().encode(response))
+        httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
 
         let expectation = XCTestExpectation(description: "Search for a specific coins by invalid query")
         service.searchCoins(by: "sdfghjkl")
@@ -138,10 +138,10 @@ class CoinScannerServiceTests: XCTestCase {
         wait(for: [expectation], timeout: 1)
     }
 
-    func testGetMarketDataForCoinIDs() {
+    func testGetMarketDataForCoins() {
         let coinIDs = [Coin.btc.id, Coin.eth.id]
-        let response = CoinMarketData.mock
-        httpClient.getResponse = .success(try! JSONEncoder().encode(response))
+        let response = MarketData.mock
+        httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
 
         let expectation = XCTestExpectation(description: "Get market data for coin IDs")
         service.getMarketData(for: coinIDs)

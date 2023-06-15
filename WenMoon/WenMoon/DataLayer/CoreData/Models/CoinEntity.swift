@@ -1,20 +1,20 @@
 //
-//  PriceAlertEntity.swift
+//  CoinEntity.swift
 //  WenMoon
 //
-//  Created by Artur Tkachenko on 23.05.23.
+//  Created by Artur Tkachenko on 11.06.23.
 //
 //
 
 import Foundation
 import CoreData
 
-@objc(PriceAlertEntity)
-final class PriceAlertEntity: NSManagedObject {
+@objc(CoinEntity)
+final class CoinEntity: NSManagedObject {
 
     @nonobjc class func fetchRequest(sortDescriptors: [NSSortDescriptor] = [],
-                                     predicate: NSPredicate? = nil) -> NSFetchRequest<PriceAlertEntity> {
-        let request = NSFetchRequest<PriceAlertEntity>(entityName: "PriceAlertEntity")
+                                     predicate: NSPredicate? = nil) -> NSFetchRequest<CoinEntity> {
+        let request = NSFetchRequest<CoinEntity>(entityName: "CoinEntity")
         request.sortDescriptors = sortDescriptors
         request.predicate = predicate
         return request

@@ -11,7 +11,7 @@ import Combine
 protocol CoinScannerService {
     func getCoins(at page: Int) -> AnyPublisher<[Coin], APIError>
     func searchCoins(by query: String) -> AnyPublisher<CoinSearchResult, APIError>
-    func getMarketData(for coinIDs: [String]) -> AnyPublisher<[String: CoinMarketData], APIError>
+    func getMarketData(for coinIDs: [String]) -> AnyPublisher<[String: MarketData], APIError>
 }
 
 final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
@@ -51,24 +51,16 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
             .eraseToAnyPublisher()
     }
 
-    func getMarketData(for coinIDs: [String]) -> AnyPublisher<[String: CoinMarketData], APIError> {
+    func getMarketData(for coinIDs: [String]) -> AnyPublisher<[String: MarketData], APIError> {
         let path = "simple/price"
         // TODO: - Replace the hardcoded parameters with the actual app settings
         return httpClient.get(path: path, parameters: ["ids": coinIDs.joined(separator: ","),
                                                        "vs_currencies": "usd",
                                                        "include_24hr_change": "true"])
-        .decode(type: [String: CoinMarketData].self, decoder: decoder)
+        .decode(type: [String: MarketData].self, decoder: decoder)
         .mapError { [weak self] error in
             self?.mapToAPIError(error) ?? APIError.unknown(response: URLResponse())
         }
         .eraseToAnyPublisher()
-    }
-
-    private func mapToAPIError(_ error: Error) -> APIError {
-        guard let error = error as? APIError else {
-            return .apiError(error: error as? URLError ?? .init(.unknown),
-                             description: error.localizedDescription)
-        }
-        return error
     }
 }

@@ -18,3 +18,14 @@ struct PriceAlert: Codable {
     let targetPrice: Double
     let targetDirection: TargetDirection
 }
+
+extension PriceAlert {
+    static let btc = PriceAlert(coinId: "btc",
+                                coinName: "Bitcoin",
+                                targetPrice: 30000,
+                                targetDirection: .above)
+    static let eth = PriceAlert(coinId: "eth",
+                                coinName: "Ethereum",
+                                targetPrice: 1000,
+                                targetDirection: .below)
+}

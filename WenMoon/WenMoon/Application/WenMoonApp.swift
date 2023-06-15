@@ -16,10 +16,11 @@ struct WenMoonApp: App {
 
     var body: some Scene {
         WindowGroup {
-            PriceAlertListView()
+            CoinListView()
         }
         .onChange(of: scenePhase) { newPhase in
             if newPhase == .active {
+                NotificationCenter.default.post(name: .appDidBecomeActive, object: nil, userInfo: nil)
                 appDelegate.resetBadgeNumber()
             }
         }

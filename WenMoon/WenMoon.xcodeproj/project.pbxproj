@@ -9,17 +9,17 @@
 /* Begin PBXBuildFile section */
 		FA07AC2629F91120008F6484 /* CoinMarketData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA07AC2529F91120008F6484 /* CoinMarketData.swift */; };
 		FA07AC3029F93292008F6484 /* Double+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA07AC2F29F93292008F6484 /* Double+Extensions.swift */; };
+		FA51D0322A361F3700D203EF /* CoinEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA51D0302A361F3600D203EF /* CoinEntity.swift */; };
 		FA8A08852A1CF8500083B8DB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8A08842A1CF8500083B8DB /* AppDelegate.swift */; };
 		FA8A08892A1CFA820083B8DB /* PriceAlertService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8A08882A1CFA820083B8DB /* PriceAlertService.swift */; };
 		FA8A088D2A1CFAF90083B8DB /* PriceAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8A088C2A1CFAF90083B8DB /* PriceAlert.swift */; };
 		FA8A08902A1CFD040083B8DB /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8A088F2A1CFD040083B8DB /* UserDefaultsManager.swift */; };
 		FA8A08922A1CFD130083B8DB /* UserDefaultsError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8A08912A1CFD130083B8DB /* UserDefaultsError.swift */; };
-		FA8A08972A1D156E0083B8DB /* PriceAlertServiceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8A08962A1D156E0083B8DB /* PriceAlertServiceError.swift */; };
-		FA8A089A2A1D16AB0083B8DB /* PriceAlertEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8A08982A1D16AB0083B8DB /* PriceAlertEntity.swift */; };
+		FAA83CC82A3B6E37001DEE1E /* UserDefaultsManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAA83CC72A3B6E37001DEE1E /* UserDefaultsManagerMock.swift */; };
 		FAB361F729F447DB00A88050 /* WenMoonApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB361F629F447DB00A88050 /* WenMoonApp.swift */; };
 		FAB361F929F447DB00A88050 /* PersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB361F829F447DB00A88050 /* PersistenceManager.swift */; };
 		FAB361FC29F447DB00A88050 /* WenMoon.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FAB361FA29F447DB00A88050 /* WenMoon.xcdatamodeld */; };
-		FAB361FE29F447DB00A88050 /* PriceAlertListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB361FD29F447DB00A88050 /* PriceAlertListView.swift */; };
+		FAB361FE29F447DB00A88050 /* CoinListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB361FD29F447DB00A88050 /* CoinListView.swift */; };
 		FAB3620029F447DC00A88050 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FAB361FF29F447DC00A88050 /* Assets.xcassets */; };
 		FAB3623629F4513B00A88050 /* HTTPRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623529F4513B00A88050 /* HTTPRequest.swift */; };
 		FAB3623829F4514B00A88050 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623729F4514B00A88050 /* APIError.swift */; };
@@ -30,14 +30,15 @@
 		FAB3624A29F453FC00A88050 /* CoinScannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3624929F453FC00A88050 /* CoinScannerService.swift */; };
 		FAB3625029F4547100A88050 /* HTTPClientMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3624F29F4547100A88050 /* HTTPClientMock.swift */; };
 		FAB3625329F4549800A88050 /* CoinScannerServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3625229F4549800A88050 /* CoinScannerServiceTests.swift */; };
-		FAB3625729F457DC00A88050 /* AddPriceAlertView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3625629F457DC00A88050 /* AddPriceAlertView.swift */; };
-		FAB3625A29F4580C00A88050 /* AddPriceAlertViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3625929F4580C00A88050 /* AddPriceAlertViewModel.swift */; };
+		FAB3625729F457DC00A88050 /* AddCoinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3625629F457DC00A88050 /* AddCoinView.swift */; };
+		FAB3625A29F4580C00A88050 /* AddCoinViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3625929F4580C00A88050 /* AddCoinViewModel.swift */; };
 		FAB3625F29F4595D00A88050 /* CoinScannerServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3625E29F4595D00A88050 /* CoinScannerServiceMock.swift */; };
-		FAB3626229F4598F00A88050 /* AddPriceAlertViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3626129F4598F00A88050 /* AddPriceAlertViewModelTests.swift */; };
+		FAB3626229F4598F00A88050 /* AddCoinViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3626129F4598F00A88050 /* AddCoinViewModelTests.swift */; };
 		FAB3626529F464BE00A88050 /* PersistenceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3626429F464BE00A88050 /* PersistenceError.swift */; };
-		FAB3626A29F4651F00A88050 /* PriceAlertListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3626929F4651F00A88050 /* PriceAlertListViewModel.swift */; };
-		FAB3627529F469E700A88050 /* PriceAlertListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3627429F469E700A88050 /* PriceAlertListViewModelTests.swift */; };
+		FAB3626A29F4651F00A88050 /* CoinListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3626929F4651F00A88050 /* CoinListViewModel.swift */; };
+		FAB3627529F469E700A88050 /* CoinListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3627429F469E700A88050 /* CoinListViewModelTests.swift */; };
 		FACB39AE29FABBC800AA613E /* PersistenceManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = FACB39AD29FABBC800AA613E /* PersistenceManagerMock.swift */; };
+		FAE0231E2A1E11F3009BA135 /* Notification+Name.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAE0231D2A1E11F3009BA135 /* Notification+Name.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,18 +54,18 @@
 /* Begin PBXFileReference section */
 		FA07AC2529F91120008F6484 /* CoinMarketData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinMarketData.swift; sourceTree = "<group>"; };
 		FA07AC2F29F93292008F6484 /* Double+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Extensions.swift"; sourceTree = "<group>"; };
+		FA51D0302A361F3600D203EF /* CoinEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinEntity.swift; sourceTree = "<group>"; };
 		FA8A08842A1CF8500083B8DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FA8A08882A1CFA820083B8DB /* PriceAlertService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertService.swift; sourceTree = "<group>"; };
 		FA8A088C2A1CFAF90083B8DB /* PriceAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlert.swift; sourceTree = "<group>"; };
 		FA8A088F2A1CFD040083B8DB /* UserDefaultsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManager.swift; sourceTree = "<group>"; };
 		FA8A08912A1CFD130083B8DB /* UserDefaultsError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsError.swift; sourceTree = "<group>"; };
-		FA8A08962A1D156E0083B8DB /* PriceAlertServiceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertServiceError.swift; sourceTree = "<group>"; };
-		FA8A08982A1D16AB0083B8DB /* PriceAlertEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertEntity.swift; sourceTree = "<group>"; };
+		FAA83CC72A3B6E37001DEE1E /* UserDefaultsManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManagerMock.swift; sourceTree = "<group>"; };
 		FAB361F329F447DB00A88050 /* WenMoon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WenMoon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FAB361F629F447DB00A88050 /* WenMoonApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WenMoonApp.swift; sourceTree = "<group>"; };
 		FAB361F829F447DB00A88050 /* PersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManager.swift; sourceTree = "<group>"; };
 		FAB361FB29F447DB00A88050 /* WenMoon.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = WenMoon.xcdatamodel; sourceTree = "<group>"; };
-		FAB361FD29F447DB00A88050 /* PriceAlertListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertListView.swift; sourceTree = "<group>"; };
+		FAB361FD29F447DB00A88050 /* CoinListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinListView.swift; sourceTree = "<group>"; };
 		FAB361FF29F447DC00A88050 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FAB3620129F447DC00A88050 /* WenMoon.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WenMoon.entitlements; sourceTree = "<group>"; };
 		FAB3620929F447DC00A88050 /* WenMoonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WenMoonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -77,14 +78,15 @@
 		FAB3624929F453FC00A88050 /* CoinScannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinScannerService.swift; sourceTree = "<group>"; };
 		FAB3624F29F4547100A88050 /* HTTPClientMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClientMock.swift; sourceTree = "<group>"; };
 		FAB3625229F4549800A88050 /* CoinScannerServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinScannerServiceTests.swift; sourceTree = "<group>"; };
-		FAB3625629F457DC00A88050 /* AddPriceAlertView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPriceAlertView.swift; sourceTree = "<group>"; };
-		FAB3625929F4580C00A88050 /* AddPriceAlertViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPriceAlertViewModel.swift; sourceTree = "<group>"; };
+		FAB3625629F457DC00A88050 /* AddCoinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCoinView.swift; sourceTree = "<group>"; };
+		FAB3625929F4580C00A88050 /* AddCoinViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCoinViewModel.swift; sourceTree = "<group>"; };
 		FAB3625E29F4595D00A88050 /* CoinScannerServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinScannerServiceMock.swift; sourceTree = "<group>"; };
-		FAB3626129F4598F00A88050 /* AddPriceAlertViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPriceAlertViewModelTests.swift; sourceTree = "<group>"; };
+		FAB3626129F4598F00A88050 /* AddCoinViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCoinViewModelTests.swift; sourceTree = "<group>"; };
 		FAB3626429F464BE00A88050 /* PersistenceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceError.swift; sourceTree = "<group>"; };
-		FAB3626929F4651F00A88050 /* PriceAlertListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertListViewModel.swift; sourceTree = "<group>"; };
-		FAB3627429F469E700A88050 /* PriceAlertListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertListViewModelTests.swift; sourceTree = "<group>"; };
+		FAB3626929F4651F00A88050 /* CoinListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinListViewModel.swift; sourceTree = "<group>"; };
+		FAB3627429F469E700A88050 /* CoinListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinListViewModelTests.swift; sourceTree = "<group>"; };
 		FACB39AD29FABBC800AA613E /* PersistenceManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManagerMock.swift; sourceTree = "<group>"; };
+		FAE0231D2A1E11F3009BA135 /* Notification+Name.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification+Name.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,6 +110,7 @@
 		FA07AC2E29F93282008F6484 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				FAE0231C2A1E11E4009BA135 /* Notification */,
 				FA07AC2F29F93292008F6484 /* Double+Extensions.swift */,
 			);
 			path = Extensions;
@@ -116,8 +119,8 @@
 		FA8A088E2A1CFCF20083B8DB /* UserDefaults */ = {
 			isa = PBXGroup;
 			children = (
-				FA8A088F2A1CFD040083B8DB /* UserDefaultsManager.swift */,
 				FA8A08912A1CFD130083B8DB /* UserDefaultsError.swift */,
+				FA8A088F2A1CFD040083B8DB /* UserDefaultsManager.swift */,
 			);
 			path = UserDefaults;
 			sourceTree = "<group>";
@@ -135,7 +138,6 @@
 			isa = PBXGroup;
 			children = (
 				FA8A088C2A1CFAF90083B8DB /* PriceAlert.swift */,
-				FA8A08962A1D156E0083B8DB /* PriceAlertServiceError.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -238,8 +240,8 @@
 		FAB3622C29F4487200A88050 /* Modules */ = {
 			isa = PBXGroup;
 			children = (
-				FAB3622E29F44B0300A88050 /* PriceAlertList */,
-				FAB3625429F457C100A88050 /* AddPriceAlert */,
+				FAB3622E29F44B0300A88050 /* CoinList */,
+				FAB3625429F457C100A88050 /* AddCoin */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -247,18 +249,18 @@
 		FAB3622D29F4488300A88050 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				FAB361FD29F447DB00A88050 /* PriceAlertListView.swift */,
+				FAB361FD29F447DB00A88050 /* CoinListView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
-		FAB3622E29F44B0300A88050 /* PriceAlertList */ = {
+		FAB3622E29F44B0300A88050 /* CoinList */ = {
 			isa = PBXGroup;
 			children = (
 				FAB3626829F4650E00A88050 /* ViewModels */,
 				FAB3622D29F4488300A88050 /* Views */,
 			);
-			path = PriceAlertList;
+			path = CoinList;
 			sourceTree = "<group>";
 		};
 		FAB3623229F4510D00A88050 /* Base */ = {
@@ -332,19 +334,19 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		FAB3625429F457C100A88050 /* AddPriceAlert */ = {
+		FAB3625429F457C100A88050 /* AddCoin */ = {
 			isa = PBXGroup;
 			children = (
 				FAB3625829F457F300A88050 /* ViewModels */,
 				FAB3625529F457CD00A88050 /* Views */,
 			);
-			path = AddPriceAlert;
+			path = AddCoin;
 			sourceTree = "<group>";
 		};
 		FAB3625529F457CD00A88050 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				FAB3625629F457DC00A88050 /* AddPriceAlertView.swift */,
+				FAB3625629F457DC00A88050 /* AddCoinView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -352,7 +354,7 @@
 		FAB3625829F457F300A88050 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				FAB3625929F4580C00A88050 /* AddPriceAlertViewModel.swift */,
+				FAB3625929F4580C00A88050 /* AddCoinViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -371,6 +373,7 @@
 			children = (
 				FAB3625E29F4595D00A88050 /* CoinScannerServiceMock.swift */,
 				FACB39AD29FABBC800AA613E /* PersistenceManagerMock.swift */,
+				FAA83CC72A3B6E37001DEE1E /* UserDefaultsManagerMock.swift */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -378,8 +381,8 @@
 		FAB3626029F4596A00A88050 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				FAB3627429F469E700A88050 /* PriceAlertListViewModelTests.swift */,
-				FAB3626129F4598F00A88050 /* AddPriceAlertViewModelTests.swift */,
+				FAB3627429F469E700A88050 /* CoinListViewModelTests.swift */,
+				FAB3626129F4598F00A88050 /* AddCoinViewModelTests.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -396,7 +399,7 @@
 		FAB3626829F4650E00A88050 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				FAB3626929F4651F00A88050 /* PriceAlertListViewModel.swift */,
+				FAB3626929F4651F00A88050 /* CoinListViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -404,9 +407,17 @@
 		FAB3627329F4659500A88050 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				FA8A08982A1D16AB0083B8DB /* PriceAlertEntity.swift */,
+				FA51D0302A361F3600D203EF /* CoinEntity.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		FAE0231C2A1E11E4009BA135 /* Notification */ = {
+			isa = PBXGroup;
+			children = (
+				FAE0231D2A1E11F3009BA135 /* Notification+Name.swift */,
+			);
+			path = Notification;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -510,6 +521,7 @@
 			files = (
 				FAB3624429F453C700A88050 /* Coin.swift in Sources */,
 				FAB361FC29F447DB00A88050 /* WenMoon.xcdatamodeld in Sources */,
+				FAE0231E2A1E11F3009BA135 /* Notification+Name.swift in Sources */,
 				FA8A08852A1CF8500083B8DB /* AppDelegate.swift in Sources */,
 				FA07AC2629F91120008F6484 /* CoinMarketData.swift in Sources */,
 				FA8A08902A1CFD040083B8DB /* UserDefaultsManager.swift in Sources */,
@@ -519,19 +531,18 @@
 				FAB3624729F453DD00A88050 /* CoinSearchResult.swift in Sources */,
 				FA8A088D2A1CFAF90083B8DB /* PriceAlert.swift in Sources */,
 				FAB3623629F4513B00A88050 /* HTTPRequest.swift in Sources */,
-				FA8A089A2A1D16AB0083B8DB /* PriceAlertEntity.swift in Sources */,
 				FAB3623A29F4515C00A88050 /* HTTPClient.swift in Sources */,
-				FA8A08972A1D156E0083B8DB /* PriceAlertServiceError.swift in Sources */,
 				FA8A08892A1CFA820083B8DB /* PriceAlertService.swift in Sources */,
-				FAB361FE29F447DB00A88050 /* PriceAlertListView.swift in Sources */,
+				FAB361FE29F447DB00A88050 /* CoinListView.swift in Sources */,
 				FAB361F929F447DB00A88050 /* PersistenceManager.swift in Sources */,
 				FAB3623829F4514B00A88050 /* APIError.swift in Sources */,
 				FA07AC3029F93292008F6484 /* Double+Extensions.swift in Sources */,
-				FAB3625729F457DC00A88050 /* AddPriceAlertView.swift in Sources */,
+				FA51D0322A361F3700D203EF /* CoinEntity.swift in Sources */,
+				FAB3625729F457DC00A88050 /* AddCoinView.swift in Sources */,
 				FAB3624A29F453FC00A88050 /* CoinScannerService.swift in Sources */,
 				FAB3623C29F4517800A88050 /* BaseBackendService.swift in Sources */,
-				FAB3625A29F4580C00A88050 /* AddPriceAlertViewModel.swift in Sources */,
-				FAB3626A29F4651F00A88050 /* PriceAlertListViewModel.swift in Sources */,
+				FAB3625A29F4580C00A88050 /* AddCoinViewModel.swift in Sources */,
+				FAB3626A29F4651F00A88050 /* CoinListViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -540,10 +551,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				FAB3625329F4549800A88050 /* CoinScannerServiceTests.swift in Sources */,
-				FAB3627529F469E700A88050 /* PriceAlertListViewModelTests.swift in Sources */,
+				FAB3627529F469E700A88050 /* CoinListViewModelTests.swift in Sources */,
 				FAB3625F29F4595D00A88050 /* CoinScannerServiceMock.swift in Sources */,
-				FAB3626229F4598F00A88050 /* AddPriceAlertViewModelTests.swift in Sources */,
+				FAB3626229F4598F00A88050 /* AddCoinViewModelTests.swift in Sources */,
 				FAB3625029F4547100A88050 /* HTTPClientMock.swift in Sources */,
+				FAA83CC82A3B6E37001DEE1E /* UserDefaultsManagerMock.swift in Sources */,
 				FACB39AE29FABBC800AA613E /* PersistenceManagerMock.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

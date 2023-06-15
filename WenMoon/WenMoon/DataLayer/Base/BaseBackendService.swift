@@ -13,11 +13,6 @@ class BaseBackendService {
     private let baseURL: URL
     private(set) var httpClient: HTTPClient
 
-    // User Defaults
-    private(set) var userDefaultsManager: UserDefaultsManager
-    private(set) var deviceTokenKey = "DEVICE_TOKEN_KEY"
-    private(set) var userDefaultsError: UserDefaultsError?
-
     private var cancellables = Set<AnyCancellable>()
 
     var encoder: JSONEncoder {
@@ -32,17 +27,19 @@ class BaseBackendService {
 
     convenience init(baseURL: URL) {
         let httpClient = HTTPClientImpl(baseURL: baseURL)
-        self.init(httpClient: httpClient, baseURL: baseURL, userDefaultsManager: UserDefaultsManagerImpl())
+        self.init(httpClient: httpClient, baseURL: baseURL)
     }
 
-    init(httpClient: HTTPClient, baseURL: URL, userDefaultsManager: UserDefaultsManager) {
+    init(httpClient: HTTPClient, baseURL: URL) {
         self.httpClient = httpClient
         self.baseURL = baseURL
-        self.userDefaultsManager = userDefaultsManager
+    }
 
-        userDefaultsManager.errorPublisher.sink { [weak self] userDefaultsError in
-            self?.userDefaultsError = userDefaultsError
+    func mapToAPIError(_ error: Error) -> APIError {
+        guard let error = error as? APIError else {
+            return .apiError(error: error as? URLError ?? .init(.unknown),
+                             description: error.localizedDescription)
         }
-        .store(in: &cancellables)
+        return error
     }
 }

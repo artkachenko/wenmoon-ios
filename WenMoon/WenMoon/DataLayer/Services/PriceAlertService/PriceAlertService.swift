@@ -9,9 +9,9 @@ import Foundation
 import Combine
 
 protocol PriceAlertService {
-    func getPriceAlerts() -> AnyPublisher<[PriceAlert], PriceAlertServiceError>
-    func setPriceAlert(_ priceAlert: PriceAlertEntity) -> AnyPublisher<PriceAlert, PriceAlertServiceError>
-    func deletePriceAlert(by id: String) -> AnyPublisher<PriceAlert, PriceAlertServiceError>
+    func getPriceAlerts(deviceToken: String) -> AnyPublisher<[PriceAlert], APIError>
+    func setPriceAlert(for coin: CoinEntity, deviceToken: String) -> AnyPublisher<PriceAlert, APIError>
+    func deletePriceAlert(for id: String, deviceToken: String) -> AnyPublisher<PriceAlert, APIError>
 }
 
 final class PriceAlertServiceImpl: BaseBackendService, PriceAlertService {
@@ -23,68 +23,40 @@ final class PriceAlertServiceImpl: BaseBackendService, PriceAlertService {
         self.init(baseURL: baseURL)
     }
 
-    func getPriceAlerts() -> AnyPublisher<[PriceAlert], PriceAlertServiceError> {
-        do {
-            let deviceToken = try fetchDeviceToken()
-            return httpClient.get(path: "price-alerts", headers: ["X-Device-ID": deviceToken])
-                .decode(type: [PriceAlert].self, decoder: decoder)
-                .mapError { [weak self] error in
-                    self?.mapToPriceAlertError(error) ?? .unknown
-                }
-                .eraseToAnyPublisher()
-        } catch {
-            return Fail(error: mapToPriceAlertError(error)).eraseToAnyPublisher()
-        }
+    func getPriceAlerts(deviceToken: String) -> AnyPublisher<[PriceAlert], APIError> {
+        httpClient.get(path: "price-alerts", headers: ["X-Device-ID": deviceToken])
+            .decode(type: [PriceAlert].self, decoder: decoder)
+            .mapError { [weak self] error in
+                self?.mapToAPIError(error) ?? .unknown(response: URLResponse())
+            }
+            .eraseToAnyPublisher()
     }
 
-    func setPriceAlert(_ priceAlert: PriceAlertEntity) -> AnyPublisher<PriceAlert, PriceAlertServiceError> {
+    func setPriceAlert(for coin: CoinEntity, deviceToken: String) -> AnyPublisher<PriceAlert, APIError> {
         do {
-            let targetPrice = priceAlert.targetPrice?.doubleValue ?? .zero
-            let request = PriceAlert(coinId: priceAlert.id,
-                                     coinName: priceAlert.name,
+            let targetPrice = coin.targetPrice?.doubleValue ?? .zero
+            let request = PriceAlert(coinId: coin.id,
+                                     coinName: coin.name,
                                      targetPrice: targetPrice,
-                                     targetDirection: priceAlert.currentPrice < targetPrice ? .above : .below)
+                                     targetDirection: coin.currentPrice < targetPrice ? .above : .below)
             let body = try encoder.encode(request)
-            let deviceToken = try fetchDeviceToken()
             return httpClient.post(path: "price-alert", headers: ["X-Device-ID": deviceToken], body: body)
                 .decode(type: PriceAlert.self, decoder: decoder)
                 .mapError { [weak self] error in
-                    self?.mapToPriceAlertError(error) ?? .unknown
+                    self?.mapToAPIError(error) ?? .unknown(response: URLResponse())
                 }
                 .eraseToAnyPublisher()
         } catch {
-            return Fail(error: mapToPriceAlertError(error)).eraseToAnyPublisher()
+            return Fail(error: .failedToEncodeBody).eraseToAnyPublisher()
         }
     }
 
-    func deletePriceAlert(by id: String) -> AnyPublisher<PriceAlert, PriceAlertServiceError> {
-        do {
-            let deviceToken = try fetchDeviceToken()
-            return httpClient.delete(path: "price-alert/\(id)", headers: ["X-Device-ID": deviceToken])
-                .decode(type: PriceAlert.self, decoder: decoder)
-                .mapError { [weak self] error in
-                    self?.mapToPriceAlertError(error) ?? .unknown
-                }
-                .eraseToAnyPublisher()
-        } catch {
-            return Fail(error: mapToPriceAlertError(error)).eraseToAnyPublisher()
-        }
-    }
-
-    private func fetchDeviceToken() throws -> String {
-        guard let deviceToken = userDefaultsManager.getObject(forKey: deviceTokenKey, objectType: String.self) else {
-            throw PriceAlertServiceError.deviceTokenNotFound(userDefaultsError ?? .unknown)
-        }
-        return deviceToken
-    }
-
-    private func mapToPriceAlertError(_ error: Error) -> PriceAlertServiceError {
-        if let error = error as? APIError {
-            return .apiError(error)
-        } else if let error = error as? UserDefaultsError {
-            return .deviceTokenNotFound(error)
-        } else {
-            return .unknown
-        }
+    func deletePriceAlert(for id: String, deviceToken: String) -> AnyPublisher<PriceAlert, APIError> {
+        httpClient.delete(path: "price-alert/\(id)", headers: ["X-Device-ID": deviceToken])
+            .decode(type: PriceAlert.self, decoder: decoder)
+            .mapError { [weak self] error in
+                self?.mapToAPIError(error) ?? .unknown(response: URLResponse())
+            }
+            .eraseToAnyPublisher()
     }
 }

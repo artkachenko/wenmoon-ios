@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CoinMarketData: Codable {
+struct MarketData: Codable {
     let currentPrice: Double?
     let priceChange: Double?
 
@@ -35,7 +35,7 @@ struct CoinMarketData: Codable {
 
 // MARK: - Mocks
 
-extension CoinMarketData {
-    static let mock = ["bitcoin": CoinMarketData(currentPrice: 28952, priceChange: 0.81),
-                       "ethereum": CoinMarketData(currentPrice: 1882.93, priceChange: 0.37)]
+extension MarketData {
+    static let mock = ["bitcoin": MarketData(currentPrice: 28952, priceChange: 0.81),
+                       "ethereum": MarketData(currentPrice: 1882.93, priceChange: 0.37)]
 }

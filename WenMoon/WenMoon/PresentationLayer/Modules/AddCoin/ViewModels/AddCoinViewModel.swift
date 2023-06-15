@@ -1,5 +1,5 @@
 //
-//  AddPriceAlertViewModel.swift
+//  AddCoinViewModel.swift
 //  WenMoon
 //
 //  Created by Artur Tkachenko on 22.04.23.
@@ -8,12 +8,12 @@
 import Foundation
 import Combine
 
-final class AddPriceAlertViewModel: ObservableObject {
+final class AddCoinViewModel: ObservableObject {
 
     // MARK: - Properties
 
     @Published private(set) var coins: [Coin] = []
-    @Published private(set) var marketData: [String: CoinMarketData] = [:]
+    @Published private(set) var marketData: [String: MarketData] = [:]
     @Published private(set) var currentPage = 1
     @Published private(set) var errorMessage: String?
     @Published private(set) var isLoading = false

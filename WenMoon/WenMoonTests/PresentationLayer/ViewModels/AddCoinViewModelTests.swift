@@ -1,5 +1,5 @@
 //
-//  AddPriceAlertViewModelTests.swift
+//  AddCoinViewModelTests.swift
 //  WenMoonTests
 //
 //  Created by Artur Tkachenko on 22.04.23.
@@ -9,11 +9,11 @@ import XCTest
 import Combine
 @testable import WenMoon
 
-class AddPriceAlertViewModelTests: XCTestCase {
+class AddCoinViewModelTests: XCTestCase {
 
     // MARK: - Properties
 
-    var viewModel: AddPriceAlertViewModel!
+    var viewModel: AddCoinViewModel!
     var service: CoinScannerServiceMock!
     var cancellables: Set<AnyCancellable>!
 
@@ -22,7 +22,7 @@ class AddPriceAlertViewModelTests: XCTestCase {
     override func setUp() {
         super.setUp()
         service = CoinScannerServiceMock()
-        viewModel = AddPriceAlertViewModel(service: service)
+        viewModel = AddCoinViewModel(service: service)
         cancellables = Set<AnyCancellable>()
     }
 
@@ -86,9 +86,9 @@ class AddPriceAlertViewModelTests: XCTestCase {
 
     func testSearchCoinsByQuerySuccess() {
         let coinSearchResult = CoinSearchResult.mock
-        let marketDataResponse = CoinMarketData.mock
+        let marketDataResponse = MarketData.mock
         service.searchCoinsByQueryResult = .success(coinSearchResult)
-        service.getMarketDataForCoinIDsResult = .success(marketDataResponse)
+        service.getMarketDataForCoinsResult = .success(marketDataResponse)
 
         let expectation = XCTestExpectation(description: "Search for a specific coins by query")
         let combinedPublisher = Publishers.CombineLatest(viewModel.$coins, viewModel.$marketData)

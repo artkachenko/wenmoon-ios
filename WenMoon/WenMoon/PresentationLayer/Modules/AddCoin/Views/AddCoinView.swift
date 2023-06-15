@@ -1,5 +1,5 @@
 //
-//  AddPriceAlertView.swift
+//  AddCoinView.swift
 //  WenMoon
 //
 //  Created by Artur Tkachenko on 22.04.23.
@@ -7,21 +7,17 @@
 
 import SwiftUI
 
-struct AddPriceAlertView: View {
+struct AddCoinView: View {
 
     // MARK: - Properties
 
     @Environment(\.presentationMode) private var presentationMode
-    @EnvironmentObject private var viewModel: AddPriceAlertViewModel
+    @EnvironmentObject private var viewModel: AddCoinViewModel
 
     @State private var searchText = ""
     @State private var showErrorAlert = false
-    @State private var showSetPriceAlertConfirmation = false
 
-    @State private var capturedCoin: Coin?
-    @State private var targetPrice: Double?
-
-    private(set) var didSelectCoin: ((Coin, CoinMarketData?, _ targetPrice: Double?) -> Void)?
+    private(set) var didSelectCoin: ((Coin, MarketData?) -> Void)?
 
     // MARK: - Body
 
@@ -47,8 +43,8 @@ struct AddPriceAlertView: View {
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        capturedCoin = coin
-                        showSetPriceAlertConfirmation = true
+                        didSelectCoin?(coin, viewModel.marketData[coin.id])
+                        presentationMode.wrappedValue.dismiss()
                     }
                     .onAppear {
                         if searchText.isEmpty && coin.id == viewModel.coins.last?.id {
@@ -83,32 +79,9 @@ struct AddPriceAlertView: View {
             .alert(viewModel.errorMessage ?? "", isPresented: $showErrorAlert) {
                 Button("OK", role: .cancel) { }
             }
-            .alert("Set Price Alert", isPresented: $showSetPriceAlertConfirmation, actions: {
-                TextField("Target Price", value: $targetPrice, format: .number)
-                    .keyboardType(.decimalPad)
-
-                Button("Confirm") {
-                    didSelectCoin(targetPrice)
-                }
-
-                Button("Not Now", role: .cancel) {
-                    didSelectCoin()
-                }
-            }) {
-                Text("Please enter your target price in USD, and our system will notify you when it is reached.")
-            }
             .onAppear {
                 viewModel.fetchCoins()
             }
         }
-    }
-
-    private func didSelectCoin(_ targetPrice: Double? = nil) {
-        guard let coin = capturedCoin else { return }
-        let marketData = viewModel.marketData[coin.id]
-        didSelectCoin?(coin, marketData, targetPrice)
-        capturedCoin = nil
-        self.targetPrice = nil
-        presentationMode.wrappedValue.dismiss()
     }
 }
