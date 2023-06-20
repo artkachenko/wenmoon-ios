@@ -6,14 +6,11 @@
 //
 
 import Foundation
-import Combine
 
 class BaseBackendService {
 
     private let baseURL: URL
     private(set) var httpClient: HTTPClient
-
-    private var cancellables = Set<AnyCancellable>()
 
     var encoder: JSONEncoder {
         httpClient.encoder.keyEncodingStrategy = .convertToSnakeCase

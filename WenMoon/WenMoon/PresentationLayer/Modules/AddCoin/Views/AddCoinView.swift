@@ -61,7 +61,7 @@ struct AddCoinView: View {
                     ProgressView()
                 }
             }
-            .navigationTitle("Add Price Alert")
+            .navigationTitle("Add Coin")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

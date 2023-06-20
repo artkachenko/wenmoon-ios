@@ -82,6 +82,7 @@ struct CoinListView: View {
                     }
                 }
             }
+            .animation(.default, value: coinListViewModel.coins)
             .navigationTitle("Coins")
             .refreshable {
                 coinListViewModel.fetchCoins()

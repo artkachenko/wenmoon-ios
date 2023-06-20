@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum APIError: LocalizedError, Equatable {
+enum APIError: LocalizedError, Equatable {
     case apiError(error: URLError?, description: String)
     case invalidEndpoint(endpoint: String)
     case failedToEncodeBody

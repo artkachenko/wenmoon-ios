@@ -60,8 +60,12 @@ final class CoinListViewModel: ObservableObject {
     // MARK: - Methods
 
     func fetchCoins() {
-        let sortDescriptors = [NSSortDescriptor(keyPath: \CoinEntity.rank, ascending: true)]
+        let isActiveSortDescriptor = NSSortDescriptor(keyPath: \CoinEntity.isActive, ascending: false)
+        let rankSortDescriptor = NSSortDescriptor(keyPath: \CoinEntity.rank, ascending: true)
+
+        let sortDescriptors = [isActiveSortDescriptor, rankSortDescriptor]
         let request = CoinEntity.fetchRequest(sortDescriptors: sortDescriptors)
+
         if let coins = persistenceManager.fetch(request) {
             self.coins = coins
         }
@@ -73,44 +77,46 @@ final class CoinListViewModel: ObservableObject {
     }
 
     func createCoinEntity(_ coin: Coin, _ marketData: MarketData? = nil) {
-        let newCoin = CoinEntity(context: persistenceManager.context)
-        newCoin.id = coin.id
-        newCoin.name = coin.name
-        newCoin.image = coin.image
-        newCoin.rank = coin.marketCapRank ?? .max
-        newCoin.targetPrice = nil
-        newCoin.isActive = false
+        if !coins.contains(where: { $0.id == coin.id }) {
+            let newCoin = CoinEntity(context: persistenceManager.context)
+            newCoin.id = coin.id
+            newCoin.name = coin.name
+            newCoin.image = coin.image
+            newCoin.rank = coin.marketCapRank ?? .max
+            newCoin.targetPrice = nil
+            newCoin.isActive = false
 
-        if let marketData {
-            newCoin.currentPrice = marketData.currentPrice ?? .zero
-            newCoin.priceChange = marketData.priceChange ?? .zero
-        } else {
-            newCoin.currentPrice = coin.currentPrice ?? .zero
-            newCoin.priceChange = coin.priceChangePercentage24H ?? .zero
+            if let marketData {
+                newCoin.currentPrice = marketData.currentPrice ?? .zero
+                newCoin.priceChange = marketData.priceChange ?? .zero
+            } else {
+                newCoin.currentPrice = coin.currentPrice ?? .zero
+                newCoin.priceChange = coin.priceChangePercentage24H ?? .zero
+            }
+
+            if let url = URL(string: coin.image) {
+                loadImage(from: url)
+                    .sink(receiveCompletion: { [weak self] completion in
+                        switch completion {
+                        case .failure(let error):
+                            self?.errorMessage = "Error downloading image for \(coin.name): \(error.localizedDescription)"
+                        case .finished:
+                            print("Image loading completed successfully")
+                        }
+                    }, receiveValue: { [weak self] imageData in
+                        newCoin.imageData = imageData
+
+                        DispatchQueue.main.async {
+                            self?.coins.append(newCoin)
+                            self?.coins.sort(by: { $0.rank < $1.rank })
+                        }
+                    })
+                    .store(in: &cancellables)
+            } else {
+                errorMessage = "Invalid image URL for \(coin.name)"
+            }
+            saveChanges()
         }
-
-        if let url = URL(string: coin.image) {
-            loadImage(from: url)
-                .sink(receiveCompletion: { [weak self] completion in
-                    switch completion {
-                    case .failure(let error):
-                        self?.errorMessage = "Error downloading image for \(coin.name): \(error.localizedDescription)"
-                    case .finished:
-                        print("Image loading completed successfully")
-                    }
-                }, receiveValue: { [weak self] imageData in
-                    newCoin.imageData = imageData
-
-                    DispatchQueue.main.async {
-                        self?.coins.append(newCoin)
-                        self?.coins.sort(by: { $0.rank < $1.rank })
-                    }
-                })
-                .store(in: &cancellables)
-        } else {
-            errorMessage = "Invalid image URL for \(coin.name)"
-        }
-        saveChanges()
     }
 
     func deleteCoin(_ coin: CoinEntity) {
@@ -130,6 +136,8 @@ final class CoinListViewModel: ObservableObject {
             coin.isActive = false
             deletePriceAlert(for: coin.id)
         }
+
+        sortCoins()
         saveChanges()
     }
 
@@ -227,6 +235,15 @@ final class CoinListViewModel: ObservableObject {
                 self?.saveChanges()
             })
             .store(in: &cancellables)
+    }
+
+    private func sortCoins() {
+        coins.sort { coin1, coin2 in
+            if coin1.isActive != coin2.isActive {
+                return coin1.isActive && !coin2.isActive
+            }
+            return coin1.rank < coin2.rank
+        }
     }
 
     private func saveChanges() {
