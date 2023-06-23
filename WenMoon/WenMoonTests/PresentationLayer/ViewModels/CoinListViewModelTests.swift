@@ -18,7 +18,6 @@ class CoinListViewModelTests: XCTestCase {
     var coinScannerService: CoinScannerServiceMock!
     var priceAlertService: PriceAlertService!
     var persistenceManager: PersistenceManagerMock!
-    var userDefaultsManager: UserDefaultsManagerMock!
     var cancellables: Set<AnyCancellable>!
 
     // MARK: - Setup
@@ -28,11 +27,8 @@ class CoinListViewModelTests: XCTestCase {
         coinScannerService = CoinScannerServiceMock()
         priceAlertService = PriceAlertServiceImpl()
         persistenceManager = PersistenceManagerMock()
-        userDefaultsManager = UserDefaultsManagerMock()
         viewModel = CoinListViewModel(coinScannerService: coinScannerService,
-                                      priceAlertService: priceAlertService,
-                                      persistenceManager: persistenceManager,
-                                      userDefaultsManager: userDefaultsManager)
+                                      priceAlertService: priceAlertService)
         cancellables = Set<AnyCancellable>()
     }
 
@@ -41,7 +37,6 @@ class CoinListViewModelTests: XCTestCase {
         coinScannerService = nil
         priceAlertService = nil
         persistenceManager = nil
-        userDefaultsManager = nil
         cancellables = nil
         super.tearDown()
     }

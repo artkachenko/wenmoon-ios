@@ -8,53 +8,27 @@
 import Foundation
 import Combine
 
-final class CoinListViewModel: ObservableObject {
+final class CoinListViewModel: BaseViewModel {
 
     // MARK: - Properties
 
     @Published var coins: [CoinEntity] = []
     @Published private(set) var marketData: [String: MarketData] = [:]
-    @Published private(set) var errorMessage: String?
 
     private let coinScannerService: CoinScannerService
     private let priceAlertService: PriceAlertService
-    private let persistenceManager: PersistenceManager
-    private let userDefaultsManager: UserDefaultsManager
-
     private var timer: Timer?
-    private var cancellables = Set<AnyCancellable>()
-
-    private var deviceToken: String? {
-        userDefaultsManager.getObject(forKey: "deviceToken", objectType: String.self)
-    }
 
     // MARK: - Initializers
 
     convenience init() {
-        self.init(coinScannerService: CoinScannerServiceImpl(),
-                  priceAlertService: PriceAlertServiceImpl(),
-                  persistenceManager: PersistenceManagerImpl(),
-                  userDefaultsManager: UserDefaultsManagerImpl())
+        self.init(coinScannerService: CoinScannerServiceImpl(), priceAlertService: PriceAlertServiceImpl())
     }
 
-    init(coinScannerService: CoinScannerService,
-         priceAlertService: PriceAlertService,
-         persistenceManager: PersistenceManager,
-         userDefaultsManager: UserDefaultsManager) {
+    init(coinScannerService: CoinScannerService, priceAlertService: PriceAlertService) {
         self.coinScannerService = coinScannerService
         self.priceAlertService = priceAlertService
-        self.persistenceManager = persistenceManager
-        self.userDefaultsManager = userDefaultsManager
-
-        persistenceManager.errorPublisher.sink { [weak self] error in
-            self?.errorMessage = error.errorDescription
-        }
-        .store(in: &cancellables)
-
-        userDefaultsManager.errorPublisher.sink { [weak self] error in
-            self?.errorMessage = error.errorDescription
-        }
-        .store(in: &cancellables)
+        super.init(persistenceManager: PersistenceManagerImpl(), userDefaultsManager: UserDefaultsManagerImpl())
     }
 
     // MARK: - Methods

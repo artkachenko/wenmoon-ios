@@ -22,7 +22,7 @@ class AddCoinViewModelTests: XCTestCase {
     override func setUp() {
         super.setUp()
         service = CoinScannerServiceMock()
-        viewModel = AddCoinViewModel(service: service)
+        viewModel = AddCoinViewModel(coinScannerService: service)
         cancellables = Set<AnyCancellable>()
     }
 

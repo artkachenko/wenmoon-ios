@@ -8,29 +8,28 @@
 import Foundation
 import Combine
 
-final class AddCoinViewModel: ObservableObject {
+final class AddCoinViewModel: BaseViewModel {
 
     // MARK: - Properties
 
     @Published private(set) var coins: [Coin] = []
     @Published private(set) var marketData: [String: MarketData] = [:]
     @Published private(set) var currentPage = 1
-    @Published private(set) var errorMessage: String?
-    @Published private(set) var isLoading = false
 
-    private let service: CoinScannerService
+    private let coinScannerService: CoinScannerService
+
     private var coinsCache: [Int: [Coin]] = [:]
     private var searchCoinsCache: [String: [Coin]] = [:]
-    private var cancellables = Set<AnyCancellable>()
 
     // MARK: - Initializers
 
     convenience init() {
-        self.init(service: CoinScannerServiceImpl())
+        self.init(coinScannerService: CoinScannerServiceImpl())
     }
 
-    init(service: CoinScannerService) {
-        self.service = service
+    init(coinScannerService: CoinScannerService) {
+        self.coinScannerService = coinScannerService
+        super.init(persistenceManager: PersistenceManagerImpl(), userDefaultsManager: UserDefaultsManagerImpl())
     }
 
     // MARK: - Methods
@@ -47,7 +46,7 @@ final class AddCoinViewModel: ObservableObject {
         }
 
         isLoading = true
-        service.getCoins(at: page)
+        coinScannerService.getCoins(at: page)
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completion in
                 self?.isLoading = false
@@ -83,7 +82,7 @@ final class AddCoinViewModel: ObservableObject {
                 return
             }
             isLoading = true
-            service.searchCoins(by: query)
+            coinScannerService.searchCoins(by: query)
                 .receive(on: RunLoop.main)
                 .sink(receiveCompletion: { [weak self] completion in
                     self?.isLoading = false
@@ -106,7 +105,7 @@ final class AddCoinViewModel: ObservableObject {
 
     private func fetchMarketData(for coinIDs: [String]) {
         isLoading = true
-        service.getMarketData(for: coinIDs)
+        coinScannerService.getMarketData(for: coinIDs)
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { [weak self] completion in
                 self?.isLoading = false
