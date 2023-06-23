@@ -219,16 +219,4 @@ final class CoinListViewModel: BaseViewModel {
             return coin1.rank < coin2.rank
         }
     }
-
-    private func saveChanges() {
-        persistenceManager.save()
-        objectWillChange.send()
-    }
-
-    private func loadImage(from url: URL) -> AnyPublisher<Data, Error> {
-        URLSession.shared.dataTaskPublisher(for: url)
-            .map(\.data)
-            .mapError { $0 as Error }
-            .eraseToAnyPublisher()
-    }
 }

@@ -44,4 +44,18 @@ class BaseViewModel: ObservableObject {
         }
         .store(in: &cancellables)
     }
+
+    // MARK: - Methods
+
+    func saveChanges() {
+        persistenceManager.save()
+        objectWillChange.send()
+    }
+
+    func loadImage(from url: URL) -> AnyPublisher<Data, Error> {
+        URLSession.shared.dataTaskPublisher(for: url)
+            .map(\.data)
+            .mapError { $0 as Error }
+            .eraseToAnyPublisher()
+    }
 }
