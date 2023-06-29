@@ -25,21 +25,35 @@ struct AddCoinView: View {
         NavigationView {
             ZStack {
                 List(viewModel.coins, id: \.self) { coin in
-                    HStack(spacing: 12) {
-                        AsyncImage(url: URL(string: coin.image)) { image in
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                        } placeholder: {
-                            Image(systemName: "photo")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
+                    ZStack(alignment: .leading) {
+                        if let rank = coin.marketCapRank {
+                            Text(String(rank))
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        } else {
+                            Text("N/A")
+                                .font(.caption)
+                                .foregroundColor(.gray)
                         }
-                        .frame(width: 24, height: 24)
 
-                        Text(coin.name).font(.headline)
+                        HStack(spacing: 12) {
+                            AsyncImage(url: URL(string: coin.image)) { image in
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .cornerRadius(12)
+                            } placeholder: {
+                                Image(systemName: "photo")
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                            }
+                            .frame(width: 24, height: 24)
 
-                        Spacer()
+                            Text(coin.name).font(.headline)
+
+                            Spacer()
+                        }
+                        .padding(.leading, 36)
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {

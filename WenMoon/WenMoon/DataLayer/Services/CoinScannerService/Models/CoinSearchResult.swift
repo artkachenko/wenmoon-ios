@@ -10,10 +10,3 @@ import Foundation
 struct CoinSearchResult: Codable {
     let coins: [Coin]
 }
-
-// MARK: - Mocks
-
-extension CoinSearchResult {
-    static let mock = CoinSearchResult(coins: [.btc, .eth])
-    static let emptyMock = CoinSearchResult(coins: [])
-}

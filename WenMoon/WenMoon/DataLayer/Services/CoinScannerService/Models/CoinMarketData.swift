@@ -32,10 +32,3 @@ struct MarketData: Codable {
         try container.encode(priceChange, forKey: .usd24HChange)
     }
 }
-
-// MARK: - Mocks
-
-extension MarketData {
-    static let mock = ["bitcoin": MarketData(currentPrice: 28952, priceChange: 0.81),
-                       "ethereum": MarketData(currentPrice: 1882.93, priceChange: 0.37)]
-}

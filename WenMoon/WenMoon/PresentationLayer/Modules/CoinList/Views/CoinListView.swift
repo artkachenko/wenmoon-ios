@@ -31,6 +31,12 @@ struct CoinListView: View {
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 48, height: 48)
+                            .cornerRadius(24)
+                    } else {
+                        Image(systemName: "photo")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 48, height: 48)
                     }
 
                     VStack(alignment: .leading, spacing: 4) {

@@ -66,7 +66,7 @@ class AddCoinViewModelTests: XCTestCase {
     }
 
     func testFetchCoinsFailure() {
-        let apiError: APIError = .apiError(error: .init(.badServerResponse), description: "Mocked server error")
+        let apiError: APIError = .apiError(description: "Mocked server error")
         service.getCoinsAtPageResult = .failure(apiError)
 
         let expectation = XCTestExpectation(description: "Get a failure with API error")

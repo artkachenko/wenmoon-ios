@@ -66,8 +66,7 @@ class CoinScannerServiceTests: XCTestCase {
     }
 
     func testGetCoinsFailure() {
-        let apiError: APIError = .apiError(error: .init(.badServerResponse),
-                                           description: "Mocked API error description")
+        let apiError: APIError = .apiError(description: "Mocked API error description")
         httpClient.getResponse = .failure(apiError)
 
         let expectation = XCTestExpectation(description: "Get a failure with API error")

@@ -70,6 +70,7 @@ final class CoinListViewModel: BaseViewModel {
 
             if let url = URL(string: coin.image) {
                 loadImage(from: url)
+                    .receive(on: RunLoop.main)
                     .sink(receiveCompletion: { [weak self] completion in
                         switch completion {
                         case .failure(let error):
@@ -79,17 +80,15 @@ final class CoinListViewModel: BaseViewModel {
                         }
                     }, receiveValue: { [weak self] imageData in
                         newCoin.imageData = imageData
+                        self?.coins.append(newCoin)
 
-                        DispatchQueue.main.async {
-                            self?.coins.append(newCoin)
-                            self?.coins.sort(by: { $0.rank < $1.rank })
-                        }
+                        self?.sortCoins()
+                        self?.saveChanges()
                     })
                     .store(in: &cancellables)
             } else {
                 errorMessage = "Invalid image URL for \(coin.name)"
             }
-            saveChanges()
         }
     }
 

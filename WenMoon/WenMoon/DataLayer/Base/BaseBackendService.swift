@@ -34,8 +34,7 @@ class BaseBackendService {
 
     func mapToAPIError(_ error: Error) -> APIError {
         guard let error = error as? APIError else {
-            return .apiError(error: error as? URLError ?? .init(.unknown),
-                             description: error.localizedDescription)
+            return .apiError(description: error.localizedDescription)
         }
         return error
     }

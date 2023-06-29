@@ -16,6 +16,9 @@
 		FA8A088D2A1CFAF90083B8DB /* PriceAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8A088C2A1CFAF90083B8DB /* PriceAlert.swift */; };
 		FA8A08902A1CFD040083B8DB /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8A088F2A1CFD040083B8DB /* UserDefaultsManager.swift */; };
 		FA8A08922A1CFD130083B8DB /* UserDefaultsError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8A08912A1CFD130083B8DB /* UserDefaultsError.swift */; };
+		FA8F60C62A4DA3A20050C983 /* Coin+Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8F60C52A4DA3A20050C983 /* Coin+Mocks.swift */; };
+		FA8F60C82A4DA3C80050C983 /* CoinSearchResult+Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8F60C72A4DA3C80050C983 /* CoinSearchResult+Mocks.swift */; };
+		FA8F60CA2A4DA40A0050C983 /* MarketData+Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8F60C92A4DA40A0050C983 /* MarketData+Mocks.swift */; };
 		FAA83CC82A3B6E37001DEE1E /* UserDefaultsManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAA83CC72A3B6E37001DEE1E /* UserDefaultsManagerMock.swift */; };
 		FAB361F729F447DB00A88050 /* WenMoonApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB361F629F447DB00A88050 /* WenMoonApp.swift */; };
 		FAB361F929F447DB00A88050 /* PersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB361F829F447DB00A88050 /* PersistenceManager.swift */; };
@@ -62,6 +65,9 @@
 		FA8A088C2A1CFAF90083B8DB /* PriceAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlert.swift; sourceTree = "<group>"; };
 		FA8A088F2A1CFD040083B8DB /* UserDefaultsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManager.swift; sourceTree = "<group>"; };
 		FA8A08912A1CFD130083B8DB /* UserDefaultsError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsError.swift; sourceTree = "<group>"; };
+		FA8F60C52A4DA3A20050C983 /* Coin+Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coin+Mocks.swift"; sourceTree = "<group>"; };
+		FA8F60C72A4DA3C80050C983 /* CoinSearchResult+Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CoinSearchResult+Mocks.swift"; sourceTree = "<group>"; };
+		FA8F60C92A4DA40A0050C983 /* MarketData+Mocks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MarketData+Mocks.swift"; sourceTree = "<group>"; };
 		FAA83CC72A3B6E37001DEE1E /* UserDefaultsManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManagerMock.swift; sourceTree = "<group>"; };
 		FAB361F329F447DB00A88050 /* WenMoon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WenMoon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FAB361F629F447DB00A88050 /* WenMoonApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WenMoonApp.swift; sourceTree = "<group>"; };
@@ -159,6 +165,16 @@
 				FAB3624929F453FC00A88050 /* CoinScannerService.swift */,
 			);
 			path = CoinScannerService;
+			sourceTree = "<group>";
+		};
+		FA8F60C42A4DA3970050C983 /* Responses */ = {
+			isa = PBXGroup;
+			children = (
+				FA8F60C52A4DA3A20050C983 /* Coin+Mocks.swift */,
+				FA8F60C72A4DA3C80050C983 /* CoinSearchResult+Mocks.swift */,
+				FA8F60C92A4DA40A0050C983 /* MarketData+Mocks.swift */,
+			);
+			path = Responses;
 			sourceTree = "<group>";
 		};
 		FAB361EA29F447DB00A88050 = {
@@ -332,6 +348,7 @@
 		FAB3624E29F4546100A88050 /* Mocks */ = {
 			isa = PBXGroup;
 			children = (
+				FA8F60C42A4DA3970050C983 /* Responses */,
 				FAB3624F29F4547100A88050 /* HTTPClientMock.swift */,
 			);
 			path = Mocks;
@@ -562,6 +579,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA8F60C62A4DA3A20050C983 /* Coin+Mocks.swift in Sources */,
+				FA8F60CA2A4DA40A0050C983 /* MarketData+Mocks.swift in Sources */,
+				FA8F60C82A4DA3C80050C983 /* CoinSearchResult+Mocks.swift in Sources */,
 				FAB3625329F4549800A88050 /* CoinScannerServiceTests.swift in Sources */,
 				FAB3627529F469E700A88050 /* CoinListViewModelTests.swift in Sources */,
 				FAB3625F29F4595D00A88050 /* CoinScannerServiceMock.swift in Sources */,

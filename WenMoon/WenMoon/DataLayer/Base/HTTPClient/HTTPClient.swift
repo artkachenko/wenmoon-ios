@@ -133,8 +133,7 @@ final class HTTPClientImpl: HTTPClient {
             }
             .mapError { error in
                 guard let error = error as? APIError else {
-                    return .apiError(error: error as? URLError ?? .init(.unknown),
-                                     description: error.localizedDescription)
+                    return .apiError(description: error.localizedDescription)
                 }
                 return error
             }

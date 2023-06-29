@@ -76,7 +76,7 @@ final class AddCoinViewModel: BaseViewModel {
             fetchCoins()
             return
         }
-        if query.count % 3 == .zero {
+        if query.count % 2 == .zero {
             if let cachedCoins = searchCoinsCache[query] {
                 coins = cachedCoins
                 return
