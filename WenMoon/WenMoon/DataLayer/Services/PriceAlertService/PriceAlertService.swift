@@ -18,7 +18,11 @@ final class PriceAlertServiceImpl: BaseBackendService, PriceAlertService {
     // MARK: - Initializers
 
     convenience init() {
+        #if DEBUG
+        let baseURL = URL(string: "http://localhost:8080/")!
+        #else
         let baseURL = URL(string: "https://wenmoon-vapor.herokuapp.com/")!
+        #endif
         self.init(baseURL: baseURL)
     }
 
