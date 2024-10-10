@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 
 final class CoinListViewModel: BaseViewModel {
 
@@ -40,13 +39,15 @@ final class CoinListViewModel: BaseViewModel {
         let sortDescriptors = [isActiveSortDescriptor, rankSortDescriptor]
         let request = CoinEntity.fetchRequest(sortDescriptors: sortDescriptors)
 
-        if let coins = persistenceManager.fetch(request) {
+        if let coins = try? persistenceManager.fetch(request) {
             self.coins = coins
         }
 
         if !coins.isEmpty {
-            fetchMarketData()
-            fetchPriceAlerts()
+            Task {
+                await fetchMarketData()
+                await fetchPriceAlerts()
+            }
         }
     }
 
@@ -69,23 +70,17 @@ final class CoinListViewModel: BaseViewModel {
             }
 
             if let url = URL(string: coin.image) {
-                loadImage(from: url)
-                    .receive(on: RunLoop.main)
-                    .sink(receiveCompletion: { [weak self] completion in
-                        switch completion {
-                        case .failure(let error):
-                            self?.errorMessage = "Error downloading image for \(coin.name): \(error.localizedDescription)"
-                        case .finished:
-                            print("Image loading completed successfully")
-                        }
-                    }, receiveValue: { [weak self] imageData in
+                Task {
+                    do {
+                        let imageData = try await loadImage(from: url)
                         newCoin.imageData = imageData
-                        self?.coins.append(newCoin)
-
-                        self?.sortCoins()
-                        self?.saveChanges()
-                    })
-                    .store(in: &cancellables)
+                        coins.append(newCoin)
+                        sortCoins()
+                        saveChanges()
+                    } catch {
+                        errorMessage = "Error downloading image for \(coin.name): \(error.localizedDescription)"
+                    }
+                }
             } else {
                 errorMessage = "Invalid image URL for \(coin.name)"
             }
@@ -93,9 +88,13 @@ final class CoinListViewModel: BaseViewModel {
     }
 
     func deleteCoin(_ coin: CoinEntity) {
-        persistenceManager.delete(coin)
-        if let index = coins.firstIndex(of: coin) {
-            coins.remove(at: index)
+        do {
+            try persistenceManager.delete(coin)
+            if let index = coins.firstIndex(of: coin) {
+                coins.remove(at: index)
+            }
+        } catch {
+            errorMessage = "Error deleting coin: \(error.localizedDescription)"
         }
     }
 
@@ -103,11 +102,15 @@ final class CoinListViewModel: BaseViewModel {
         if let targetPrice {
             coin.targetPrice = NSNumber(value: targetPrice)
             coin.isActive = true
-            setPriceAlert(for: coin)
+            Task {
+                await setPriceAlert(for: coin)
+            }
         } else {
             coin.targetPrice = nil
             coin.isActive = false
-            deletePriceAlert(for: coin.id)
+            Task {
+                await deletePriceAlert(for: coin.id)
+            }
         }
 
         sortCoins()
@@ -122,92 +125,66 @@ final class CoinListViewModel: BaseViewModel {
         saveChanges()
     }
 
-    private func fetchPriceAlerts() {
+    @MainActor
+    private func fetchPriceAlerts() async {
         guard let deviceToken else { return }
-        priceAlertService.getPriceAlerts(deviceToken: deviceToken)
-            .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                switch completion {
-                case .failure(let error):
-                    self?.errorMessage = error.errorDescription
-                case .finished: break
+        do {
+            let priceAlerts = try await priceAlertService.getPriceAlerts(deviceToken: deviceToken)
+            for (index, coin) in coins.enumerated() {
+                if let matchingPriceAlert = priceAlerts.first(where: { $0.coinId == coin.id }) {
+                    coins[index].targetPrice = NSNumber(value: matchingPriceAlert.targetPrice)
+                    coins[index].isActive = true
+                } else {
+                    coins[index].targetPrice = nil
+                    coins[index].isActive = false
                 }
-            }, receiveValue: { [weak self] priceAlerts in
-                guard let self else { return }
-
-                for (index, coin) in coins.enumerated() {
-                    if let matchingPriceAlert = priceAlerts.first(where: { $0.coinId == coin.id }) {
-                        coins[index].targetPrice = NSNumber(value: matchingPriceAlert.targetPrice)
-                        coins[index].isActive = true
-                    } else {
-                        coins[index].targetPrice = nil
-                        coins[index].isActive = false
-                    }
-                }
-
-                saveChanges()
-            })
-            .store(in: &cancellables)
+            }
+            saveChanges()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
-    private func setPriceAlert(for coin: CoinEntity) {
+    private func setPriceAlert(for coin: CoinEntity) async {
         guard let deviceToken else { return }
-        priceAlertService.setPriceAlert(for: coin, deviceToken: deviceToken)
-            .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                switch completion {
-                case .failure(let error):
-                    self?.errorMessage = error.errorDescription
-                case .finished: break
-                }
-            }, receiveValue: { priceAlert in
-                print("Successfully set price alert for \(priceAlert.coinName) with target price \(priceAlert.targetPrice)")
-            })
-            .store(in: &cancellables)
+        do {
+            let priceAlert = try await priceAlertService.setPriceAlert(for: coin, deviceToken: deviceToken)
+            print("Successfully set price alert for \(priceAlert.coinName) with target price \(priceAlert.targetPrice)")
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
-    private func deletePriceAlert(for id: String) {
+    private func deletePriceAlert(for id: String) async {
         guard let deviceToken else { return }
-        priceAlertService.deletePriceAlert(for: id, deviceToken: deviceToken)
-            .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                switch completion {
-                case .failure(let error):
-                    self?.errorMessage = error.errorDescription
-                case .finished: break
-                }
-            }, receiveValue: { priceAlert in
-                print("Successfully delete price alert for \(priceAlert.coinName)")
-            })
-            .store(in: &cancellables)
+        do {
+            let priceAlert = try await priceAlertService.deletePriceAlert(for: id, deviceToken: deviceToken)
+            print("Successfully deleted price alert for \(priceAlert.coinName)")
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
-    private func fetchMarketData() {
+    @MainActor
+    private func fetchMarketData() async {
         let coinIDs = coins.map { $0.id }
         let existingMarketData = coinIDs.compactMap { marketData[$0] }
-
+        
         guard existingMarketData.count != coins.count else { return }
-
-        coinScannerService.getMarketData(for: coinIDs)
-            .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                switch completion {
-                case .failure(let error):
-                    self?.errorMessage = error.errorDescription
-                case .finished: break
+        
+        do {
+            let fetchedMarketData = try await coinScannerService.getMarketData(for: coinIDs)
+            for (index, coinID) in coinIDs.enumerated() {
+                if let coinMarketData = fetchedMarketData[coinID] {
+                    marketData[coinID] = coinMarketData
+                    coins[index].currentPrice = coinMarketData.currentPrice ?? .zero
+                    coins[index].priceChange = coinMarketData.priceChange ?? .zero
                 }
-            }, receiveValue: { [weak self] marketData in
-                for (index, coinID) in coinIDs.enumerated() {
-                    if let coinMarketData = marketData[coinID] {
-                        self?.marketData[coinID] = coinMarketData
-                        self?.coins[index].currentPrice = coinMarketData.currentPrice ?? .zero
-                        self?.coins[index].priceChange = coinMarketData.priceChange ?? .zero
-                    }
-                }
-
-                self?.saveChanges()
-            })
-            .store(in: &cancellables)
+            }
+            saveChanges()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
     private func sortCoins() {

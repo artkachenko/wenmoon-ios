@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 
 class BaseViewModel: ObservableObject {
 
@@ -18,10 +17,8 @@ class BaseViewModel: ObservableObject {
     private(set) var persistenceManager: PersistenceManager
     private(set) var userDefaultsManager: UserDefaultsManager
 
-    var cancellables = Set<AnyCancellable>()
-
     var deviceToken: String? {
-        userDefaultsManager.getObject(forKey: "deviceToken", objectType: String.self)
+        try? userDefaultsManager.getObject(forKey: "deviceToken", objectType: String.self)
     }
 
     // MARK: - Initializers
@@ -33,29 +30,21 @@ class BaseViewModel: ObservableObject {
     init(persistenceManager: PersistenceManager, userDefaultsManager: UserDefaultsManager) {
         self.persistenceManager = persistenceManager
         self.userDefaultsManager = userDefaultsManager
-
-        persistenceManager.errorPublisher.sink { [weak self] error in
-            self?.errorMessage = error.errorDescription
-        }
-        .store(in: &cancellables)
-
-        userDefaultsManager.errorPublisher.sink { [weak self] error in
-            self?.errorMessage = error.errorDescription
-        }
-        .store(in: &cancellables)
     }
 
     // MARK: - Methods
 
     func saveChanges() {
-        persistenceManager.save()
-        objectWillChange.send()
+        do {
+            try persistenceManager.save()
+            objectWillChange.send()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
     }
 
-    func loadImage(from url: URL) -> AnyPublisher<Data, Error> {
-        URLSession.shared.dataTaskPublisher(for: url)
-            .map(\.data)
-            .mapError { $0 as Error }
-            .eraseToAnyPublisher()
+    func loadImage(from url: URL) async throws -> Data {
+        let (data, _) = try await URLSession.shared.data(from: url)
+        return data
     }
 }

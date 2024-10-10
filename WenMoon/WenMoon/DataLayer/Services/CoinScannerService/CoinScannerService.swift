@@ -6,12 +6,11 @@
 //
 
 import Foundation
-import Combine
 
 protocol CoinScannerService {
-    func getCoins(at page: Int) -> AnyPublisher<[Coin], APIError>
-    func searchCoins(by query: String) -> AnyPublisher<CoinSearchResult, APIError>
-    func getMarketData(for coinIDs: [String]) -> AnyPublisher<[String: MarketData], APIError>
+    func getCoins(at page: Int) async throws -> [Coin]
+    func searchCoins(by query: String) async throws -> CoinSearchResult
+    func getMarketData(for coinIDs: [String]) async throws -> [String: MarketData]
 }
 
 final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
@@ -25,42 +24,42 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
 
     // MARK: - CoinScannerService
 
-    func getCoins(at page: Int) -> AnyPublisher<[Coin], APIError> {
+    func getCoins(at page: Int) async throws -> [Coin] {
         let path = "coins/markets"
         // TODO: - Replace the hardcoded parameters with the actual app settings
-        return httpClient.get(path: path, parameters: ["vs_currency": "usd",
-                                                       "order": "market_cap_desc",
-                                                       "per_page": "250",
-                                                       "page": String(page),
-                                                       "sparkline": "false",
-                                                       "locale": "en"])
-        .decode(type: [Coin].self, decoder: decoder)
-        .mapError { [weak self] error in
-            self?.mapToAPIError(error) ?? APIError.unknown(response: URLResponse())
+        let data = try await httpClient.get(path: path, parameters: ["vs_currency": "usd",
+                                                                     "order": "market_cap_desc",
+                                                                     "per_page": "250",
+                                                                     "page": String(page),
+                                                                     "sparkline": "false",
+                                                                     "locale": "en"])
+        do {
+            return try decoder.decode([Coin].self, from: data)
+        } catch {
+            throw mapToAPIError(error)
         }
-        .eraseToAnyPublisher()
     }
 
-    func searchCoins(by query: String) -> AnyPublisher<CoinSearchResult, APIError> {
+    func searchCoins(by query: String) async throws -> CoinSearchResult {
         let path = "search"
-        return httpClient.get(path: path, parameters: ["query": query])
-            .decode(type: CoinSearchResult.self, decoder: decoder)
-            .mapError { [weak self] error in
-                self?.mapToAPIError(error) ?? APIError.unknown(response: URLResponse())
-            }
-            .eraseToAnyPublisher()
+        let data = try await httpClient.get(path: path, parameters: ["query": query])
+        do {
+            return try decoder.decode(CoinSearchResult.self, from: data)
+        } catch {
+            throw mapToAPIError(error)
+        }
     }
 
-    func getMarketData(for coinIDs: [String]) -> AnyPublisher<[String: MarketData], APIError> {
+    func getMarketData(for coinIDs: [String]) async throws -> [String: MarketData] {
         let path = "simple/price"
         // TODO: - Replace the hardcoded parameters with the actual app settings
-        return httpClient.get(path: path, parameters: ["ids": coinIDs.joined(separator: ","),
-                                                       "vs_currencies": "usd",
-                                                       "include_24hr_change": "true"])
-        .decode(type: [String: MarketData].self, decoder: decoder)
-        .mapError { [weak self] error in
-            self?.mapToAPIError(error) ?? APIError.unknown(response: URLResponse())
+        let data = try await httpClient.get(path: path, parameters: ["ids": coinIDs.joined(separator: ","),
+                                                                     "vs_currencies": "usd",
+                                                                     "include_24hr_change": "true"])
+        do {
+            return try decoder.decode([String: MarketData].self, from: data)
+        } catch {
+            throw mapToAPIError(error)
         }
-        .eraseToAnyPublisher()
     }
 }

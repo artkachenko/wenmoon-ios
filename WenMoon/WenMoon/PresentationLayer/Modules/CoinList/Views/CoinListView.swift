@@ -10,8 +10,8 @@ import CoreData
 
 struct CoinListView: View {
 
-    @StateObject private var coinListViewModel = CoinListViewModel()
-    @StateObject private var addCoinViewModel = AddCoinViewModel()
+    @ObservedObject private var coinListViewModel = CoinListViewModel()
+    @ObservedObject private var addCoinViewModel = AddCoinViewModel()
 
     @State private var showAddCoinView = false
     @State private var showErrorAlert = false

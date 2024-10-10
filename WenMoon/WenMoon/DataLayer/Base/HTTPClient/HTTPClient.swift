@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 
 protocol HTTPClient {
     var encoder: JSONEncoder { get }
@@ -14,34 +13,36 @@ protocol HTTPClient {
 
     func get(path: String,
              parameters: [String: String]?,
-             headers: [String: String]?) -> AnyPublisher<Data, APIError>
+             headers: [String: String]?) async throws -> Data
+
     func post(path: String,
               parameters: [String: String]?,
               headers: [String: String]?,
-              body: Data?) -> AnyPublisher<Data, APIError>
+              body: Data?) async throws -> Data
+
     func delete(path: String,
                 parameters: [String: String]?,
-                headers: [String: String]?) -> AnyPublisher<Data, APIError>
+                headers: [String: String]?) async throws -> Data
 }
 
 extension HTTPClient {
     func get(path: String,
              parameters: [String: String]? = nil,
-             headers: [String: String]? = nil) -> AnyPublisher<Data, APIError> {
-        get(path: path, parameters: parameters, headers: headers)
+             headers: [String: String]? = nil) async throws -> Data {
+        try await get(path: path, parameters: parameters, headers: headers)
     }
 
     func post(path: String,
               parameters: [String: String]? = nil,
               headers: [String: String]? = nil,
-              body: Data? = nil) -> AnyPublisher<Data, APIError> {
-        post(path: path, parameters: parameters, headers: headers, body: body)
+              body: Data? = nil) async throws -> Data {
+        try await post(path: path, parameters: parameters, headers: headers, body: body)
     }
 
     func delete(path: String,
                 parameters: [String: String]? = nil,
-                headers: [String: String]? = nil) -> AnyPublisher<Data, APIError> {
-        delete(path: path, parameters: parameters, headers: headers)
+                headers: [String: String]? = nil) async throws -> Data {
+        try await delete(path: path, parameters: parameters, headers: headers)
     }
 }
 
@@ -74,44 +75,44 @@ final class HTTPClientImpl: HTTPClient {
 
     func get(path: String,
              parameters: [String: String]?,
-             headers: [String: String]?) -> AnyPublisher<Data, APIError> {
+             headers: [String: String]?) async throws -> Data {
         let httpRequest = HTTPRequest(httpMethod: .get,
                                       path: path,
                                       parameters: parameters,
                                       headers: headers,
                                       body: nil)
-        return execute(httpRequest)
+        return try await execute(httpRequest)
     }
 
     func post(path: String,
               parameters: [String: String]?,
               headers: [String: String]?,
-              body: Data?) -> AnyPublisher<Data, APIError> {
+              body: Data?) async throws -> Data {
         let httpRequest = HTTPRequest(httpMethod: .post,
                                       path: path,
                                       parameters: parameters,
                                       headers: headers,
                                       body: body)
-        return execute(httpRequest)
+        return try await execute(httpRequest)
     }
 
     func delete(path: String,
                 parameters: [String: String]?,
-                headers: [String: String]?) -> AnyPublisher<Data, APIError> {
+                headers: [String: String]?) async throws -> Data {
         let httpRequest = HTTPRequest(httpMethod: .delete,
                                       path: path,
                                       parameters: parameters,
                                       headers: headers,
                                       body: nil)
-        return execute(httpRequest)
+        return try await execute(httpRequest)
     }
 
     // MARK: - Private
 
-    private func execute(_ httpRequest: HTTPRequest) -> AnyPublisher<Data, APIError> {
+    private func execute(_ httpRequest: HTTPRequest) async throws -> Data {
         guard var urlComponents = URLComponents(url: absolutePath(httpRequest.path),
                                                 resolvingAgainstBaseURL: false) else {
-            return Fail(error: .invalidEndpoint(endpoint: httpRequest.path)).eraseToAnyPublisher()
+            throw APIError.invalidEndpoint(endpoint: httpRequest.path)
         }
         urlComponents.queryItems = queryitems(from: httpRequest.parameters)
 
@@ -122,27 +123,18 @@ final class HTTPClientImpl: HTTPClient {
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         httpRequest.headers?.forEach { urlRequest.setValue($0.value, forHTTPHeaderField: $0.key) }
 
-        return session.dataTaskPublisher(for: urlRequest)
-            .tryMap { data, response in
-                guard let response = response as? HTTPURLResponse,
-                      (200..<300 ~= response.statusCode)
-                else {
-                    throw APIError.unknown(response: response)
-                }
-                return data
-            }
-            .mapError { error in
-                guard let error = error as? APIError else {
-                    return .apiError(description: error.localizedDescription)
-                }
-                return error
-            }
-            .eraseToAnyPublisher()
+        let (data, response) = try await session.data(for: urlRequest)
+
+        guard let httpResponse = response as? HTTPURLResponse, (200..<300).contains(httpResponse.statusCode) else {
+            throw APIError.unknown(response: response)
+        }
+
+        return data
     }
 
     private func absolutePath(_ relativePath: String) -> URL {
         guard !relativePath.isEmpty else { return baseURL }
-        assert(relativePath.first != "/", "'/' symbol at the begining of url relativePath will cause 'RestrictedIP' error")
+        assert(relativePath.first != "/", "'/' symbol at the beginning of url relativePath will cause 'RestrictedIP' error")
 
         guard let url = URL(string: relativePath, relativeTo: baseURL) else {
             assertionFailure("Failed to construct url for path \(relativePath)")

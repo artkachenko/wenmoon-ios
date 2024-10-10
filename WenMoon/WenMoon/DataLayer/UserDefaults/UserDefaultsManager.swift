@@ -6,35 +6,27 @@
 //
 
 import Foundation
-import Combine
 
 protocol UserDefaultsManager {
-    var errorPublisher: AnyPublisher<UserDefaultsError, Never> { get }
-
-    func setObject<T: Encodable>(_ object: T, forKey key: String)
-    func getObject<T: Decodable>(forKey key: String, objectType: T.Type) -> T?
+    func setObject<T: Encodable>(_ object: T, forKey key: String) throws
+    func getObject<T: Decodable>(forKey key: String, objectType: T.Type) throws -> T?
     func removeObject(forKey key: String)
 }
 
 final class UserDefaultsManagerImpl: UserDefaultsManager {
 
     private let userDefaults = UserDefaults.standard
-    private let errorSubject = PassthroughSubject<UserDefaultsError, Never>()
 
-    var errorPublisher: AnyPublisher<UserDefaultsError, Never> {
-        errorSubject.eraseToAnyPublisher()
-    }
-
-    func setObject<T: Encodable>(_ object: T, forKey key: String) {
+    func setObject<T: Encodable>(_ object: T, forKey key: String) throws {
         do {
             let data = try JSONEncoder().encode(object)
             userDefaults.set(data, forKey: key)
         } catch {
-            errorSubject.send(.failedToEncodeObject(error: error))
+            throw UserDefaultsError.failedToEncodeObject(error: error)
         }
     }
 
-    func getObject<T: Decodable>(forKey key: String, objectType: T.Type) -> T? {
+    func getObject<T: Decodable>(forKey key: String, objectType: T.Type) throws -> T? {
         guard let data = userDefaults.data(forKey: key) else {
             return nil
         }
@@ -43,8 +35,7 @@ final class UserDefaultsManagerImpl: UserDefaultsManager {
             let object = try JSONDecoder().decode(objectType, from: data)
             return object
         } catch {
-            errorSubject.send(.failedToDecodeObject(error: error))
-            return nil
+            throw UserDefaultsError.failedToDecodeObject(error: error)
         }
     }
 

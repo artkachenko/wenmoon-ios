@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 
 final class AddCoinViewModel: BaseViewModel {
 
@@ -34,6 +33,7 @@ final class AddCoinViewModel: BaseViewModel {
 
     // MARK: - Methods
 
+    @MainActor
     func fetchCoins(at page: Int = 1) {
         if let cachedCoins = coinsCache[page] {
             if page > 1 {
@@ -45,32 +45,34 @@ final class AddCoinViewModel: BaseViewModel {
             return
         }
 
-        isLoading = true
-        coinScannerService.getCoins(at: page)
-            .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                self?.isLoading = false
-                switch completion {
-                case .failure(let error):
-                    self?.errorMessage = error.errorDescription
-                case .finished:
-                    self?.currentPage = page
-                }
-            }, receiveValue: { [weak self] coins in
-                self?.coinsCache[page] = coins
+        Task {
+            do {
+                isLoading = true
+                let fetchedCoins = try await coinScannerService.getCoins(at: page)
+                coinsCache[page] = fetchedCoins
                 if page > 1 {
-                    self?.coins += coins
+                    coins += fetchedCoins
                 } else {
-                    self?.coins = coins
+                    coins = fetchedCoins
                 }
-            })
-            .store(in: &cancellables)
+                currentPage = page
+            } catch {
+                if let apiError = error as? APIError {
+                    errorMessage = apiError.errorDescription
+                } else {
+                    errorMessage = error.localizedDescription
+                }
+            }
+            isLoading = false
+        }
     }
 
+    @MainActor
     func fetchCoinsOnNextPage() {
         fetchCoins(at: currentPage + 1)
     }
 
+    @MainActor
     func searchCoins(by query: String) {
         guard !query.isEmpty else {
             fetchCoins()
@@ -81,42 +83,41 @@ final class AddCoinViewModel: BaseViewModel {
                 coins = cachedCoins
                 return
             }
-            isLoading = true
-            coinScannerService.searchCoins(by: query)
-                .receive(on: RunLoop.main)
-                .sink(receiveCompletion: { [weak self] completion in
-                    self?.isLoading = false
-                    switch completion {
-                    case .failure(let error):
-                        self?.errorMessage = error.errorDescription
-                    case .finished: break
-                    }
-                }, receiveValue: { [weak self] coinSearchResult in
+
+            Task {
+                do {
+                    isLoading = true
+                    let coinSearchResult = try await coinScannerService.searchCoins(by: query)
                     let coins = coinSearchResult.coins
-                    self?.searchCoinsCache[query] = coins
-                    self?.coins = coins
+                    searchCoinsCache[query] = coins
+                    self.coins = coins
 
                     let coinIDs = coins.map { $0.id }
-                    self?.fetchMarketData(for: coinIDs)
-                })
-                .store(in: &cancellables)
+                    await fetchMarketData(for: coinIDs)
+                } catch {
+                    if let apiError = error as? APIError {
+                        errorMessage = apiError.errorDescription
+                    } else {
+                        errorMessage = error.localizedDescription
+                    }
+                }
+                isLoading = false
+            }
         }
     }
 
-    private func fetchMarketData(for coinIDs: [String]) {
-        isLoading = true
-        coinScannerService.getMarketData(for: coinIDs)
-            .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { [weak self] completion in
-                self?.isLoading = false
-                switch completion {
-                case .failure(let error):
-                    self?.errorMessage = error.errorDescription
-                case .finished: break
-                }
-            }, receiveValue: { [weak self] marketData in
-                self?.marketData.merge(marketData, uniquingKeysWith: { $1 })
-            })
-            .store(in: &cancellables)
+    private func fetchMarketData(for coinIDs: [String]) async {
+        do {
+            isLoading = true
+            let getMarketData = try await coinScannerService.getMarketData(for: coinIDs)
+            marketData.merge(getMarketData, uniquingKeysWith: { $1 })
+        } catch {
+            if let apiError = error as? APIError {
+                errorMessage = apiError.errorDescription
+            } else {
+                errorMessage = error.localizedDescription
+            }
+        }
+        isLoading = false
     }
 }

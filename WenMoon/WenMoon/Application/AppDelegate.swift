@@ -44,9 +44,9 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
         let token = tokenParts.joined()
         print("Device Token: \(token)")
-        guard userDefaultsManager?.getObject(forKey: "deviceToken",
-                                            objectType: String.self) == nil else { return }
-        userDefaultsManager?.setObject(token, forKey: "deviceToken")
+        guard (try? userDefaultsManager?.getObject(forKey: "deviceToken",
+                                                   objectType: String.self)) == nil else { return }
+        try? userDefaultsManager?.setObject(token, forKey: "deviceToken")
     }
 
     func application(_ application: UIApplication,
