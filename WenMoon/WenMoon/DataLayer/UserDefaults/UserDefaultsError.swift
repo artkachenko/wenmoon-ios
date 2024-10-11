@@ -7,16 +7,16 @@
 
 import Foundation
 
-enum UserDefaultsError: LocalizedError {
-    case failedToEncodeObject(error: Error)
-    case failedToDecodeObject(error: Error)
+enum UserDefaultsError: DescriptiveError {
+    case failedToEncodeObject
+    case failedToDecodeObject
 
-    var errorDescription: String? {
+    var errorDescription: String {
         switch self {
-        case .failedToEncodeObject(let error):
-            return "Failed to encode object: \(error.localizedDescription)"
-        case .failedToDecodeObject(let error):
-            return "Failed to decode object: \(error.localizedDescription)"
+        case .failedToEncodeObject:
+            return "Failed to encode object."
+        case .failedToDecodeObject:
+            return "Failed to decode object."
         }
     }
 }

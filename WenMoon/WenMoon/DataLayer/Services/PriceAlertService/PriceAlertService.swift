@@ -9,7 +9,7 @@ import Foundation
 
 protocol PriceAlertService {
     func getPriceAlerts(deviceToken: String) async throws -> [PriceAlert]
-    func setPriceAlert(for coin: CoinEntity, deviceToken: String) async throws -> PriceAlert
+    func setPriceAlert(for coin: CoinData, deviceToken: String) async throws -> PriceAlert
     func deletePriceAlert(for id: String, deviceToken: String) async throws -> PriceAlert
 }
 
@@ -37,9 +37,9 @@ final class PriceAlertServiceImpl: BaseBackendService, PriceAlertService {
         }
     }
 
-    func setPriceAlert(for coin: CoinEntity, deviceToken: String) async throws -> PriceAlert {
+    func setPriceAlert(for coin: CoinData, deviceToken: String) async throws -> PriceAlert {
         do {
-            let targetPrice = coin.targetPrice?.doubleValue ?? .zero
+            let targetPrice = coin.targetPrice ?? .zero
             let request = PriceAlert(coinId: coin.id,
                                      coinName: coin.name,
                                      targetPrice: targetPrice,

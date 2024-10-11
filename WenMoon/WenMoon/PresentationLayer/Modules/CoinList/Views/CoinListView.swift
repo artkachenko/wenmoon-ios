@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import CoreData
 
 struct CoinListView: View {
 
@@ -17,7 +16,7 @@ struct CoinListView: View {
     @State private var showErrorAlert = false
     @State private var showSetPriceAlertConfirmation = false
 
-    @State private var capturedCoin: CoinEntity?
+    @State private var capturedCoin: CoinData?
     @State private var targetPrice: Double?
 
     @State private var toggleOffCoinID: String?
@@ -70,7 +69,7 @@ struct CoinListView: View {
                             }
                         ))
 
-                        if let targetPrice = coin.targetPrice?.doubleValue {
+                        if let targetPrice = coin.targetPrice {
                             Text("\(targetPrice.formatValue()) $")
                                 .font(.caption)
                         } else {
@@ -110,7 +109,7 @@ struct CoinListView: View {
             .onReceive(NotificationCenter.default.publisher(for: .appDidBecomeActive)) { _ in
                 coinListViewModel.fetchCoins()
             }
-            .onChange(of: coinListViewModel.errorMessage) { errorMessage in
+            .onChange(of: coinListViewModel.errorMessage) { _, errorMessage in
                 showErrorAlert = errorMessage != nil
             }
             .alert(coinListViewModel.errorMessage ?? "", isPresented: $showErrorAlert) {
@@ -144,9 +143,9 @@ struct CoinListView: View {
 
     private func didSelectCoin(coin: Coin, marketData: MarketData?) {
         guard let marketData else {
-            coinListViewModel.createCoinEntity(coin)
+            coinListViewModel.createCoin(coin)
             return
         }
-        coinListViewModel.createCoinEntity(coin, marketData)
+        coinListViewModel.createCoin(coin, marketData)
     }
 }

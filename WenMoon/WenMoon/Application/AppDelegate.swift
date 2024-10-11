@@ -19,7 +19,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     }
 
     func resetBadgeNumber() {
-        UIApplication.shared.applicationIconBadgeNumber = .zero
+        UNUserNotificationCenter.current().setBadgeCount(.zero)
     }
 
     private func registerForPushNotifications() {

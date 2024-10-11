@@ -22,7 +22,7 @@ final class UserDefaultsManagerImpl: UserDefaultsManager {
             let data = try JSONEncoder().encode(object)
             userDefaults.set(data, forKey: key)
         } catch {
-            throw UserDefaultsError.failedToEncodeObject(error: error)
+            throw UserDefaultsError.failedToEncodeObject
         }
     }
 
@@ -35,7 +35,7 @@ final class UserDefaultsManagerImpl: UserDefaultsManager {
             let object = try JSONDecoder().decode(objectType, from: data)
             return object
         } catch {
-            throw UserDefaultsError.failedToDecodeObject(error: error)
+            throw UserDefaultsError.failedToDecodeObject
         }
     }
 

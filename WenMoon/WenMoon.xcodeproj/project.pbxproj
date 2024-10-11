@@ -7,9 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D22D33992CB92721007997DD /* CoinData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D33982CB92721007997DD /* CoinData.swift */; };
+		D22D339D2CB92ABC007997DD /* SwiftDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D339C2CB92ABC007997DD /* SwiftDataManager.swift */; };
+		D22D339E2CB92ABC007997DD /* SwiftDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D339C2CB92ABC007997DD /* SwiftDataManager.swift */; };
+		D22D33A02CB9342A007997DD /* SwiftDataError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D339F2CB9342A007997DD /* SwiftDataError.swift */; };
+		D22D33A12CB9342A007997DD /* SwiftDataError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D339F2CB9342A007997DD /* SwiftDataError.swift */; };
+		D22D33A32CB958A5007997DD /* DescriptiveError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D33A22CB958A5007997DD /* DescriptiveError.swift */; };
+		D22D33A42CB958A5007997DD /* DescriptiveError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D33A22CB958A5007997DD /* DescriptiveError.swift */; };
 		FA07AC2629F91120008F6484 /* CoinMarketData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA07AC2529F91120008F6484 /* CoinMarketData.swift */; };
 		FA07AC3029F93292008F6484 /* Double+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA07AC2F29F93292008F6484 /* Double+Extensions.swift */; };
-		FA51D0322A361F3700D203EF /* CoinEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA51D0302A361F3600D203EF /* CoinEntity.swift */; };
 		FA61B3F12A41B71D008A9FB9 /* BaseViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA61B3F02A41B71D008A9FB9 /* BaseViewModel.swift */; };
 		FA8A08852A1CF8500083B8DB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8A08842A1CF8500083B8DB /* AppDelegate.swift */; };
 		FA8A08892A1CFA820083B8DB /* PriceAlertService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8A08882A1CFA820083B8DB /* PriceAlertService.swift */; };
@@ -21,8 +27,6 @@
 		FA8F60CA2A4DA40A0050C983 /* MarketData+Mocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8F60C92A4DA40A0050C983 /* MarketData+Mocks.swift */; };
 		FAA83CC82A3B6E37001DEE1E /* UserDefaultsManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAA83CC72A3B6E37001DEE1E /* UserDefaultsManagerMock.swift */; };
 		FAB361F729F447DB00A88050 /* WenMoonApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB361F629F447DB00A88050 /* WenMoonApp.swift */; };
-		FAB361F929F447DB00A88050 /* PersistenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB361F829F447DB00A88050 /* PersistenceManager.swift */; };
-		FAB361FC29F447DB00A88050 /* WenMoon.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FAB361FA29F447DB00A88050 /* WenMoon.xcdatamodeld */; };
 		FAB361FE29F447DB00A88050 /* CoinListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB361FD29F447DB00A88050 /* CoinListView.swift */; };
 		FAB3620029F447DC00A88050 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FAB361FF29F447DC00A88050 /* Assets.xcassets */; };
 		FAB3623629F4513B00A88050 /* HTTPRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3623529F4513B00A88050 /* HTTPRequest.swift */; };
@@ -38,7 +42,6 @@
 		FAB3625A29F4580C00A88050 /* AddCoinViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3625929F4580C00A88050 /* AddCoinViewModel.swift */; };
 		FAB3625F29F4595D00A88050 /* CoinScannerServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3625E29F4595D00A88050 /* CoinScannerServiceMock.swift */; };
 		FAB3626229F4598F00A88050 /* AddCoinViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3626129F4598F00A88050 /* AddCoinViewModelTests.swift */; };
-		FAB3626529F464BE00A88050 /* PersistenceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3626429F464BE00A88050 /* PersistenceError.swift */; };
 		FAB3626A29F4651F00A88050 /* CoinListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3626929F4651F00A88050 /* CoinListViewModel.swift */; };
 		FAB3627529F469E700A88050 /* CoinListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3627429F469E700A88050 /* CoinListViewModelTests.swift */; };
 		FACB39AE29FABBC800AA613E /* PersistenceManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = FACB39AD29FABBC800AA613E /* PersistenceManagerMock.swift */; };
@@ -56,9 +59,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D22D33982CB92721007997DD /* CoinData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinData.swift; sourceTree = "<group>"; };
+		D22D339C2CB92ABC007997DD /* SwiftDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataManager.swift; sourceTree = "<group>"; };
+		D22D339F2CB9342A007997DD /* SwiftDataError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataError.swift; sourceTree = "<group>"; };
+		D22D33A22CB958A5007997DD /* DescriptiveError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptiveError.swift; sourceTree = "<group>"; };
 		FA07AC2529F91120008F6484 /* CoinMarketData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinMarketData.swift; sourceTree = "<group>"; };
 		FA07AC2F29F93292008F6484 /* Double+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Extensions.swift"; sourceTree = "<group>"; };
-		FA51D0302A361F3600D203EF /* CoinEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinEntity.swift; sourceTree = "<group>"; };
 		FA61B3F02A41B71D008A9FB9 /* BaseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewModel.swift; sourceTree = "<group>"; };
 		FA8A08842A1CF8500083B8DB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FA8A08882A1CFA820083B8DB /* PriceAlertService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertService.swift; sourceTree = "<group>"; };
@@ -71,8 +77,6 @@
 		FAA83CC72A3B6E37001DEE1E /* UserDefaultsManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManagerMock.swift; sourceTree = "<group>"; };
 		FAB361F329F447DB00A88050 /* WenMoon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WenMoon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FAB361F629F447DB00A88050 /* WenMoonApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WenMoonApp.swift; sourceTree = "<group>"; };
-		FAB361F829F447DB00A88050 /* PersistenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManager.swift; sourceTree = "<group>"; };
-		FAB361FB29F447DB00A88050 /* WenMoon.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = WenMoon.xcdatamodel; sourceTree = "<group>"; };
 		FAB361FD29F447DB00A88050 /* CoinListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinListView.swift; sourceTree = "<group>"; };
 		FAB361FF29F447DC00A88050 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FAB3620129F447DC00A88050 /* WenMoon.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WenMoon.entitlements; sourceTree = "<group>"; };
@@ -90,7 +94,6 @@
 		FAB3625929F4580C00A88050 /* AddCoinViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCoinViewModel.swift; sourceTree = "<group>"; };
 		FAB3625E29F4595D00A88050 /* CoinScannerServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinScannerServiceMock.swift; sourceTree = "<group>"; };
 		FAB3626129F4598F00A88050 /* AddCoinViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCoinViewModelTests.swift; sourceTree = "<group>"; };
-		FAB3626429F464BE00A88050 /* PersistenceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceError.swift; sourceTree = "<group>"; };
 		FAB3626929F4651F00A88050 /* CoinListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinListViewModel.swift; sourceTree = "<group>"; };
 		FAB3627429F469E700A88050 /* CoinListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinListViewModelTests.swift; sourceTree = "<group>"; };
 		FACB39AD29FABBC800AA613E /* PersistenceManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceManagerMock.swift; sourceTree = "<group>"; };
@@ -115,6 +118,32 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D22D33962CB92707007997DD /* SwiftData */ = {
+			isa = PBXGroup;
+			children = (
+				D22D339B2CB92AA2007997DD /* Manager */,
+				D22D33972CB9270C007997DD /* Models */,
+			);
+			path = SwiftData;
+			sourceTree = "<group>";
+		};
+		D22D33972CB9270C007997DD /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				D22D33982CB92721007997DD /* CoinData.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		D22D339B2CB92AA2007997DD /* Manager */ = {
+			isa = PBXGroup;
+			children = (
+				D22D339C2CB92ABC007997DD /* SwiftDataManager.swift */,
+				D22D339F2CB9342A007997DD /* SwiftDataError.swift */,
+			);
+			path = Manager;
+			sourceTree = "<group>";
+		};
 		FA07AC2E29F93282008F6484 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -135,8 +164,8 @@
 		FA8A088E2A1CFCF20083B8DB /* UserDefaults */ = {
 			isa = PBXGroup;
 			children = (
-				FA8A08912A1CFD130083B8DB /* UserDefaultsError.swift */,
 				FA8A088F2A1CFD040083B8DB /* UserDefaultsManager.swift */,
+				FA8A08912A1CFD130083B8DB /* UserDefaultsError.swift */,
 			);
 			path = UserDefaults;
 			sourceTree = "<group>";
@@ -237,22 +266,13 @@
 		FAB3622829F4482B00A88050 /* DataLayer */ = {
 			isa = PBXGroup;
 			children = (
+				D22D33A22CB958A5007997DD /* DescriptiveError.swift */,
 				FA8A088E2A1CFCF20083B8DB /* UserDefaults */,
-				FAB3622929F4484300A88050 /* CoreData */,
+				D22D33962CB92707007997DD /* SwiftData */,
 				FAB3623229F4510D00A88050 /* Base */,
 				FAB3624129F453A400A88050 /* Services */,
 			);
 			path = DataLayer;
-			sourceTree = "<group>";
-		};
-		FAB3622929F4484300A88050 /* CoreData */ = {
-			isa = PBXGroup;
-			children = (
-				FAB3626329F464AC00A88050 /* Persistence */,
-				FAB3627329F4659500A88050 /* Models */,
-				FAB361FA29F447DB00A88050 /* WenMoon.xcdatamodeld */,
-			);
-			path = CoreData;
 			sourceTree = "<group>";
 		};
 		FAB3622B29F4485500A88050 /* PresentationLayer */ = {
@@ -415,29 +435,12 @@
 			path = ViewModels;
 			sourceTree = "<group>";
 		};
-		FAB3626329F464AC00A88050 /* Persistence */ = {
-			isa = PBXGroup;
-			children = (
-				FAB3626429F464BE00A88050 /* PersistenceError.swift */,
-				FAB361F829F447DB00A88050 /* PersistenceManager.swift */,
-			);
-			path = Persistence;
-			sourceTree = "<group>";
-		};
 		FAB3626829F4650E00A88050 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
 				FAB3626929F4651F00A88050 /* CoinListViewModel.swift */,
 			);
 			path = ViewModels;
-			sourceTree = "<group>";
-		};
-		FAB3627329F4659500A88050 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				FA51D0302A361F3600D203EF /* CoinEntity.swift */,
-			);
-			path = Models;
 			sourceTree = "<group>";
 		};
 		FAE0231C2A1E11E4009BA135 /* Notification */ = {
@@ -494,7 +497,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1430;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					FAB361F229F447DB00A88050 = {
 						CreatedOnToolsVersion = 14.3;
@@ -547,26 +550,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D22D33992CB92721007997DD /* CoinData.swift in Sources */,
 				FAB3624429F453C700A88050 /* Coin.swift in Sources */,
-				FAB361FC29F447DB00A88050 /* WenMoon.xcdatamodeld in Sources */,
 				FAE0231E2A1E11F3009BA135 /* Notification+Name.swift in Sources */,
 				FA8A08852A1CF8500083B8DB /* AppDelegate.swift in Sources */,
 				FA07AC2629F91120008F6484 /* CoinMarketData.swift in Sources */,
+				D22D339D2CB92ABC007997DD /* SwiftDataManager.swift in Sources */,
 				FA8A08902A1CFD040083B8DB /* UserDefaultsManager.swift in Sources */,
 				FA61B3F12A41B71D008A9FB9 /* BaseViewModel.swift in Sources */,
 				FA8A08922A1CFD130083B8DB /* UserDefaultsError.swift in Sources */,
-				FAB3626529F464BE00A88050 /* PersistenceError.swift in Sources */,
 				FAB361F729F447DB00A88050 /* WenMoonApp.swift in Sources */,
+				D22D33A02CB9342A007997DD /* SwiftDataError.swift in Sources */,
 				FAB3624729F453DD00A88050 /* CoinSearchResult.swift in Sources */,
 				FA8A088D2A1CFAF90083B8DB /* PriceAlert.swift in Sources */,
 				FAB3623629F4513B00A88050 /* HTTPRequest.swift in Sources */,
+				D22D33A32CB958A5007997DD /* DescriptiveError.swift in Sources */,
 				FAB3623A29F4515C00A88050 /* HTTPClient.swift in Sources */,
 				FA8A08892A1CFA820083B8DB /* PriceAlertService.swift in Sources */,
 				FAB361FE29F447DB00A88050 /* CoinListView.swift in Sources */,
-				FAB361F929F447DB00A88050 /* PersistenceManager.swift in Sources */,
 				FAB3623829F4514B00A88050 /* APIError.swift in Sources */,
 				FA07AC3029F93292008F6484 /* Double+Extensions.swift in Sources */,
-				FA51D0322A361F3700D203EF /* CoinEntity.swift in Sources */,
 				FAB3625729F457DC00A88050 /* AddCoinView.swift in Sources */,
 				FAB3624A29F453FC00A88050 /* CoinScannerService.swift in Sources */,
 				FAB3623C29F4517800A88050 /* BaseBackendService.swift in Sources */,
@@ -580,13 +583,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA8F60C62A4DA3A20050C983 /* Coin+Mocks.swift in Sources */,
+				D22D339E2CB92ABC007997DD /* SwiftDataManager.swift in Sources */,
 				FA8F60CA2A4DA40A0050C983 /* MarketData+Mocks.swift in Sources */,
 				FA8F60C82A4DA3C80050C983 /* CoinSearchResult+Mocks.swift in Sources */,
 				FAB3625329F4549800A88050 /* CoinScannerServiceTests.swift in Sources */,
 				FAB3627529F469E700A88050 /* CoinListViewModelTests.swift in Sources */,
 				FAB3625F29F4595D00A88050 /* CoinScannerServiceMock.swift in Sources */,
 				FAB3626229F4598F00A88050 /* AddCoinViewModelTests.swift in Sources */,
+				D22D33A12CB9342A007997DD /* SwiftDataError.swift in Sources */,
 				FAB3625029F4547100A88050 /* HTTPClientMock.swift in Sources */,
+				D22D33A42CB958A5007997DD /* DescriptiveError.swift in Sources */,
 				FAA83CC82A3B6E37001DEE1E /* UserDefaultsManagerMock.swift in Sources */,
 				FACB39AE29FABBC800AA613E /* PersistenceManagerMock.swift in Sources */,
 			);
@@ -636,9 +642,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -694,9 +702,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -720,6 +730,7 @@
 				CODE_SIGN_ENTITLEMENTS = WenMoon/Application/WenMoon.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 4H24ZTYPFZ;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -760,6 +771,7 @@
 				CODE_SIGN_ENTITLEMENTS = WenMoon/Application/WenMoon.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = 4H24ZTYPFZ;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -795,10 +807,10 @@
 		FAB3622129F447DC00A88050 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 4H24ZTYPFZ;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
@@ -818,10 +830,10 @@
 		FAB3622229F447DC00A88050 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 4H24ZTYPFZ;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
@@ -869,19 +881,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCVersionGroup section */
-		FAB361FA29F447DB00A88050 /* WenMoon.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				FAB361FB29F447DB00A88050 /* WenMoon.xcdatamodel */,
-			);
-			currentVersion = FAB361FB29F447DB00A88050 /* WenMoon.xcdatamodel */;
-			path = WenMoon.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = FAB361EB29F447DB00A88050 /* Project object */;
 }

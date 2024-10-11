@@ -84,10 +84,10 @@ struct AddCoinView: View {
                     }
                 }
             }
-            .onChange(of: searchText) { query in
+            .onChange(of: searchText) { _, query in
                 viewModel.searchCoins(by: query)
             }
-            .onChange(of: viewModel.errorMessage) { errorMessage in
+            .onChange(of: viewModel.errorMessage) { _, errorMessage in
                 showErrorAlert = errorMessage != nil
             }
             .alert(viewModel.errorMessage ?? "", isPresented: $showErrorAlert) {

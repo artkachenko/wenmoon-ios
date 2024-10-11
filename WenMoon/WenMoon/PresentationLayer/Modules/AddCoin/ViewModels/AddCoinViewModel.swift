@@ -28,7 +28,7 @@ final class AddCoinViewModel: BaseViewModel {
 
     init(coinScannerService: CoinScannerService) {
         self.coinScannerService = coinScannerService
-        super.init(persistenceManager: PersistenceManagerImpl(), userDefaultsManager: UserDefaultsManagerImpl())
+        super.init()
     }
 
     // MARK: - Methods
@@ -57,11 +57,7 @@ final class AddCoinViewModel: BaseViewModel {
                 }
                 currentPage = page
             } catch {
-                if let apiError = error as? APIError {
-                    errorMessage = apiError.errorDescription
-                } else {
-                    errorMessage = error.localizedDescription
-                }
+                setErrorMessage(error)
             }
             isLoading = false
         }
@@ -95,11 +91,7 @@ final class AddCoinViewModel: BaseViewModel {
                     let coinIDs = coins.map { $0.id }
                     await fetchMarketData(for: coinIDs)
                 } catch {
-                    if let apiError = error as? APIError {
-                        errorMessage = apiError.errorDescription
-                    } else {
-                        errorMessage = error.localizedDescription
-                    }
+                    setErrorMessage(error)
                 }
                 isLoading = false
             }
@@ -112,11 +104,7 @@ final class AddCoinViewModel: BaseViewModel {
             let getMarketData = try await coinScannerService.getMarketData(for: coinIDs)
             marketData.merge(getMarketData, uniquingKeysWith: { $1 })
         } catch {
-            if let apiError = error as? APIError {
-                errorMessage = apiError.errorDescription
-            } else {
-                errorMessage = error.localizedDescription
-            }
+            setErrorMessage(error)
         }
         isLoading = false
     }

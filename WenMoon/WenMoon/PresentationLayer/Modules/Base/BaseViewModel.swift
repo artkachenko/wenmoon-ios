@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftData
 
 class BaseViewModel: ObservableObject {
 
@@ -14,37 +15,71 @@ class BaseViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var isLoading = false
 
-    private(set) var persistenceManager: PersistenceManager
-    private(set) var userDefaultsManager: UserDefaultsManager
+    private(set) var swiftDataManager: SwiftDataManager?
+    private(set) var userDefaultsManager: UserDefaultsManager?
 
     var deviceToken: String? {
-        try? userDefaultsManager.getObject(forKey: "deviceToken", objectType: String.self)
+        try? userDefaultsManager?.getObject(forKey: "deviceToken", objectType: String.self)
     }
 
     // MARK: - Initializers
 
-    convenience init() {
-        self.init(persistenceManager: PersistenceManagerImpl(), userDefaultsManager: UserDefaultsManagerImpl())
-    }
-
-    init(persistenceManager: PersistenceManager, userDefaultsManager: UserDefaultsManager) {
-        self.persistenceManager = persistenceManager
+    init(swiftDataManager: SwiftDataManager? = nil, userDefaultsManager: UserDefaultsManager? = nil) {
+        self.swiftDataManager = swiftDataManager
         self.userDefaultsManager = userDefaultsManager
     }
 
     // MARK: - Methods
-
-    func saveChanges() {
+    
+    func fetch<T: PersistentModel>(_ descriptor: FetchDescriptor<T>) -> [T] {
         do {
-            try persistenceManager.save()
-            objectWillChange.send()
+            let models = try swiftDataManager?.fetch(descriptor)
+            return models ?? []
         } catch {
-            errorMessage = error.localizedDescription
+            setErrorMessage(error)
+            return []
+        }
+    }
+    
+    func insertAndSave<T: PersistentModel>(_ model: T) {
+        do {
+            try swiftDataManager?.insert(model)
+        } catch {
+            setErrorMessage(error)
+        }
+    }
+    
+    func deleteAndSave<T: PersistentModel>(_ model: T) {
+        do {
+            try swiftDataManager?.delete(model)
+        } catch {
+            setErrorMessage(error)
         }
     }
 
-    func loadImage(from url: URL) async throws -> Data {
-        let (data, _) = try await URLSession.shared.data(from: url)
-        return data
+    func save() {
+        do {
+            try swiftDataManager?.save()
+        } catch {
+            setErrorMessage(error)
+        }
+    }
+
+    func loadImage(from url: URL) async -> Data? {
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            return data
+        } catch {
+            errorMessage = "Error downloading image: \(error.localizedDescription)"
+            return nil
+        }
+    }
+    
+    func setErrorMessage(_ error: Error) {
+        if let descriptiveError = error as? DescriptiveError {
+            errorMessage = descriptiveError.errorDescription
+        } else {
+            errorMessage = "An unknown error occurred: \(error.localizedDescription)"
+        }
     }
 }
