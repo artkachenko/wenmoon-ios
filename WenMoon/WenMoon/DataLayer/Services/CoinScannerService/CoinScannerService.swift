@@ -34,7 +34,9 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
                                                                      "sparkline": "false",
                                                                      "locale": "en"])
         do {
-            return try decoder.decode([Coin].self, from: data)
+            let coins = try decoder.decode([Coin].self, from: data)
+            print("Fetched coins: \(coins)")
+            return coins
         } catch {
             throw mapToAPIError(error)
         }
@@ -44,7 +46,9 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
         let path = "search"
         let data = try await httpClient.get(path: path, parameters: ["query": query])
         do {
-            return try decoder.decode(CoinSearchResult.self, from: data)
+            let searchedCoins = try decoder.decode(CoinSearchResult.self, from: data)
+            print("Searched coins: \(searchedCoins)")
+            return searchedCoins
         } catch {
             throw mapToAPIError(error)
         }
@@ -57,7 +61,9 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
                                                                      "vs_currencies": "usd",
                                                                      "include_24hr_change": "true"])
         do {
-            return try decoder.decode([String: MarketData].self, from: data)
+            let marketData = try decoder.decode([String: MarketData].self, from: data)
+            print("Market Data: \(marketData)")
+            return marketData
         } catch {
             throw mapToAPIError(error)
         }

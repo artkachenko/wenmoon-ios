@@ -31,7 +31,9 @@ final class PriceAlertServiceImpl: BaseBackendService, PriceAlertService {
     func getPriceAlerts(deviceToken: String) async throws -> [PriceAlert] {
         let data = try await httpClient.get(path: "price-alerts", headers: ["X-Device-ID": deviceToken])
         do {
-            return try decoder.decode([PriceAlert].self, from: data)
+            let priceAlerts = try decoder.decode([PriceAlert].self, from: data)
+            print("Price Alerts: \(priceAlerts)")
+            return priceAlerts
         } catch {
             throw mapToAPIError(error)
         }

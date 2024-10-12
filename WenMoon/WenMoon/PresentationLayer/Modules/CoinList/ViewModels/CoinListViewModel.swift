@@ -31,17 +31,21 @@ final class CoinListViewModel: BaseViewModel {
         
         if let modelContainer = try? ModelContainer(for: CoinData.self) {
             let swiftDataManager = SwiftDataManagerImpl(modelContainer: modelContainer)
-            super.init(swiftDataManager: swiftDataManager)
+            super.init(swiftDataManager: swiftDataManager, userDefaultsManager: UserDefaultsManagerImpl())
         } else {
-            super.init()
+            super.init(userDefaultsManager: UserDefaultsManagerImpl())
         }
     }
     
     // MARK: - Methods
     
     func fetchCoins() {
-        let descriptor = FetchDescriptor<CoinData>(sortBy: [SortDescriptor(\.rank)])
-        coins = fetch(descriptor)
+        if isFirstLaunch {
+            insertPredefinedCoins()
+        } else {
+            let descriptor = FetchDescriptor<CoinData>(sortBy: [SortDescriptor(\.rank)])
+            coins = fetch(descriptor)
+        }
         
         if !coins.isEmpty {
             Task {
@@ -50,8 +54,17 @@ final class CoinListViewModel: BaseViewModel {
             }
         }
     }
+        
+    private func insertPredefinedCoins() {
+        let predefinedCoins = CoinData.predefinedCoins
+        
+        for coin in predefinedCoins {
+            insertNewCoin(coin)
+        }
+        
+        self.coins = predefinedCoins
+    }
     
-    @MainActor
     func createCoin(_ coin: Coin, _ marketData: MarketData? = nil) {
         if !coins.contains(where: { $0.id == coin.id }) {
             let newCoin = CoinData()
@@ -70,19 +83,24 @@ final class CoinListViewModel: BaseViewModel {
                 newCoin.priceChange = coin.priceChangePercentage24H ?? .zero
             }
             
-            if let url = URL(string: coin.image) {
-                Task {
-                    if let imageData = await loadImage(from: url) {
-                        newCoin.imageData = imageData
-                    }
-                    coins.append(newCoin)
-                    sortCoins()
-                    insertAndSave(newCoin)
-                }
-            } else {
-                errorMessage = "Invalid image URL for \(coin.name)"
-            }
+            insertNewCoin(newCoin)
         }
+    }
+    
+    private func insertNewCoin(_ coin: CoinData) {
+        if let url = URL(string: coin.image) {
+            Task {
+                if let imageData = await loadImage(from: url) {
+                    coin.imageData = imageData
+                }
+            }
+        } else {
+            errorMessage = "Invalid image URL for \(coin.name)"
+        }
+        
+        coins.append(coin)
+        sortCoins()
+        insertAndSave(coin)
     }
     
     func deleteCoin(_ coin: CoinData) {
@@ -180,11 +198,7 @@ final class CoinListViewModel: BaseViewModel {
             }
             save()
         } catch {
-            if let apiError = error as? APIError {
-                errorMessage = apiError.errorDescription
-            } else {
-                setErrorMessage(error)
-            }
+            setErrorMessage(error)
         }
     }
     
