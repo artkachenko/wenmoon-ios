@@ -8,7 +8,6 @@
 import Foundation
 import SwiftData
 
-@MainActor
 final class CoinListViewModel: BaseViewModel {
     
     // MARK: - Properties
