@@ -22,7 +22,12 @@ class BaseBackendService {
         return httpClient.decoder
     }
 
-    convenience init(baseURL: URL) {
+    convenience init() {
+        #if DEBUG
+        let baseURL = URL(string: "http://localhost:8080/")!
+        #else
+        let baseURL = URL(string: "https://wenmoon-vapor.herokuapp.com/")!
+        #endif
         let httpClient = HTTPClientImpl(baseURL: baseURL)
         self.init(httpClient: httpClient, baseURL: baseURL)
     }

@@ -37,7 +37,7 @@ struct AddCoinView: View {
                         }
 
                         HStack(spacing: 12) {
-                            AsyncImage(url: URL(string: coin.image)) { image in
+                            AsyncImage(url: coin.imageURL) { image in
                                 image
                                     .resizable()
                                     .aspectRatio(contentMode: .fit)

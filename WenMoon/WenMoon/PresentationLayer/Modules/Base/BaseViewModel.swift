@@ -8,6 +8,7 @@
 import Foundation
 import SwiftData
 
+@MainActor
 class BaseViewModel: ObservableObject {
     
     // MARK: - Properties
@@ -106,7 +107,7 @@ class BaseViewModel: ObservableObject {
     // MARK: - Helpers
     
     private func isUserDefaultsManagerAvailable() -> Bool {
-        guard let userDefaultsManager else {
+        guard userDefaultsManager != nil else {
             print("UserDefaultsManager is not initialized.")
             return false
         }
@@ -114,7 +115,7 @@ class BaseViewModel: ObservableObject {
     }
     
     private func isSwiftDataManagerAvailable() -> Bool {
-        guard let swiftDataManager else {
+        guard swiftDataManager != nil else {
             print("SwiftDataManager is not initialized.")
             return false
         }

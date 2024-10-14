@@ -9,30 +9,18 @@ import Foundation
 
 protocol CoinScannerService {
     func getCoins(at page: Int) async throws -> [Coin]
-    func searchCoins(by query: String) async throws -> CoinSearchResult
+    func searchCoins(by query: String) async throws -> [Coin]
     func getMarketData(for coinIDs: [String]) async throws -> [String: MarketData]
 }
 
 final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
 
-    // MARK: - Initializers
-
-    convenience init() {
-        let baseURL = URL(string: "https://api.coingecko.com/api/v3/")!
-        self.init(baseURL: baseURL)
-    }
-
     // MARK: - CoinScannerService
 
     func getCoins(at page: Int) async throws -> [Coin] {
-        let path = "coins/markets"
+        let path = "coins"
         // TODO: - Replace the hardcoded parameters with the actual app settings
-        let data = try await httpClient.get(path: path, parameters: ["vs_currency": "usd",
-                                                                     "order": "market_cap_desc",
-                                                                     "per_page": "250",
-                                                                     "page": String(page),
-                                                                     "sparkline": "false",
-                                                                     "locale": "en"])
+        let data = try await httpClient.get(path: path, parameters: ["page": String(page)])
         do {
             let coins = try decoder.decode([Coin].self, from: data)
             print("Fetched coins: \(coins)")
@@ -42,11 +30,11 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
         }
     }
 
-    func searchCoins(by query: String) async throws -> CoinSearchResult {
+    func searchCoins(by query: String) async throws -> [Coin] {
         let path = "search"
         let data = try await httpClient.get(path: path, parameters: ["query": query])
         do {
-            let searchedCoins = try decoder.decode(CoinSearchResult.self, from: data)
+            let searchedCoins = try decoder.decode([Coin].self, from: data)
             print("Searched coins: \(searchedCoins)")
             return searchedCoins
         } catch {
@@ -55,11 +43,9 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
     }
 
     func getMarketData(for coinIDs: [String]) async throws -> [String: MarketData] {
-        let path = "simple/price"
+        let path = "market-data"
         // TODO: - Replace the hardcoded parameters with the actual app settings
-        let data = try await httpClient.get(path: path, parameters: ["ids": coinIDs.joined(separator: ","),
-                                                                     "vs_currencies": "usd",
-                                                                     "include_24hr_change": "true"])
+        let data = try await httpClient.get(path: path, parameters: ["ids": coinIDs.joined(separator: ",")])
         do {
             let marketData = try decoder.decode([String: MarketData].self, from: data)
             print("Market Data: \(marketData)")

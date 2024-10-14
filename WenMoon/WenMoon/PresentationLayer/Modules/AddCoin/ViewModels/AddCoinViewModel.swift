@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 final class AddCoinViewModel: BaseViewModel {
 
     // MARK: - Properties
@@ -33,7 +34,6 @@ final class AddCoinViewModel: BaseViewModel {
 
     // MARK: - Methods
 
-    @MainActor
     func fetchCoins(at page: Int = 1) {
         if let cachedCoins = coinsCache[page] {
             if page > 1 {
@@ -63,12 +63,10 @@ final class AddCoinViewModel: BaseViewModel {
         }
     }
 
-    @MainActor
     func fetchCoinsOnNextPage() {
         fetchCoins(at: currentPage + 1)
     }
 
-    @MainActor
     func searchCoins(by query: String) {
         guard !query.isEmpty else {
             fetchCoins()
@@ -83,29 +81,14 @@ final class AddCoinViewModel: BaseViewModel {
             Task {
                 do {
                     isLoading = true
-                    let coinSearchResult = try await coinScannerService.searchCoins(by: query)
-                    let coins = coinSearchResult.coins
+                    let coins = try await coinScannerService.searchCoins(by: query)
                     searchCoinsCache[query] = coins
                     self.coins = coins
-
-                    let coinIDs = coins.map { $0.id }
-                    await fetchMarketData(for: coinIDs)
                 } catch {
                     setErrorMessage(error)
                 }
                 isLoading = false
             }
         }
-    }
-
-    private func fetchMarketData(for coinIDs: [String]) async {
-        do {
-            isLoading = true
-            let getMarketData = try await coinScannerService.getMarketData(for: coinIDs)
-            marketData.merge(getMarketData, uniquingKeysWith: { $1 })
-        } catch {
-            setErrorMessage(error)
-        }
-        isLoading = false
     }
 }

@@ -25,7 +25,8 @@ struct CoinListView: View {
         NavigationView {
             List(coinListViewModel.coins, id: \.self) { coin in
                 HStack(spacing: .zero) {
-                    if let uiImage = UIImage(data: coin.imageData) {
+                    if let data = coin.imageData,
+                       let uiImage = UIImage(data: data) {
                         Image(uiImage: uiImage)
                             .resizable()
                             .aspectRatio(contentMode: .fit)

@@ -8,6 +8,7 @@
 import Foundation
 import SwiftData
 
+@MainActor
 final class CoinListViewModel: BaseViewModel {
     
     // MARK: - Properties
@@ -54,23 +55,13 @@ final class CoinListViewModel: BaseViewModel {
             }
         }
     }
-        
-    private func insertPredefinedCoins() {
-        let predefinedCoins = CoinData.predefinedCoins
-        
-        for coin in predefinedCoins {
-            insertNewCoin(coin)
-        }
-        
-        self.coins = predefinedCoins
-    }
     
     func createCoin(_ coin: Coin, _ marketData: MarketData? = nil) {
         if !coins.contains(where: { $0.id == coin.id }) {
             let newCoin = CoinData()
             newCoin.id = coin.id
             newCoin.name = coin.name
-            newCoin.image = coin.image
+            newCoin.imageURL = coin.imageURL
             newCoin.rank = coin.marketCapRank ?? .max
             newCoin.targetPrice = nil
             newCoin.isActive = false
@@ -85,22 +76,6 @@ final class CoinListViewModel: BaseViewModel {
             
             insertNewCoin(newCoin)
         }
-    }
-    
-    private func insertNewCoin(_ coin: CoinData) {
-        if let url = URL(string: coin.image) {
-            Task {
-                if let imageData = await loadImage(from: url) {
-                    coin.imageData = imageData
-                }
-            }
-        } else {
-            errorMessage = "Invalid image URL for \(coin.name)"
-        }
-        
-        coins.append(coin)
-        sortCoins()
-        insertAndSave(coin)
     }
     
     func deleteCoin(_ coin: CoinData) {
@@ -140,7 +115,29 @@ final class CoinListViewModel: BaseViewModel {
         save()
     }
     
-    @MainActor
+    // MARK: - Private
+    
+    private func insertPredefinedCoins() {
+        let predefinedCoins = CoinData.predefinedCoins
+        
+        for coin in predefinedCoins {
+            insertNewCoin(coin)
+        }
+        
+        self.coins = predefinedCoins
+    }
+    
+    private func insertNewCoin(_ coin: CoinData) {
+        Task {
+            if let url = coin.imageURL {
+                coin.imageData = await loadImage(from: url)
+            }
+            coins.append(coin)
+            sortCoins()
+            insertAndSave(coin)
+        }
+    }
+    
     private func fetchPriceAlerts() async {
         guard let deviceToken else { return }
         do {
@@ -180,7 +177,6 @@ final class CoinListViewModel: BaseViewModel {
         }
     }
     
-    @MainActor
     private func fetchMarketData() async {
         let coinIDs = coins.map { $0.id }
         let existingMarketData = coinIDs.compactMap { marketData[$0] }
