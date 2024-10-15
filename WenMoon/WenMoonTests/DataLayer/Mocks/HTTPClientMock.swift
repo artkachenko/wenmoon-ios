@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 @testable import WenMoon
 
 class HTTPClientMock: HTTPClient {
@@ -18,7 +17,7 @@ class HTTPClientMock: HTTPClient {
     var deleteResponse: Result<Data, APIError>?
 
     convenience init() {
-        self.init(encoder: .init(), decoder: .init())
+        self.init(encoder: JSONEncoder(), decoder: JSONDecoder())
     }
 
     init(encoder: JSONEncoder, decoder: JSONDecoder) {
@@ -28,29 +27,47 @@ class HTTPClientMock: HTTPClient {
 
     func get(path: String,
              parameters: [String: String]?,
-             headers: [String : String]?) -> AnyPublisher<Data, APIError> {
+             headers: [String : String]?) async throws -> Data {
         guard let result = getResponse else {
-            return Fail(error: .unknown(response: URLResponse())).eraseToAnyPublisher()
+            throw APIError.unknown(response: URLResponse())
         }
-        return result.publisher.eraseToAnyPublisher()
+
+        switch result {
+        case .success(let data):
+            return data
+        case .failure(let error):
+            throw error
+        }
     }
 
     func post(path: String,
               parameters: [String: String]?,
               headers: [String: String]?,
-              body: Data?) -> AnyPublisher<Data, APIError> {
+              body: Data?) async throws -> Data {
         guard let result = postResponse else {
-            return Fail(error: .unknown(response: URLResponse())).eraseToAnyPublisher()
+            throw APIError.unknown(response: URLResponse())
         }
-        return result.publisher.eraseToAnyPublisher()
+
+        switch result {
+        case .success(let data):
+            return data
+        case .failure(let error):
+            throw error
+        }
     }
 
     func delete(path: String,
                 parameters: [String: String]?,
-                headers: [String: String]?) -> AnyPublisher<Data, APIError> {
+                headers: [String: String]?) async throws -> Data {
         guard let result = deleteResponse else {
-            return Fail(error: .unknown(response: URLResponse())).eraseToAnyPublisher()
+            throw APIError.unknown(response: URLResponse())
         }
-        return result.publisher.eraseToAnyPublisher()
+
+        switch result {
+        case .success(let data):
+            return data
+        case .failure(let error):
+            throw error
+        }
     }
 }

@@ -6,54 +6,47 @@
 //
 
 import XCTest
-import Combine
 @testable import WenMoon
 
 class CoinScannerServiceMock: CoinScannerService {
 
     var getCoinsAtPageResult: Result<[Coin], APIError>!
-    var searchCoinsByQueryResult: Result<CoinSearchResult, APIError>!
+    var searchCoinsByQueryResult: Result<[Coin], APIError>!
     var getMarketDataForCoinsResult: Result<[String: MarketData], APIError>!
 
-    func getCoins(at page: Int) -> AnyPublisher<[Coin], APIError> {
-        Future { [weak self] promise in
-            switch self?.getCoinsAtPageResult {
-            case .success(let coins):
-                promise(.success(coins))
-            case .failure(let error):
-                promise(.failure(error))
-            case .none:
-                XCTFail("getCoinsAtPageResult not set")
-            }
+    func getCoins(at page: Int) async throws -> [Coin] {
+        switch getCoinsAtPageResult {
+        case .success(let coins):
+            return coins
+        case .failure(let error):
+            throw error
+        case .none:
+            XCTFail("getCoinsAtPageResult not set")
+            throw APIError.unknown(response: URLResponse())
         }
-        .eraseToAnyPublisher()
     }
 
-    func searchCoins(by query: String) -> AnyPublisher<CoinSearchResult, APIError> {
-        Future { [weak self] promise in
-            switch self?.searchCoinsByQueryResult {
-            case .success(let searchedCoins):
-                promise(.success(searchedCoins))
-            case .failure(let error):
-                promise(.failure(error))
-            case .none:
-                XCTFail("searchCoinsByQueryResult not set")
-            }
+    func searchCoins(by query: String) async throws -> [Coin] {
+        switch searchCoinsByQueryResult {
+        case .success(let searchedCoins):
+            return searchedCoins
+        case .failure(let error):
+            throw error
+        case .none:
+            XCTFail("searchCoinsByQueryResult not set")
+            throw APIError.unknown(response: URLResponse())
         }
-        .eraseToAnyPublisher()
     }
 
-    func getMarketData(for coinIDs: [String]) -> AnyPublisher<[String: MarketData], APIError> {
-        Future { [weak self] promise in
-            switch self?.getMarketDataForCoinsResult {
-            case .success(let marketData):
-                promise(.success(marketData))
-            case .failure(let error):
-                promise(.failure(error))
-            case .none:
-                XCTFail("getMarketDataForCoinIDsResult not set")
-            }
+    func getMarketData(for coinIDs: [String]) async throws -> [String: MarketData] {
+        switch getMarketDataForCoinsResult {
+        case .success(let marketData):
+            return marketData
+        case .failure(let error):
+            throw error
+        case .none:
+            XCTFail("getMarketDataForCoinIDsResult not set")
+            throw APIError.unknown(response: URLResponse())
         }
-        .eraseToAnyPublisher()
     }
 }

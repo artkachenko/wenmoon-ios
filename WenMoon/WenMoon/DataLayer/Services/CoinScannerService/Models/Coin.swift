@@ -12,7 +12,7 @@ struct Coin: Codable {
     var id: String
     var name: String
     var imageURL: URL?
-    var marketCapRank: Int16?
+    var marketCapRank: Int64?
     var currentPrice: Double?
     var priceChangePercentage24H: Double?
 
@@ -23,7 +23,7 @@ struct Coin: Codable {
     init(id: String,
          name: String,
          imageURL: URL?,
-         marketCapRank: Int16?,
+         marketCapRank: Int64?,
          currentPrice: Double?,
          priceChangePercentage24H: Double?) {
         self.id = id
@@ -39,7 +39,7 @@ struct Coin: Codable {
         id = try container.decode(String.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         imageURL = try container.decodeIfPresent(URL.self, forKey: .imageURL)
-        marketCapRank = try container.decodeIfPresent(Int16.self, forKey: .marketCapRank)
+        marketCapRank = try container.decodeIfPresent(Int64.self, forKey: .marketCapRank)
         currentPrice = try container.decodeIfPresent(Double.self, forKey: .currentPrice)
         priceChangePercentage24H = try container.decodeIfPresent(Double.self, forKey: .priceChangePercentage24H)
     }

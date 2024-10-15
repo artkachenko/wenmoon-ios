@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Combine
 @testable import WenMoon
 
 class UserDefaultsManagerMock: UserDefaultsManager {
@@ -17,8 +16,6 @@ class UserDefaultsManagerMock: UserDefaultsManager {
     var setObjectCalled = false
     var getObjectCalled = false
     var removeObjectCalled = false
-
-    var errorPublisher = Empty<UserDefaultsError, Never>().eraseToAnyPublisher()
 
     func setObject<T: Encodable>(_ object: T, forKey key: String) {
         setObjectCalled = true

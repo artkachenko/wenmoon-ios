@@ -6,163 +6,118 @@
 //
 
 import XCTest
-import Combine
 @testable import WenMoon
 
 class CoinScannerServiceTests: XCTestCase {
-
+    
     // MARK: - Properties
-
     var service: CoinScannerService!
     var httpClient: HTTPClientMock!
-    var cancellables: Set<AnyCancellable>!
-
+    
     // MARK: - Setup
-
     override func setUp() {
         super.setUp()
         httpClient = HTTPClientMock()
         service = CoinScannerServiceImpl(httpClient: httpClient, baseURL: URL(string: "https://example.com/")!)
-        cancellables = []
     }
-
+    
     override func tearDown() {
         service = nil
         httpClient = nil
-        cancellables = nil
         super.tearDown()
     }
-
+    
     // MARK: - Tests
-
-    func testGetCoinsSuccess() {
-        let response: [Coin] = [.btc, .eth]
+    // Get Coins
+    func testGetCoinsSuccess() async throws {
+        let response = makeCoins()
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
-
-        let expectation = XCTestExpectation(description: "Get an array of coins on page 1")
-        service.getCoins(at: 1)
-            .sink(receiveCompletion: { result in
-                switch result {
-                case .failure(let error):
-                    XCTFail("Expected success but got failure: \(error.errorDescription ?? error.localizedDescription)")
-                case .finished:
-                    expectation.fulfill()
-                }
-            }, receiveValue: { value in
-                XCTAssertFalse(value.isEmpty)
-                XCTAssertEqual(value.count, response.count)
-
-                XCTAssertEqual(value.first?.id, response.first?.id)
-                XCTAssertEqual(value.first?.name, response.first?.name)
-                XCTAssertEqual(value.first?.image, response.first?.image)
-
-                XCTAssertEqual(value.last?.id, response.last?.id)
-                XCTAssertEqual(value.last?.name, response.last?.name)
-                XCTAssertEqual(value.last?.image, response.last?.image)
-            })
-            .store(in: &cancellables)
-
-        wait(for: [expectation], timeout: 1)
+        
+        let coins = try await service.getCoins(at: 1)
+        
+        XCTAssertFalse(coins.isEmpty)
+        XCTAssertEqual(coins.count, response.count)
+        
+        assertCoin(coins.first!, response.first!)
+        assertCoin(coins.last!, response.last!)
     }
-
-    func testGetCoinsFailure() {
-        let apiError: APIError = .apiError(description: "Mocked API error description")
+    
+    func testGetCoinsFailure() async throws {
+        let apiError = makeAPIError()
         httpClient.getResponse = .failure(apiError)
-
-        let expectation = XCTestExpectation(description: "Get a failure with API error")
-        service.getCoins(at: 1)
-            .sink(receiveCompletion: { result in
-                switch result {
-                case .failure(let error):
-                    XCTAssertNotNil(error)
-                    XCTAssertEqual(error, apiError)
-                    expectation.fulfill()
-                case .finished:
-                    XCTFail("Expected failure but got success")
-                }
-            }, receiveValue: { _ in })
-            .store(in: &cancellables)
-
-        wait(for: [expectation], timeout: 1)
+        
+        await assertAPIFailure(
+            for: { [weak self] in
+                try await self?.service.getCoins(at: 1)
+            },
+            expectedError: apiError
+        )
     }
-
-    func testSearchCoinsByQuerySuccess() {
-        let response = CoinSearchResult.mock
+    
+    // Search Coins
+    func testSearchCoinsByQuerySuccess() async throws {
+        let response = makeCoins()
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
-
-        let expectation = XCTestExpectation(description: "Search for a specific coins by query")
-        service.searchCoins(by: "bit")
-            .sink(receiveCompletion: { result in
-                switch result {
-                case .failure(let error):
-                    XCTFail("Failed to search coins: \(error.errorDescription ?? error.localizedDescription)")
-                case .finished:
-                    expectation.fulfill()
-                }
-            }, receiveValue: { value in
-                XCTAssertFalse(value.coins.isEmpty)
-                XCTAssertEqual(value.coins.count, response.coins.count)
-
-                XCTAssertEqual(value.coins.first?.id, response.coins.first?.id)
-                XCTAssertEqual(value.coins.first?.name, response.coins.first?.name)
-                XCTAssertEqual(value.coins.first?.image, response.coins.first?.image)
-
-                XCTAssertEqual(value.coins.last?.id, response.coins.last?.id)
-                XCTAssertEqual(value.coins.last?.name, response.coins.last?.name)
-                XCTAssertEqual(value.coins.last?.image, response.coins.last?.image)
-            })
-            .store(in: &cancellables)
-
-        wait(for: [expectation], timeout: 1)
+        
+        let coins = try await service.searchCoins(by: "bit")
+        
+        XCTAssertFalse(coins.isEmpty)
+        XCTAssertEqual(coins.count, response.count)
+        
+        assertCoin(coins.first!, response.first!)
+        assertCoin(coins.last!, response.last!)
     }
-
-    func testSearchCoinsByQueryEmptyResult() {
-        let response = CoinSearchResult.emptyMock
+    
+    func testSearchCoinsByQueryEmptyResult() async throws {
+        let response = [Coin]()
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
-
-        let expectation = XCTestExpectation(description: "Search for a specific coins by invalid query")
-        service.searchCoins(by: "sdfghjkl")
-            .sink(receiveCompletion: { result in
-                switch result {
-                case .failure(let error):
-                    XCTFail("Failed to search coins: \(error.errorDescription ?? error.localizedDescription)")
-                case .finished:
-                    expectation.fulfill()
-                }
-            }, receiveValue: { value in
-                XCTAssert(value.coins.isEmpty)
-            })
-            .store(in: &cancellables)
-
-        wait(for: [expectation], timeout: 1)
+        
+        let coins = try await service.searchCoins(by: "sdfghjkl")
+        XCTAssertTrue(coins.isEmpty)
     }
-
-    func testGetMarketDataForCoins() {
-        let coinIDs = [Coin.btc.id, Coin.eth.id]
-        let response = MarketData.mock
+    
+    func testSearchCoinsByQueryFailure() async throws {
+        let apiError = makeAPIError()
+        httpClient.getResponse = .failure(apiError)
+        
+        await assertAPIFailure(
+            for: { [weak self] in
+                try await self?.service.searchCoins(by: "bit")
+            },
+            expectedError: apiError
+        )
+    }
+    
+    // Get Market Data
+    func testGetMarketDataForCoins() async throws {
+        let coinIDs = makeCoins().map { $0.id }
+        let response = makeMarketData()
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
-
-        let expectation = XCTestExpectation(description: "Get market data for coin IDs")
-        service.getMarketData(for: coinIDs)
-            .sink(receiveCompletion: { result in
-                switch result {
-                case .failure(let error):
-                    XCTFail("Failed to get market data: \(error.errorDescription ?? error.localizedDescription)")
-                case .finished:
-                    expectation.fulfill()
-                }
-            }, receiveValue: { value in
-                XCTAssertFalse(value.isEmpty)
-                XCTAssertEqual(value.count, response.count)
-
-                XCTAssertEqual(value[coinIDs.first!]?.currentPrice, response[coinIDs.first!]?.currentPrice)
-                XCTAssertEqual(value[coinIDs.first!]?.priceChange, response[coinIDs.first!]?.priceChange)
-
-                XCTAssertEqual(value[coinIDs.last!]?.currentPrice, response[coinIDs.last!]?.currentPrice)
-                XCTAssertEqual(value[coinIDs.last!]?.priceChange, response[coinIDs.last!]?.priceChange)
-            })
-            .store(in: &cancellables)
-
-        wait(for: [expectation], timeout: 1)
+        
+        let result = try await service.getMarketData(for: coinIDs)
+        
+        XCTAssertFalse(result.isEmpty)
+        XCTAssertEqual(result.count, response.count)
+        
+        let firstCoinID = coinIDs.first!
+        XCTAssertEqual(result[firstCoinID]!.currentPrice, response[firstCoinID]!.currentPrice)
+        XCTAssertEqual(result[firstCoinID]!.priceChange, response[firstCoinID]!.priceChange)
+        
+        let lastCoinID = coinIDs.last!
+        XCTAssertEqual(result[lastCoinID]!.currentPrice, response[lastCoinID]!.currentPrice)
+        XCTAssertEqual(result[lastCoinID]!.priceChange, response[lastCoinID]!.priceChange)
+    }
+    
+    func testGetMarketDataForCoinsFailure() async throws {
+        let coinIDs = makeCoins().map { $0.id }
+        let apiError = makeAPIError()
+        httpClient.getResponse = .failure(apiError)
+        
+        await assertAPIFailure(
+            for: { [weak self] in
+                try await self?.service.getMarketData(for: coinIDs)
+            },
+            expectedError: apiError
+        )
     }
 }

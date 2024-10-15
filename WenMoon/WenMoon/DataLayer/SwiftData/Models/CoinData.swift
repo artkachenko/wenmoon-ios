@@ -15,7 +15,7 @@ final class CoinData {
     var id: String
     
     var name: String
-    var rank: Int16
+    var rank: Int64
     var currentPrice: Double
     var priceChange: Double
     var imageURL: URL?
@@ -25,7 +25,7 @@ final class CoinData {
 
     init(id: String = "",
          name: String = "",
-         rank: Int16 = .zero,
+         rank: Int64 = .zero,
          currentPrice: Double = .zero,
          priceChange: Double = .zero,
          imageURL: URL? = nil,

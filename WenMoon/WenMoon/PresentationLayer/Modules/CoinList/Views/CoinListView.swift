@@ -65,7 +65,9 @@ struct CoinListView: View {
                                     capturedCoin = coin
                                     showSetPriceAlertConfirmation = true
                                 } else {
-                                    coinListViewModel.setPriceAlert(for: coin, targetPrice: nil)
+                                    Task {
+                                        await coinListViewModel.setPriceAlert(for: coin, targetPrice: nil)
+                                    }
                                 }
                             }
                         ))
@@ -82,7 +84,9 @@ struct CoinListView: View {
                 }
                 .swipeActions {
                     Button(role: .destructive) {
-                        coinListViewModel.deleteCoin(coin)
+                        Task {
+                            await coinListViewModel.deleteCoin(coin)
+                        }
                     } label: {
                         Image(systemName: "trash")
                     }
@@ -91,7 +95,9 @@ struct CoinListView: View {
             .animation(.default, value: coinListViewModel.coins)
             .navigationTitle("Coins")
             .refreshable {
-                coinListViewModel.fetchCoins()
+                Task {
+                    await coinListViewModel.fetchCoins()
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -108,7 +114,9 @@ struct CoinListView: View {
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: .appDidBecomeActive)) { _ in
-                coinListViewModel.fetchCoins()
+                Task {
+                    await coinListViewModel.fetchCoins()
+                }
             }
             .onChange(of: coinListViewModel.errorMessage) { _, errorMessage in
                 showErrorAlert = errorMessage != nil
@@ -122,7 +130,9 @@ struct CoinListView: View {
 
                 Button("Confirm") {
                     if let coin = capturedCoin {
-                        coinListViewModel.setPriceAlert(for: coin, targetPrice: targetPrice)
+                        Task {
+                            await coinListViewModel.setPriceAlert(for: coin, targetPrice: targetPrice)
+                        }
                         capturedCoin = nil
                         targetPrice = nil
                     }
@@ -142,11 +152,9 @@ struct CoinListView: View {
         }
     }
 
-    private func didSelectCoin(coin: Coin, marketData: MarketData?) {
-        guard let marketData else {
-            coinListViewModel.createCoin(coin)
-            return
+    private func didSelectCoin(coin: Coin) {
+        Task {
+            await coinListViewModel.createCoin(coin)
         }
-        coinListViewModel.createCoin(coin, marketData)
     }
 }

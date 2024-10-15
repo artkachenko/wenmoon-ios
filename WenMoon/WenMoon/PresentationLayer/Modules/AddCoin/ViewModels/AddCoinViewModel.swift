@@ -13,7 +13,6 @@ final class AddCoinViewModel: BaseViewModel {
     // MARK: - Properties
     
     @Published private(set) var coins: [Coin] = []
-    @Published private(set) var marketData: [String: MarketData] = [:]
     @Published private(set) var currentPage = 1
     
     private let coinScannerService: CoinScannerService
@@ -36,14 +35,16 @@ final class AddCoinViewModel: BaseViewModel {
         searchQuerySubject
             .debounce(for: 0.5, scheduler: RunLoop.main)
             .sink { [weak self] query in
-                self?.searchCoins(for: query)
+                Task {
+                    await self?.searchCoins(for: query)
+                }
             }
             .store(in: &cancellables)
     }
     
     // MARK: - Methods
     
-    func fetchCoins(at page: Int = 1) {
+    func fetchCoins(at page: Int = 1) async {
         if let cachedCoins = coinsCache[page] {
             if page > 1 {
                 coins += cachedCoins
@@ -54,52 +55,48 @@ final class AddCoinViewModel: BaseViewModel {
             return
         }
         
-        Task {
-            do {
-                isLoading = true
-                let fetchedCoins = try await coinScannerService.getCoins(at: page)
-                coinsCache[page] = fetchedCoins
-                if page > 1 {
-                    coins += fetchedCoins
-                } else {
-                    coins = fetchedCoins
-                }
-                currentPage = page
-            } catch {
-                setErrorMessage(error)
+        do {
+            isLoading = true
+            let fetchedCoins = try await coinScannerService.getCoins(at: page)
+            coinsCache[page] = fetchedCoins
+            if page > 1 {
+                coins += fetchedCoins
+            } else {
+                coins = fetchedCoins
             }
-            isLoading = false
+            currentPage = page
+        } catch {
+            setErrorMessage(error)
         }
+        isLoading = false
     }
     
-    func fetchCoinsOnNextPage() {
-        fetchCoins(at: currentPage + 1)
+    func fetchCoinsOnNextPage() async {
+        await fetchCoins(at: currentPage + 1)
     }
     
-    func handleSearchInput(_ query: String) {
+    func handleSearchInput(_ query: String) async {
         guard !query.isEmpty else {
-            fetchCoins()
+            await fetchCoins()
             return
         }
         searchQuerySubject.send(query)
     }
     
-    private func searchCoins(for query: String) {
+    func searchCoins(for query: String) async {
         if let cachedCoins = searchCoinsCache[query] {
             coins = cachedCoins
             return
         }
         
-        Task {
-            do {
-                isLoading = true
-                let coins = try await coinScannerService.searchCoins(by: query)
-                searchCoinsCache[query] = coins
-                self.coins = coins
-            } catch {
-                setErrorMessage(error)
-            }
-            isLoading = false
+        do {
+            isLoading = true
+            let coins = try await coinScannerService.searchCoins(by: query)
+            searchCoinsCache[query] = coins
+            self.coins = coins
+        } catch {
+            setErrorMessage(error)
         }
+        isLoading = false
     }
 }

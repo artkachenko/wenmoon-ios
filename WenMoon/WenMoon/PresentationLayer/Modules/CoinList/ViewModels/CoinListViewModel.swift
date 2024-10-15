@@ -22,40 +22,36 @@ final class CoinListViewModel: BaseViewModel {
     // MARK: - Initializers
     
     convenience init() {
+        if let modelContainer = try? ModelContainer(for: CoinData.self) {
+            let swiftDataManager = SwiftDataManagerImpl(modelContainer: modelContainer)
+            self.init(coinScannerService: CoinScannerServiceImpl(), priceAlertService: PriceAlertServiceImpl(), swiftDataManager: swiftDataManager)
+        }
         self.init(coinScannerService: CoinScannerServiceImpl(), priceAlertService: PriceAlertServiceImpl())
     }
     
-    init(coinScannerService: CoinScannerService, priceAlertService: PriceAlertService) {
+    init(coinScannerService: CoinScannerService, priceAlertService: PriceAlertService, swiftDataManager: SwiftDataManager? = nil) {
         self.coinScannerService = coinScannerService
         self.priceAlertService = priceAlertService
-        
-        if let modelContainer = try? ModelContainer(for: CoinData.self) {
-            let swiftDataManager = SwiftDataManagerImpl(modelContainer: modelContainer)
-            super.init(swiftDataManager: swiftDataManager, userDefaultsManager: UserDefaultsManagerImpl())
-        } else {
-            super.init(userDefaultsManager: UserDefaultsManagerImpl())
-        }
+        super.init(swiftDataManager: swiftDataManager, userDefaultsManager: UserDefaultsManagerImpl())
     }
     
     // MARK: - Methods
     
-    func fetchCoins() {
+    func fetchCoins() async {
         if isFirstLaunch {
-            insertPredefinedCoins()
+            await insertPredefinedCoins()
         } else {
             let descriptor = FetchDescriptor<CoinData>(sortBy: [SortDescriptor(\.rank)])
             coins = fetch(descriptor)
         }
         
         if !coins.isEmpty {
-            Task {
-                await fetchMarketData()
-                await fetchPriceAlerts()
-            }
+            await fetchMarketData()
+            await fetchPriceAlerts()
         }
     }
     
-    func createCoin(_ coin: Coin, _ marketData: MarketData? = nil) {
+    func createCoin(_ coin: Coin, _ marketData: MarketData? = nil) async {
         if !coins.contains(where: { $0.id == coin.id }) {
             let newCoin = CoinData()
             newCoin.id = coin.id
@@ -73,15 +69,13 @@ final class CoinListViewModel: BaseViewModel {
                 newCoin.priceChange = coin.priceChangePercentage24H ?? .zero
             }
             
-            insertNewCoin(newCoin)
+            await insertNewCoin(newCoin)
         }
     }
     
-    func deleteCoin(_ coin: CoinData) {
+    func deleteCoin(_ coin: CoinData) async {
         if coin.targetPrice != nil {
-            Task {
-                await deletePriceAlert(for: coin.id)
-            }
+            await deletePriceAlert(for: coin.id)
         }
         deleteAndSave(coin)
         if let index = coins.firstIndex(of: coin) {
@@ -89,19 +83,15 @@ final class CoinListViewModel: BaseViewModel {
         }
     }
     
-    func setPriceAlert(for coin: CoinData, targetPrice: Double?) {
+    func setPriceAlert(for coin: CoinData, targetPrice: Double?) async {
         if let targetPrice {
             coin.targetPrice = targetPrice
             coin.isActive = true
-            Task {
-                await setPriceAlert(for: coin)
-            }
+            await setPriceAlert(for: coin)
         } else {
             coin.targetPrice = nil
             coin.isActive = false
-            Task {
-                await deletePriceAlert(for: coin.id)
-            }
+            await deletePriceAlert(for: coin.id)
         }
         save()
     }
@@ -116,25 +106,23 @@ final class CoinListViewModel: BaseViewModel {
     
     // MARK: - Private
     
-    private func insertPredefinedCoins() {
+    private func insertPredefinedCoins() async {
         let predefinedCoins = CoinData.predefinedCoins
         
         for coin in predefinedCoins {
-            insertNewCoin(coin)
+            await insertNewCoin(coin)
         }
         
         self.coins = predefinedCoins
     }
     
-    private func insertNewCoin(_ coin: CoinData) {
-        Task {
-            if let url = coin.imageURL {
-                coin.imageData = await loadImage(from: url)
-            }
-            coins.append(coin)
-            sortCoins()
-            insertAndSave(coin)
+    private func insertNewCoin(_ coin: CoinData) async {
+        if let url = coin.imageURL {
+            coin.imageData = await loadImage(from: url)
         }
+        coins.append(coin)
+        sortCoins()
+        insertAndSave(coin)
     }
     
     private func fetchPriceAlerts() async {

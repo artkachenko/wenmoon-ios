@@ -17,7 +17,7 @@ struct AddCoinView: View {
     @State private var searchText = ""
     @State private var showErrorAlert = false
     
-    private(set) var didSelectCoin: ((Coin, MarketData?) -> Void)?
+    private(set) var didSelectCoin: ((Coin) -> Void)?
     
     // MARK: - Body
     
@@ -57,12 +57,14 @@ struct AddCoinView: View {
                     }
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        didSelectCoin?(coin, viewModel.marketData[coin.id])
+                        didSelectCoin?(coin)
                         presentationMode.wrappedValue.dismiss()
                     }
                     .onAppear {
                         if searchText.isEmpty && coin.id == viewModel.coins.last?.id {
-                            viewModel.fetchCoinsOnNextPage()
+                            Task {
+                                await viewModel.fetchCoinsOnNextPage()
+                            }
                         }
                     }
                 }
@@ -85,7 +87,9 @@ struct AddCoinView: View {
                 }
             }
             .onChange(of: searchText) { _, query in
-                viewModel.handleSearchInput(query)
+                Task {
+                    await viewModel.handleSearchInput(query)
+                }
             }
             .onChange(of: viewModel.errorMessage) { _, errorMessage in
                 showErrorAlert = errorMessage != nil
@@ -94,7 +98,9 @@ struct AddCoinView: View {
                 Button("OK", role: .cancel) { }
             }
             .onAppear {
-                viewModel.fetchCoins()
+                Task {
+                    await viewModel.fetchCoins()
+                }
             }
         }
     }
