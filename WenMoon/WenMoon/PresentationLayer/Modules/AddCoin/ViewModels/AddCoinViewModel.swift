@@ -17,8 +17,9 @@ final class AddCoinViewModel: BaseViewModel {
     
     private let coinScannerService: CoinScannerService
     
-    private var coinsCache: [Int: [Coin]] = [:]
-    private var searchCoinsCache: [String: [Coin]] = [:]
+    var coinsCache: [Int: [Coin]] = [:]
+    var searchCoinsCache: [String: [Coin]] = [:]
+    
     private var searchQuerySubject = PassthroughSubject<String, Never>()
     private var cancellables = Set<AnyCancellable>()
     
