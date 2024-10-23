@@ -14,12 +14,9 @@ protocol CoinScannerService {
 }
 
 final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
-
     // MARK: - CoinScannerService
-
     func getCoins(at page: Int) async throws -> [Coin] {
         let path = "coins"
-        // TODO: - Replace the hardcoded parameters with the actual app settings
         let data = try await httpClient.get(path: path, parameters: ["page": String(page)])
         do {
             let coins = try decoder.decode([Coin].self, from: data)
@@ -29,7 +26,7 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
             throw mapToAPIError(error)
         }
     }
-
+    
     func searchCoins(by query: String) async throws -> [Coin] {
         let path = "search"
         let data = try await httpClient.get(path: path, parameters: ["query": query])
@@ -41,10 +38,9 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
             throw mapToAPIError(error)
         }
     }
-
+    
     func getMarketData(for coinIDs: [String]) async throws -> [String: MarketData] {
         let path = "market-data"
-        // TODO: - Replace the hardcoded parameters with the actual app settings
         let data = try await httpClient.get(path: path, parameters: ["ids": coinIDs.joined(separator: ",")])
         do {
             let marketData = try decoder.decode([String: MarketData].self, from: data)

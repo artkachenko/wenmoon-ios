@@ -8,20 +8,24 @@
 import UIKit
 
 class AppDelegate: NSObject, UIApplicationDelegate {
-
+    // MARK: - Properties
     private var userDefaultsManager: UserDefaultsManager?
-
-    func application(_ application: UIApplication,
-                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+    
+    // MARK: - Methods
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+    ) -> Bool {
         userDefaultsManager = UserDefaultsManagerImpl()
         registerForPushNotifications()
         return true
     }
-
+    
     func resetBadgeNumber() {
         UNUserNotificationCenter.current().setBadgeCount(.zero)
     }
-
+    
+    // MARK: - Private
     private func registerForPushNotifications() {
         let notificationCenter = UNUserNotificationCenter.current()
         notificationCenter.delegate = self
@@ -33,42 +37,37 @@ class AppDelegate: NSObject, UIApplicationDelegate {
             }
         }
     }
+    
+    private func sendTargetPriceNotification(for coinID: String) {
+        let userInfo: [String: Any] = ["coinID": coinID]
+        NotificationCenter.default.post(name: .targetPriceReached, object: nil, userInfo: userInfo)
+    }
 }
 
 // MARK: - UNUserNotificationCenterDelegate
-
 extension AppDelegate: UNUserNotificationCenterDelegate {
-
-    func application(_ application: UIApplication,
-                     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         let tokenParts = deviceToken.map { data in String(format: "%02.2hhx", data) }
         let token = tokenParts.joined()
         print("Device Token: \(token)")
-        guard (try? userDefaultsManager?.getObject(forKey: "deviceToken",
-                                                   objectType: String.self)) == nil else { return }
+        guard (try? userDefaultsManager?.getObject(forKey: "deviceToken", objectType: String.self)) == nil else { return }
         try? userDefaultsManager?.setObject(token, forKey: "deviceToken")
     }
-
-    func application(_ application: UIApplication,
-                     didFailToRegisterForRemoteNotificationsWithError error: Error) {
+    
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("Failed to register for remote notifications with error: \(error.localizedDescription)")
     }
-
-    func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                willPresent notification: UNNotification,
-                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification,
+        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions
+        ) -> Void) {
         let userInfo = notification.request.content.userInfo
-
         if let coinID = userInfo["coinID"] as? String {
             sendTargetPriceNotification(for: coinID)
             resetBadgeNumber()
         }
-
         completionHandler([.banner, .badge, .sound])
-    }
-
-    private func sendTargetPriceNotification(for coinID: String) {
-        let userInfo: [String: Any] = ["coinID": coinID]
-        NotificationCenter.default.post(name: .targetPriceReached, object: nil, userInfo: userInfo)
     }
 }

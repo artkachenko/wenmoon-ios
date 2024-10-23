@@ -10,7 +10,6 @@ import XCTest
 
 @MainActor
 class AddCoinViewModelTests: XCTestCase {
-    
     // MARK: - Properties
     var viewModel: AddCoinViewModel!
     var service: CoinScannerServiceMock!
@@ -30,93 +29,108 @@ class AddCoinViewModelTests: XCTestCase {
     
     // MARK: - Tests
     // Fetch Coins
-    func testFetchCoinsSuccess() async throws {
-        let response = makeCoins()
+    func testFetchCoins_success() async throws {
+        // Setup
+        let response = CoinFactoryMock.makeCoins()
         service.getCoinsAtPageResult = .success(response)
         
+        // Action
         await viewModel.fetchCoins()
         
+        // Assertions
         let coins = viewModel.coins
-        XCTAssertFalse(coins.isEmpty)
-        XCTAssertEqual(coins.count, response.count)
-        
-        assertCoin(coins.first!, response.first!)
-        assertCoin(coins.last!, response.last!)
-        
+        assertCoinsEqual(coins, response)
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testFetchCoinsUsesCache() async throws {
-        let cachedCoins = makeCoins()
+    func testFetchCoins_usesCache() async throws {
+        // Setup
+        let cachedCoins = CoinFactoryMock.makeCoins()
         viewModel.coinsCache[1] = cachedCoins
         
+        // Action
         await viewModel.fetchCoins(at: 1)
         
-        let coins = viewModel.coins
-        XCTAssertEqual(coins.count, cachedCoins.count)
-        assertCoin(coins.first!, cachedCoins.first!)
-        assertCoin(coins.last!, cachedCoins.last!)
+        // Assertions
+        assertCoinsEqual(viewModel.coins, cachedCoins)
     }
     
-    func testFetchCoinsFailure() async throws {
-        let apiError: APIError = .apiError(description: "Mocked server error")
-        service.getCoinsAtPageResult = .failure(apiError)
+    func testFetchCoins_networkError() async throws {
+        // Setup
+        let error = ErrorFactoryMock.makeNoNetworkConnectionError()
+        service.getCoinsAtPageResult = .failure(error)
         
+        // Action
         await viewModel.fetchCoins()
         
+        // Assertions
         XCTAssertNotNil(viewModel.errorMessage)
-        XCTAssertEqual(viewModel.errorMessage, apiError.errorDescription)
+        XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
     // Search Coins
-    func testSearchCoinsByQuerySuccess() async throws {
-        let response = makeCoins()
+    func testSearchCoinsByQuery_success() async throws {
+        // Setup
+        let response = CoinFactoryMock.makeCoins()
         service.searchCoinsByQueryResult = .success(response)
         
+        // Action
         await viewModel.searchCoins(for: "bit")
         
-        let coins = viewModel.coins
-        XCTAssertFalse(coins.isEmpty)
-        XCTAssertEqual(coins.count, response.count)
-        
-        assertCoin(coins.first!, response.first!)
-        assertCoin(coins.last!, response.last!)
-        
+        // Assertions
+        assertCoinsEqual(viewModel.coins, response)
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testSearchCoinsByQueryEmptyResult() async throws {
-        let response = makeEmptyCoins()
+    func testSearchCoinsByQuery_emptyResult() async throws {
+        // Setup
+        let response = CoinFactoryMock.makeEmptyCoins()
         service.searchCoinsByQueryResult = .success(response)
         
-        await viewModel.searchCoins(for: "sdfghjkl")
+        // Action
+        await viewModel.searchCoins(for: "invalidquery")
         
-        XCTAssertTrue(viewModel.coins.isEmpty)
+        // Assertions
+        XCTAssert(viewModel.coins.isEmpty)
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testSearchCoinsUsesCache() async throws {
-        let cachedCoins = makeCoins()
+    func testSearchCoins_usesCache() async throws {
+        // Setup
+        let cachedCoins = CoinFactoryMock.makeCoins()
         viewModel.searchCoinsCache["bit"] = cachedCoins
         
+        // Action
         await viewModel.searchCoins(for: "bit")
         
-        let coins = viewModel.coins
-        XCTAssertEqual(coins.count, cachedCoins.count)
-        assertCoin(coins.first!, cachedCoins.first!)
-        assertCoin(coins.last!, cachedCoins.last!)
+        // Assertions
+        assertCoinsEqual(viewModel.coins, cachedCoins)
     }
     
-    func testHandleSearchInputEmptyQuery() async throws {
-        let initialCoins = makeCoins()
+    func testSearchCoinsByQuery_unknownError() async throws {
+        // Setup
+        let error = ErrorFactoryMock.makeUnknownError()
+        service.searchCoinsByQueryResult = .failure(error)
+        
+        // Action
+        await viewModel.searchCoins(for: "bit")
+        
+        // Assertions
+        XCTAssertNotNil(viewModel.errorMessage)
+        XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
+    }
+    
+    func testHandleSearchInput_emptyQuery() async throws {
+        // Setup
+        let initialCoins = CoinFactoryMock.makeCoins()
         service.getCoinsAtPageResult = .success(initialCoins)
         await viewModel.fetchCoins()
         
+        // Action
         await viewModel.handleSearchInput("")
         
-        let coins = viewModel.coins
-        XCTAssertEqual(coins.count, initialCoins.count)
-        assertCoin(coins.first!, initialCoins.first!)
-        assertCoin(coins.last!, initialCoins.last!)
+        // Assertions
+        assertCoinsEqual(viewModel.coins, initialCoins)
+        XCTAssertNil(viewModel.errorMessage)
     }
 }

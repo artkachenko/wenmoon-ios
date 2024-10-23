@@ -9,7 +9,6 @@ import XCTest
 @testable import WenMoon
 
 class CoinScannerServiceTests: XCTestCase {
-    
     // MARK: - Properties
     var service: CoinScannerService!
     var httpClient: HTTPClientMock!
@@ -29,95 +28,97 @@ class CoinScannerServiceTests: XCTestCase {
     
     // MARK: - Tests
     // Get Coins
-    func testGetCoinsSuccess() async throws {
-        let response = makeCoins()
+    func testGetCoins_success() async throws {
+        // Setup
+        let response = CoinFactoryMock.makeCoins()
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
         
+        // Action
         let coins = try await service.getCoins(at: 1)
         
-        XCTAssertFalse(coins.isEmpty)
-        XCTAssertEqual(coins.count, response.count)
-        
-        assertCoin(coins.first!, response.first!)
-        assertCoin(coins.last!, response.last!)
+        // Assertions
+        assertCoinsEqual(coins, response)
     }
     
-    func testGetCoinsFailure() async throws {
-        let apiError = makeAPIError()
-        httpClient.getResponse = .failure(apiError)
+    func testGetCoins_apiError() async throws {
+        // Setup
+        let error = ErrorFactoryMock.makeAPIError()
+        httpClient.getResponse = .failure(error)
         
-        await assertAPIFailure(
+        // Action & Assertions
+        await assertFailure(
             for: { [weak self] in
-                try await self?.service.getCoins(at: 1)
+                try await self!.service.getCoins(at: 1)
             },
-            expectedError: apiError
+            expectedError: error
         )
     }
     
     // Search Coins
-    func testSearchCoinsByQuerySuccess() async throws {
-        let response = makeCoins()
+    func testSearchCoinsByQuery_success() async throws {
+        // Setup
+        let response = CoinFactoryMock.makeCoins()
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
         
+        // Action
         let coins = try await service.searchCoins(by: "bit")
         
-        XCTAssertFalse(coins.isEmpty)
-        XCTAssertEqual(coins.count, response.count)
-        
-        assertCoin(coins.first!, response.first!)
-        assertCoin(coins.last!, response.last!)
+        // Assertions
+        assertCoinsEqual(coins, response)
     }
     
-    func testSearchCoinsByQueryEmptyResult() async throws {
+    func testSearchCoinsByQuery_emptyResult() async throws {
+        // Setup
         let response = [Coin]()
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
         
+        // Action
         let coins = try await service.searchCoins(by: "sdfghjkl")
-        XCTAssertTrue(coins.isEmpty)
+        
+        // Assertions
+        XCTAssert(coins.isEmpty)
     }
     
-    func testSearchCoinsByQueryFailure() async throws {
-        let apiError = makeAPIError()
-        httpClient.getResponse = .failure(apiError)
+    func testSearchCoinsByQuery_invalidEndpoint() async throws {
+        // Setup
+        let error = ErrorFactoryMock.makeInvalidEndpointError()
+        httpClient.getResponse = .failure(error)
         
-        await assertAPIFailure(
+        // Action & Assertions
+        await assertFailure(
             for: { [weak self] in
-                try await self?.service.searchCoins(by: "bit")
+                try await self!.service.searchCoins(by: "bit")
             },
-            expectedError: apiError
+            expectedError: error
         )
     }
     
     // Get Market Data
-    func testGetMarketDataForCoins() async throws {
-        let coinIDs = makeCoins().map { $0.id }
-        let response = makeMarketData()
+    func testGetMarketDataForCoins_success() async throws {
+        // Setup
+        let coinIDs = CoinFactoryMock.makeCoins().map { $0.id }
+        let response = MarketDataFactoryMock.makeMarketData()
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
         
-        let result = try await service.getMarketData(for: coinIDs)
+        // Action
+        let marketData = try await service.getMarketData(for: coinIDs)
         
-        XCTAssertFalse(result.isEmpty)
-        XCTAssertEqual(result.count, response.count)
-        
-        let firstCoinID = coinIDs.first!
-        XCTAssertEqual(result[firstCoinID]!.currentPrice, response[firstCoinID]!.currentPrice)
-        XCTAssertEqual(result[firstCoinID]!.priceChange, response[firstCoinID]!.priceChange)
-        
-        let lastCoinID = coinIDs.last!
-        XCTAssertEqual(result[lastCoinID]!.currentPrice, response[lastCoinID]!.currentPrice)
-        XCTAssertEqual(result[lastCoinID]!.priceChange, response[lastCoinID]!.priceChange)
+        // Assertions
+        assertMarketDataEqual(marketData, response, for: coinIDs)
     }
     
-    func testGetMarketDataForCoinsFailure() async throws {
-        let coinIDs = makeCoins().map { $0.id }
-        let apiError = makeAPIError()
-        httpClient.getResponse = .failure(apiError)
+    func testGetMarketDataForCoins_networkError() async throws {
+        // Setup
+        let coinIDs = CoinFactoryMock.makeCoins().map { $0.id }
+        let error = ErrorFactoryMock.makeNoNetworkConnectionError()
+        httpClient.getResponse = .failure(error)
         
-        await assertAPIFailure(
+        // Action & Assertions
+        await assertFailure(
             for: { [weak self] in
-                try await self?.service.getMarketData(for: coinIDs)
+                try await self!.service.getMarketData(for: coinIDs)
             },
-            expectedError: apiError
+            expectedError: error
         )
     }
 }

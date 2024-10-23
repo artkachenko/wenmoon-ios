@@ -10,9 +10,7 @@ import SwiftData
 
 @MainActor
 class BaseViewModel: ObservableObject {
-    
     // MARK: - Properties
-    
     @Published var errorMessage: String?
     @Published var isLoading = false
     
@@ -40,14 +38,12 @@ class BaseViewModel: ObservableObject {
     }
     
     // MARK: - Initializers
-    
     init(swiftDataManager: SwiftDataManager? = nil, userDefaultsManager: UserDefaultsManager? = nil) {
         self.swiftDataManager = swiftDataManager
         self.userDefaultsManager = userDefaultsManager
     }
     
     // MARK: - Methods
-    
     func fetch<T: PersistentModel>(_ descriptor: FetchDescriptor<T>) -> [T] {
         guard isSwiftDataManagerAvailable() else { return [] }
         do {
@@ -59,7 +55,7 @@ class BaseViewModel: ObservableObject {
         }
     }
     
-    func insertAndSave<T: PersistentModel>(_ model: T) {
+    func insert<T: PersistentModel>(_ model: T) {
         guard isSwiftDataManagerAvailable() else { return }
         do {
             try swiftDataManager!.insert(model)
@@ -68,7 +64,7 @@ class BaseViewModel: ObservableObject {
         }
     }
     
-    func deleteAndSave<T: PersistentModel>(_ model: T) {
+    func delete<T: PersistentModel>(_ model: T) {
         guard isSwiftDataManagerAvailable() else { return }
         do {
             try swiftDataManager!.delete(model)
@@ -104,11 +100,10 @@ class BaseViewModel: ObservableObject {
         }
     }
     
-    // MARK: - Helpers
-    
+    // MARK: - Private
     private func isUserDefaultsManagerAvailable() -> Bool {
         guard userDefaultsManager != nil else {
-            print("UserDefaultsManager is not initialized.")
+            print("UserDefaultsManager is not initialized")
             return false
         }
         return true
@@ -116,7 +111,7 @@ class BaseViewModel: ObservableObject {
     
     private func isSwiftDataManagerAvailable() -> Bool {
         guard swiftDataManager != nil else {
-            print("SwiftDataManager is not initialized.")
+            print("SwiftDataManager is not initialized")
             return false
         }
         return true

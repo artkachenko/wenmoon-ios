@@ -16,13 +16,15 @@ protocol SwiftDataManager {
 }
 
 final class SwiftDataManagerImpl: SwiftDataManager {
-    
+    // MARK: - Properties
     private let modelContext: ModelContext
     
+    // MARK: - Initializers
     init(modelContainer: ModelContainer) {
         modelContext = ModelContext(modelContainer)
     }
     
+    // MARK: - SwiftDataManager
     func fetch<T: PersistentModel>(_ descriptor: FetchDescriptor<T>) throws -> [T] {
         do {
             let data = try modelContext.fetch(descriptor)

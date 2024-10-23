@@ -7,15 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D21A57BE2CCA65AB00AC2D13 /* MarketData+Assertations.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21A57BD2CCA65AB00AC2D13 /* MarketData+Assertations.swift */; };
+		D21A57C12CCAA8BC00AC2D13 /* ErrorFactoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21A57C02CCAA8BC00AC2D13 /* ErrorFactoryMock.swift */; };
+		D21A57C32CCAAB9400AC2D13 /* Error+Assertations.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21A57C22CCAAB9400AC2D13 /* Error+Assertations.swift */; };
 		D22D33992CB92721007997DD /* CoinData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D33982CB92721007997DD /* CoinData.swift */; };
 		D22D339D2CB92ABC007997DD /* SwiftDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D339C2CB92ABC007997DD /* SwiftDataManager.swift */; };
 		D22D33A02CB9342A007997DD /* SwiftDataError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D339F2CB9342A007997DD /* SwiftDataError.swift */; };
 		D22D33A32CB958A5007997DD /* DescriptiveError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D33A22CB958A5007997DD /* DescriptiveError.swift */; };
-		D2D0F9EC2CC2DF3F00712717 /* Coin+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D0F9EB2CC2DF3F00712717 /* Coin+Mock.swift */; };
-		D2D0F9EE2CC2E0C300712717 /* Coin+Assertation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D0F9ED2CC2E0C300712717 /* Coin+Assertation.swift */; };
+		D2D0F9EC2CC2DF3F00712717 /* CoinFactoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D0F9EB2CC2DF3F00712717 /* CoinFactoryMock.swift */; };
+		D2D0F9EE2CC2E0C300712717 /* Coin+Assertations.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D0F9ED2CC2E0C300712717 /* Coin+Assertations.swift */; };
 		D2F6DD642CC650D4009EF857 /* PriceAlertServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F6DD632CC650D4009EF857 /* PriceAlertServiceTests.swift */; };
-		D2F6DD682CC6514E009EF857 /* PriceAlert+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F6DD672CC6514E009EF857 /* PriceAlert+Mock.swift */; };
-		D2F6DD6A2CC65216009EF857 /* PriceAlert+Assertation.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F6DD692CC65216009EF857 /* PriceAlert+Assertation.swift */; };
+		D2F6DD682CC6514E009EF857 /* PriceAlertFactoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F6DD672CC6514E009EF857 /* PriceAlertFactoryMock.swift */; };
+		D2F6DD6A2CC65216009EF857 /* PriceAlert+Assertations.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F6DD692CC65216009EF857 /* PriceAlert+Assertations.swift */; };
+		D2F6DD6C2CC682C3009EF857 /* PriceAlertServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F6DD6B2CC682C3009EF857 /* PriceAlertServiceMock.swift */; };
 		FA07AC2629F91120008F6484 /* CoinMarketData.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA07AC2529F91120008F6484 /* CoinMarketData.swift */; };
 		FA07AC3029F93292008F6484 /* Double+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA07AC2F29F93292008F6484 /* Double+Extensions.swift */; };
 		FA61B3F12A41B71D008A9FB9 /* BaseViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA61B3F02A41B71D008A9FB9 /* BaseViewModel.swift */; };
@@ -24,7 +28,7 @@
 		FA8A088D2A1CFAF90083B8DB /* PriceAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8A088C2A1CFAF90083B8DB /* PriceAlert.swift */; };
 		FA8A08902A1CFD040083B8DB /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8A088F2A1CFD040083B8DB /* UserDefaultsManager.swift */; };
 		FA8A08922A1CFD130083B8DB /* UserDefaultsError.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8A08912A1CFD130083B8DB /* UserDefaultsError.swift */; };
-		FA8F60CA2A4DA40A0050C983 /* MarketData+Mock.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8F60C92A4DA40A0050C983 /* MarketData+Mock.swift */; };
+		FA8F60CA2A4DA40A0050C983 /* MarketDataFactoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA8F60C92A4DA40A0050C983 /* MarketDataFactoryMock.swift */; };
 		FAA83CC82A3B6E37001DEE1E /* UserDefaultsManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAA83CC72A3B6E37001DEE1E /* UserDefaultsManagerMock.swift */; };
 		FAB361F729F447DB00A88050 /* WenMoonApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB361F629F447DB00A88050 /* WenMoonApp.swift */; };
 		FAB361FE29F447DB00A88050 /* CoinListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB361FD29F447DB00A88050 /* CoinListView.swift */; };
@@ -59,15 +63,19 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D21A57BD2CCA65AB00AC2D13 /* MarketData+Assertations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MarketData+Assertations.swift"; sourceTree = "<group>"; };
+		D21A57C02CCAA8BC00AC2D13 /* ErrorFactoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorFactoryMock.swift; sourceTree = "<group>"; };
+		D21A57C22CCAAB9400AC2D13 /* Error+Assertations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Error+Assertations.swift"; sourceTree = "<group>"; };
 		D22D33982CB92721007997DD /* CoinData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinData.swift; sourceTree = "<group>"; };
 		D22D339C2CB92ABC007997DD /* SwiftDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataManager.swift; sourceTree = "<group>"; };
 		D22D339F2CB9342A007997DD /* SwiftDataError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataError.swift; sourceTree = "<group>"; };
 		D22D33A22CB958A5007997DD /* DescriptiveError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptiveError.swift; sourceTree = "<group>"; };
-		D2D0F9EB2CC2DF3F00712717 /* Coin+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coin+Mock.swift"; sourceTree = "<group>"; };
-		D2D0F9ED2CC2E0C300712717 /* Coin+Assertation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coin+Assertation.swift"; sourceTree = "<group>"; };
+		D2D0F9EB2CC2DF3F00712717 /* CoinFactoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinFactoryMock.swift; sourceTree = "<group>"; };
+		D2D0F9ED2CC2E0C300712717 /* Coin+Assertations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coin+Assertations.swift"; sourceTree = "<group>"; };
 		D2F6DD632CC650D4009EF857 /* PriceAlertServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertServiceTests.swift; sourceTree = "<group>"; };
-		D2F6DD672CC6514E009EF857 /* PriceAlert+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PriceAlert+Mock.swift"; sourceTree = "<group>"; };
-		D2F6DD692CC65216009EF857 /* PriceAlert+Assertation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PriceAlert+Assertation.swift"; sourceTree = "<group>"; };
+		D2F6DD672CC6514E009EF857 /* PriceAlertFactoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertFactoryMock.swift; sourceTree = "<group>"; };
+		D2F6DD692CC65216009EF857 /* PriceAlert+Assertations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PriceAlert+Assertations.swift"; sourceTree = "<group>"; };
+		D2F6DD6B2CC682C3009EF857 /* PriceAlertServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertServiceMock.swift; sourceTree = "<group>"; };
 		FA07AC2529F91120008F6484 /* CoinMarketData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinMarketData.swift; sourceTree = "<group>"; };
 		FA07AC2F29F93292008F6484 /* Double+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Double+Extensions.swift"; sourceTree = "<group>"; };
 		FA61B3F02A41B71D008A9FB9 /* BaseViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewModel.swift; sourceTree = "<group>"; };
@@ -76,7 +84,7 @@
 		FA8A088C2A1CFAF90083B8DB /* PriceAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlert.swift; sourceTree = "<group>"; };
 		FA8A088F2A1CFD040083B8DB /* UserDefaultsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManager.swift; sourceTree = "<group>"; };
 		FA8A08912A1CFD130083B8DB /* UserDefaultsError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsError.swift; sourceTree = "<group>"; };
-		FA8F60C92A4DA40A0050C983 /* MarketData+Mock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MarketData+Mock.swift"; sourceTree = "<group>"; };
+		FA8F60C92A4DA40A0050C983 /* MarketDataFactoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarketDataFactoryMock.swift; sourceTree = "<group>"; };
 		FAA83CC72A3B6E37001DEE1E /* UserDefaultsManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsManagerMock.swift; sourceTree = "<group>"; };
 		FAB361F329F447DB00A88050 /* WenMoon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WenMoon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FAB361F629F447DB00A88050 /* WenMoonApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WenMoonApp.swift; sourceTree = "<group>"; };
@@ -121,11 +129,30 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D21A57BF2CCAA7FB00AC2D13 /* MarketData */ = {
+			isa = PBXGroup;
+			children = (
+				FA8F60C92A4DA40A0050C983 /* MarketDataFactoryMock.swift */,
+				D21A57BD2CCA65AB00AC2D13 /* MarketData+Assertations.swift */,
+			);
+			path = MarketData;
+			sourceTree = "<group>";
+		};
+		D21A57C42CCAAB9900AC2D13 /* Error */ = {
+			isa = PBXGroup;
+			children = (
+				D21A57C02CCAA8BC00AC2D13 /* ErrorFactoryMock.swift */,
+				D21A57C22CCAAB9400AC2D13 /* Error+Assertations.swift */,
+			);
+			path = Error;
+			sourceTree = "<group>";
+		};
 		D22D33962CB92707007997DD /* SwiftData */ = {
 			isa = PBXGroup;
 			children = (
-				D22D339B2CB92AA2007997DD /* Manager */,
 				D22D33972CB9270C007997DD /* Models */,
+				D22D339C2CB92ABC007997DD /* SwiftDataManager.swift */,
+				D22D339F2CB9342A007997DD /* SwiftDataError.swift */,
 			);
 			path = SwiftData;
 			sourceTree = "<group>";
@@ -138,20 +165,22 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		D22D339B2CB92AA2007997DD /* Manager */ = {
+		D275F5912CC972FE00EB4560 /* Persistence */ = {
 			isa = PBXGroup;
 			children = (
-				D22D339C2CB92ABC007997DD /* SwiftDataManager.swift */,
-				D22D339F2CB9342A007997DD /* SwiftDataError.swift */,
+				FA8A088E2A1CFCF20083B8DB /* UserDefaults */,
+				D22D33962CB92707007997DD /* SwiftData */,
 			);
-			path = Manager;
+			path = Persistence;
 			sourceTree = "<group>";
 		};
 		D2D0F9EF2CC2E15100712717 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
 				D2F6DD652CC65123009EF857 /* Coin */,
+				D21A57BF2CCAA7FB00AC2D13 /* MarketData */,
 				D2F6DD662CC6513F009EF857 /* PriceAlert */,
+				D21A57C42CCAAB9900AC2D13 /* Error */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -159,9 +188,8 @@
 		D2F6DD652CC65123009EF857 /* Coin */ = {
 			isa = PBXGroup;
 			children = (
-				D2D0F9EB2CC2DF3F00712717 /* Coin+Mock.swift */,
-				D2D0F9ED2CC2E0C300712717 /* Coin+Assertation.swift */,
-				FA8F60C92A4DA40A0050C983 /* MarketData+Mock.swift */,
+				D2D0F9EB2CC2DF3F00712717 /* CoinFactoryMock.swift */,
+				D2D0F9ED2CC2E0C300712717 /* Coin+Assertations.swift */,
 			);
 			path = Coin;
 			sourceTree = "<group>";
@@ -169,10 +197,28 @@
 		D2F6DD662CC6513F009EF857 /* PriceAlert */ = {
 			isa = PBXGroup;
 			children = (
-				D2F6DD672CC6514E009EF857 /* PriceAlert+Mock.swift */,
-				D2F6DD692CC65216009EF857 /* PriceAlert+Assertation.swift */,
+				D2F6DD672CC6514E009EF857 /* PriceAlertFactoryMock.swift */,
+				D2F6DD692CC65216009EF857 /* PriceAlert+Assertations.swift */,
 			);
 			path = PriceAlert;
+			sourceTree = "<group>";
+		};
+		D2F6DD6D2CC68EB2009EF857 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				FAB3625E29F4595D00A88050 /* CoinScannerServiceMock.swift */,
+				D2F6DD6B2CC682C3009EF857 /* PriceAlertServiceMock.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		D2F6DD6E2CC68EBA009EF857 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				FACB39AD29FABBC800AA613E /* SwiftDataManagerMock.swift */,
+				FAA83CC72A3B6E37001DEE1E /* UserDefaultsManagerMock.swift */,
+			);
+			path = Persistence;
 			sourceTree = "<group>";
 		};
 		FA07AC2E29F93282008F6484 /* Extensions */ = {
@@ -289,10 +335,9 @@
 			isa = PBXGroup;
 			children = (
 				D22D33A22CB958A5007997DD /* DescriptiveError.swift */,
-				FA8A088E2A1CFCF20083B8DB /* UserDefaults */,
-				D22D33962CB92707007997DD /* SwiftData */,
 				FAB3623229F4510D00A88050 /* Base */,
 				FAB3624129F453A400A88050 /* Services */,
+				D275F5912CC972FE00EB4560 /* Persistence */,
 			);
 			path = DataLayer;
 			sourceTree = "<group>";
@@ -441,9 +486,8 @@
 		FAB3625D29F4593A00A88050 /* Mocks */ = {
 			isa = PBXGroup;
 			children = (
-				FAB3625E29F4595D00A88050 /* CoinScannerServiceMock.swift */,
-				FACB39AD29FABBC800AA613E /* SwiftDataManagerMock.swift */,
-				FAA83CC72A3B6E37001DEE1E /* UserDefaultsManagerMock.swift */,
+				D2F6DD6D2CC68EB2009EF857 /* Services */,
+				D2F6DD6E2CC68EBA009EF857 /* Persistence */,
 			);
 			path = Mocks;
 			sourceTree = "<group>";
@@ -604,18 +648,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FA8F60CA2A4DA40A0050C983 /* MarketData+Mock.swift in Sources */,
+				D2F6DD6C2CC682C3009EF857 /* PriceAlertServiceMock.swift in Sources */,
+				FA8F60CA2A4DA40A0050C983 /* MarketDataFactoryMock.swift in Sources */,
+				D21A57BE2CCA65AB00AC2D13 /* MarketData+Assertations.swift in Sources */,
 				FAB3625329F4549800A88050 /* CoinScannerServiceTests.swift in Sources */,
 				FAB3627529F469E700A88050 /* CoinListViewModelTests.swift in Sources */,
-				D2F6DD6A2CC65216009EF857 /* PriceAlert+Assertation.swift in Sources */,
+				D2F6DD6A2CC65216009EF857 /* PriceAlert+Assertations.swift in Sources */,
 				FAB3625F29F4595D00A88050 /* CoinScannerServiceMock.swift in Sources */,
-				D2F6DD682CC6514E009EF857 /* PriceAlert+Mock.swift in Sources */,
+				D21A57C32CCAAB9400AC2D13 /* Error+Assertations.swift in Sources */,
+				D2F6DD682CC6514E009EF857 /* PriceAlertFactoryMock.swift in Sources */,
 				FAB3626229F4598F00A88050 /* AddCoinViewModelTests.swift in Sources */,
 				FAB3625029F4547100A88050 /* HTTPClientMock.swift in Sources */,
 				D2F6DD642CC650D4009EF857 /* PriceAlertServiceTests.swift in Sources */,
-				D2D0F9EC2CC2DF3F00712717 /* Coin+Mock.swift in Sources */,
+				D2D0F9EC2CC2DF3F00712717 /* CoinFactoryMock.swift in Sources */,
 				FAA83CC82A3B6E37001DEE1E /* UserDefaultsManagerMock.swift in Sources */,
-				D2D0F9EE2CC2E0C300712717 /* Coin+Assertation.swift in Sources */,
+				D21A57C12CCAA8BC00AC2D13 /* ErrorFactoryMock.swift in Sources */,
+				D2D0F9EE2CC2E0C300712717 /* Coin+Assertations.swift in Sources */,
 				FACB39AE29FABBC800AA613E /* SwiftDataManagerMock.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

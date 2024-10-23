@@ -10,20 +10,20 @@ import Foundation
 enum APIError: DescriptiveError, Equatable {
     case apiError(description: String)
     case invalidEndpoint(endpoint: String)
-    case failedToEncodeBody
     case noNetworkConnection
+    case failedToEncodeBody
     case unknown(response: URLResponse)
-
+    
     var errorDescription: String {
         switch self {
         case let .apiError(description):
             return description
         case let .invalidEndpoint(endpoint):
             return "Invalid endpoint: \(endpoint)"
-        case .failedToEncodeBody:
-            return "Failed to encode request body."
         case .noNetworkConnection:
-            return "No internet connection."
+            return "No internet connection"
+        case .failedToEncodeBody:
+            return "Failed to encode request body"
         case let .unknown(response):
             return "Unknown error occured. Reason: \(response.description)"
         }

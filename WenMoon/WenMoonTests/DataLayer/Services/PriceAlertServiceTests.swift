@@ -9,94 +9,119 @@ import XCTest
 @testable import WenMoon
 
 class PriceAlertServiceTests: XCTestCase {
-
     // MARK: - Properties
     var service: PriceAlertService!
     var httpClient: HTTPClientMock!
-
+    var deviceToken: String!
+    
     // MARK: - Setup
     override func setUp() {
         super.setUp()
         httpClient = HTTPClientMock()
         service = PriceAlertServiceImpl(httpClient: httpClient, baseURL: URL(string: "https://example.com/")!)
+        deviceToken = "someDeviceToken"
     }
-
+    
     override func tearDown() {
         service = nil
         httpClient = nil
+        deviceToken = nil
         super.tearDown()
     }
-
+    
     // MARK: - Tests
     // Get Price Alerts
-    func testGetPriceAlertsSuccess() async throws {
-        let response = makePriceAlerts()
+    func testGetPriceAlerts_success() async throws {
+        // Setup
+        let response = PriceAlertFactoryMock.makePriceAlerts()
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
-
-        let priceAlerts = try await service.getPriceAlerts(deviceToken: "")
         
-        XCTAssertFalse(priceAlerts.isEmpty)
-        XCTAssertEqual(priceAlerts.count, response.count)
-
-        assertPriceAlert(priceAlerts.first!, response.first!)
-        assertPriceAlert(priceAlerts.last!, response.last!)
+        // Action
+        let priceAlerts = try await service.getPriceAlerts(deviceToken: deviceToken)
+        
+        // Assertions
+        assertPriceAlertsEqual(priceAlerts, response)
     }
-
-    func testGetPriceAlertsFailure() async throws {
-        let apiError = makeAPIError()
-        httpClient.getResponse = .failure(apiError)
-
-        await assertAPIFailure(
+    
+    func testGetPriceAlerts_emptyResponse() async throws {
+        // Setup
+        let response = [PriceAlert]()
+        httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
+        
+        // Action
+        let priceAlerts = try await service.getPriceAlerts(deviceToken: deviceToken)
+        
+        // Assertions
+        XCTAssert(priceAlerts.isEmpty)
+    }
+    
+    func testGetPriceAlerts_networkError() async throws {
+        // Setup
+        let error = ErrorFactoryMock.makeNoNetworkConnectionError()
+        httpClient.getResponse = .failure(error)
+        
+        // Action & Assertions
+        await assertFailure(
             for: { [weak self] in
-                try await self?.service.getPriceAlerts(deviceToken: "")
+                try await self!.service.getPriceAlerts(deviceToken: self!.deviceToken)
             },
-            expectedError: apiError
+            expectedError: error
         )
     }
-
+    
     // Set Price Alert
-    func testSetPriceAlertSuccess() async throws {
-        let bitcoin = makeCoinData()
-        let response = makeBitcoinPriceAlert()
+    func testSetPriceAlert_success() async throws {
+        // Setup
+        let bitcoin = CoinFactoryMock.makeBitcoinData()
+        let response = PriceAlertFactoryMock.makeBitcoinPriceAlert()
         httpClient.postResponse = .success(try! httpClient.encoder.encode(response))
-
-        let priceAlert = try await service.setPriceAlert(for: bitcoin, deviceToken: "")
         
-        assertPriceAlert(priceAlert, response)
+        // Action
+        let priceAlert = try await service.setPriceAlert(70000, for: bitcoin, deviceToken: deviceToken)
+        
+        // Assertions
+        assertPriceAlertsEqual([priceAlert], [response])
     }
-
-    func testSetPriceAlertFailure() async throws {
-        let bitcoin = makeCoinData()
-        let apiError = makeAPIError()
-        httpClient.postResponse = .failure(apiError)
-
-        await assertAPIFailure(
+    
+    func testSetPriceAlert_encodingError() async throws {
+        // Setup
+        let bitcoin = CoinFactoryMock.makeBitcoinData()
+        let error = ErrorFactoryMock.makeFailedToEncodeBodyError()
+        httpClient.postResponse = .failure(error)
+        
+        // Action & Assertions
+        await assertFailure(
             for: { [weak self] in
-                try await self?.service.setPriceAlert(for: bitcoin, deviceToken: "")
+                try await self!.service.setPriceAlert(70000, for: bitcoin, deviceToken: self!.deviceToken)
             },
-            expectedError: apiError
+            expectedError: error
         )
     }
-
+    
     // Delete Price Alert
-    func testDeletePriceAlertSuccess() async throws {
-        let response = makeBitcoinPriceAlert()
+    func testDeletePriceAlert_success() async throws {
+        // Setup
+        let response = PriceAlertFactoryMock.makeBitcoinPriceAlert()
         httpClient.deleteResponse = .success(try! httpClient.encoder.encode(response))
-
-        let priceAlert = try await service.deletePriceAlert(for: "1", deviceToken: "")
         
-        assertPriceAlert(priceAlert, response)
+        // Action
+        let priceAlert = try await service.deletePriceAlert(for: "1", deviceToken: deviceToken)
+        
+        // Assertions
+        assertPriceAlertsEqual([priceAlert], [response])
     }
-
-    func testDeletePriceAlertFailure() async throws {
-        let apiError = makeAPIError()
-        httpClient.deleteResponse = .failure(apiError)
+    
+    func testDeletePriceAlert_unknownError() async throws {
+        // Setup
+        let error = ErrorFactoryMock.makeUnknownError()
+        httpClient.deleteResponse = .failure(error)
         
-        await assertAPIFailure(
+        // Action & Assertions
+        await assertFailure(
             for: { [weak self] in
-                try await self?.service.deletePriceAlert(for: "1", deviceToken: "")
+                try await self!.service.deletePriceAlert(for: "1", deviceToken: self!.deviceToken)
             },
-            expectedError: apiError
+            expectedError: error
         )
     }
 }

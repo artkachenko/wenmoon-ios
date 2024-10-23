@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct AddCoinView: View {
-    
     // MARK: - Properties
-    
     @Environment(\.presentationMode) private var presentationMode
     @EnvironmentObject private var viewModel: AddCoinViewModel
     
@@ -20,7 +18,6 @@ struct AddCoinView: View {
     private(set) var didSelectCoin: ((Coin) -> Void)?
     
     // MARK: - Body
-    
     var body: some View {
         NavigationView {
             ZStack {
@@ -68,9 +65,7 @@ struct AddCoinView: View {
                         }
                     }
                 }
-                .searchable(text: $searchText,
-                            placement: .toolbar,
-                            prompt: "e.g. Bitcoin")
+                .searchable(text: $searchText, placement: .toolbar, prompt: "e.g. Bitcoin")
                 .scrollDismissesKeyboard(.immediately)
                 
                 if viewModel.isLoading {

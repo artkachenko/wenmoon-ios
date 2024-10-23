@@ -10,10 +10,10 @@ import UserNotifications
 
 @main
 struct WenMoonApp: App {
-
+    
     @Environment(\.scenePhase) var scenePhase
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-
+    
     var body: some Scene {
         WindowGroup {
             CoinListView()

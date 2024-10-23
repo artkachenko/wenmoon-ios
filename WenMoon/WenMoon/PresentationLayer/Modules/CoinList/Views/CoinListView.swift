@@ -8,19 +8,20 @@
 import SwiftUI
 
 struct CoinListView: View {
-
+    // MARK: - Properties
     @ObservedObject private var coinListViewModel = CoinListViewModel()
     @ObservedObject private var addCoinViewModel = AddCoinViewModel()
-
+    
     @State private var showAddCoinView = false
     @State private var showErrorAlert = false
     @State private var showSetPriceAlertConfirmation = false
-
+    
     @State private var capturedCoin: CoinData?
     @State private var targetPrice: Double?
-
+    
     @State private var toggleOffCoinID: String?
-
+    
+    // MARK: - Body
     var body: some View {
         NavigationView {
             List(coinListViewModel.coins, id: \.self) { coin in
@@ -38,11 +39,11 @@ struct CoinListView: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(width: 48, height: 48)
                     }
-
+                    
                     VStack(alignment: .leading, spacing: 4) {
                         Text(coin.name)
                             .font(.headline)
-
+                        
                         // TODO: - Move the formatting of values to the CoinListViewModel
                         HStack(spacing: 4) {
                             Text("\(coin.currentPrice.formatValue()) $")
@@ -54,9 +55,9 @@ struct CoinListView: View {
                         }
                     }
                     .padding(.leading, 16)
-
+                    
                     Spacer()
-
+                    
                     VStack(alignment: .trailing, spacing: 8) {
                         Toggle("", isOn: Binding<Bool>(
                             get: { coin.isActive },
@@ -71,7 +72,7 @@ struct CoinListView: View {
                                 }
                             }
                         ))
-
+                        
                         if let targetPrice = coin.targetPrice {
                             Text("\(targetPrice.formatValue()) $")
                                 .font(.caption)
@@ -108,14 +109,17 @@ struct CoinListView: View {
                     }
                 }
             }
+            .onAppear {
+                //.onReceive(NotificationCenter.default.publisher(for: .appDidBecomeActive)) { _ in
+                Task {
+                    await coinListViewModel.fetchCoins()
+                    await coinListViewModel.fetchMarketData()
+                    await coinListViewModel.fetchPriceAlerts()
+                }
+            }
             .onReceive(NotificationCenter.default.publisher(for: .targetPriceReached)) { notification in
                 if let coinID = notification.userInfo?["coinID"] as? String {
                     coinListViewModel.toggleOffPriceAlert(for: coinID)
-                }
-            }
-            .onReceive(NotificationCenter.default.publisher(for: .appDidBecomeActive)) { _ in
-                Task {
-                    await coinListViewModel.fetchCoins()
                 }
             }
             .onChange(of: coinListViewModel.errorMessage) { _, errorMessage in
@@ -127,23 +131,23 @@ struct CoinListView: View {
             .alert("Set Price Alert", isPresented: $showSetPriceAlertConfirmation, actions: {
                 TextField("Target Price", value: $targetPrice, format: .number)
                     .keyboardType(.decimalPad)
-
+                
                 Button("Confirm") {
                     if let coin = capturedCoin {
                         Task {
                             await coinListViewModel.setPriceAlert(for: coin, targetPrice: targetPrice)
+                            capturedCoin = nil
+                            targetPrice = nil
                         }
-                        capturedCoin = nil
-                        targetPrice = nil
                     }
                 }
-
+                
                 Button("Cancel", role: .cancel) {
                     capturedCoin = nil
                     targetPrice = nil
                 }
             }) {
-                Text("Please enter your target price in USD, and our system will notify you when it is reached.")
+                Text("Please enter your target price in USD, and our system will notify you when it is reached")
             }
             .sheet(isPresented: $showAddCoinView) {
                 AddCoinView(didSelectCoin: didSelectCoin)
@@ -151,10 +155,11 @@ struct CoinListView: View {
             }
         }
     }
-
+    
+    // MARK: - Private
     private func didSelectCoin(coin: Coin) {
         Task {
-            await coinListViewModel.createCoin(coin)
+            await coinListViewModel.saveCoin(coin)
         }
     }
 }

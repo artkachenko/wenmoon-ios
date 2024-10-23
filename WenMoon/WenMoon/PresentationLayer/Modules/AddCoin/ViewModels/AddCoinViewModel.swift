@@ -9,9 +9,7 @@ import Foundation
 import Combine
 
 final class AddCoinViewModel: BaseViewModel {
-    
     // MARK: - Properties
-    
     @Published private(set) var coins: [Coin] = []
     @Published private(set) var currentPage = 1
     
@@ -24,7 +22,6 @@ final class AddCoinViewModel: BaseViewModel {
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Initializers
-    
     convenience init() {
         self.init(coinScannerService: CoinScannerServiceImpl())
     }
@@ -44,7 +41,6 @@ final class AddCoinViewModel: BaseViewModel {
     }
     
     // MARK: - Methods
-    
     func fetchCoins(at page: Int = 1) async {
         if let cachedCoins = coinsCache[page] {
             if page > 1 {

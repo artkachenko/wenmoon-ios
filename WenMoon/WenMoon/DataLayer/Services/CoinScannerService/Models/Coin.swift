@@ -8,18 +8,17 @@
 import Foundation
 
 struct Coin: Codable {
-
     var id: String
     var name: String
     var imageURL: URL?
     var marketCapRank: Int64?
     var currentPrice: Double?
     var priceChangePercentage24H: Double?
-
+    
     private enum CodingKeys: String, CodingKey {
         case id, name, imageURL = "image", large, marketCapRank, currentPrice, priceChangePercentage24H
     }
-
+    
     init(id: String,
          name: String,
          imageURL: URL?,
@@ -33,7 +32,7 @@ struct Coin: Codable {
         self.currentPrice = currentPrice
         self.priceChangePercentage24H = priceChangePercentage24H
     }
-
+    
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
@@ -43,7 +42,7 @@ struct Coin: Codable {
         currentPrice = try container.decodeIfPresent(Double.self, forKey: .currentPrice)
         priceChangePercentage24H = try container.decodeIfPresent(Double.self, forKey: .priceChangePercentage24H)
     }
-
+    
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
