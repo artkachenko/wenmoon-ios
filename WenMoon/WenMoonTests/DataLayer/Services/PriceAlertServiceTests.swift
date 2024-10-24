@@ -55,9 +55,9 @@ class PriceAlertServiceTests: XCTestCase {
         XCTAssert(priceAlerts.isEmpty)
     }
     
-    func testGetPriceAlerts_networkError() async throws {
+    func testGetPriceAlerts_decodingError() async throws {
         // Setup
-        let error = ErrorFactoryMock.makeNoNetworkConnectionError()
+        let error = ErrorFactoryMock.makeFailedToDecodeResponseError()
         httpClient.getResponse = .failure(error)
         
         // Action & Assertions

@@ -40,9 +40,19 @@ class BaseBackendService {
     
     // MARK: - Methods
     func mapToAPIError(_ error: Error) -> APIError {
-        guard let error = error as? APIError else {
+        if let apiError = error as? APIError {
+            return apiError
+        }
+        
+        switch error {
+        case let nsError as NSError where nsError.domain == NSURLErrorDomain:
+            return .noNetworkConnection
+        case is EncodingError:
+            return .failedToEncodeBody
+        case is DecodingError:
+            return .failedToDecodeResponse
+        default:
             return .apiError(description: error.localizedDescription)
         }
-        return error
     }
 }

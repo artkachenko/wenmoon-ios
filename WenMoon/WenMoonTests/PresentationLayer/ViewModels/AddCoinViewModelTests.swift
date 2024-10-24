@@ -107,9 +107,9 @@ class AddCoinViewModelTests: XCTestCase {
         assertCoinsEqual(viewModel.coins, cachedCoins)
     }
     
-    func testSearchCoinsByQuery_unknownError() async throws {
+    func testSearchCoinsByQuery_decodingError() async throws {
         // Setup
-        let error = ErrorFactoryMock.makeUnknownError()
+        let error = ErrorFactoryMock.makeFailedToDecodeResponseError()
         service.searchCoinsByQueryResult = .failure(error)
         
         // Action

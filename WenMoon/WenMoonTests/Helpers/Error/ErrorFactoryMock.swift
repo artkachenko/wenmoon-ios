@@ -25,6 +25,10 @@ struct ErrorFactoryMock {
         .failedToEncodeBody
     }
     
+    static func makeFailedToDecodeResponseError() -> APIError {
+        .failedToDecodeResponse
+    }
+    
     static func makeUnknownError(response: URLResponse = URLResponse()) -> APIError {
         .unknown(response: response)
     }

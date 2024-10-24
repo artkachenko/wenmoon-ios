@@ -12,6 +12,7 @@ enum APIError: DescriptiveError, Equatable {
     case invalidEndpoint(endpoint: String)
     case noNetworkConnection
     case failedToEncodeBody
+    case failedToDecodeResponse
     case unknown(response: URLResponse)
     
     var errorDescription: String {
@@ -24,6 +25,8 @@ enum APIError: DescriptiveError, Equatable {
             return "No internet connection"
         case .failedToEncodeBody:
             return "Failed to encode request body"
+        case .failedToDecodeResponse:
+            return "Failed to decode response"
         case let .unknown(response):
             return "Unknown error occured. Reason: \(response.description)"
         }
