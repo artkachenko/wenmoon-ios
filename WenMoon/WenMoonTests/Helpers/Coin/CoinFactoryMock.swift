@@ -11,12 +11,12 @@ import Foundation
 struct CoinFactoryMock {
     // MARK: - Coin
     static func makeCoin(
-        id: String,
-        name: String,
-        imageURL: URL?,
-        marketCapRank: Int64?,
-        currentPrice: Double?,
-        priceChangePercentage24H: Double?
+        id: String = "coin-1",
+        name: String = "Coin 1",
+        imageURL: URL? = nil,
+        marketCapRank: Int64? = Int64.random(in: 1...2500),
+        currentPrice: Double? = Double.random(in: 0.01...100000),
+        priceChangePercentage24H: Double? = Double.random(in: -50...50)
     ) -> Coin {
         .init(
             id: id,
@@ -28,60 +28,15 @@ struct CoinFactoryMock {
         )
     }
     
-    static func makeBitcoin() -> Coin {
-        makeCoin(
-            id: "bitcoin",
-            name: "Bitcoin",
-            imageURL: nil,
-            marketCapRank: 1,
-            currentPrice: 65000,
-            priceChangePercentage24H: -5
-        )
-    }
-    
-    static func makeEthereum() -> Coin {
-        makeCoin(
-            id: "ethereum",
-            name: "Ethereum",
-            imageURL: nil,
-            marketCapRank: 2,
-            currentPrice: 2000,
-            priceChangePercentage24H: 2
-        )
-    }
-    
-    static func makeBNB() -> Coin {
-        makeCoin(
-            id: "binancecoin",
-            name: "BNB",
-            imageURL: nil,
-            marketCapRank: 3,
-            currentPrice: 600,
-            priceChangePercentage24H: -1
-        )
-    }
-    
-    static func makeSolana() -> Coin {
-        makeCoin(
-            id: "solana",
-            name: "Solana",
-            imageURL: nil,
-            marketCapRank: 4,
-            currentPrice: 150,
-            priceChangePercentage24H: 10
-        )
-    }
-    
-    static func makeCoins(at page: Int = 1) -> [Coin] {
-        switch page {
-        case 1:
-            return [makeBitcoin(), makeEthereum()]
-        default:
-            return [makeBNB(), makeSolana()]
+    static func makeCoins(count: Int = 10, at page: Int = 1) -> [Coin] {
+        let startIndex = (page - 1) * count + 1
+        return (startIndex..<startIndex + count).map { index in
+            makeCoin(
+                id: "coin-\(index)",
+                name: "Coin \(index)"
+            )
         }
     }
-    
-    static func makeEmptyCoins() -> [Coin] { [] }
     
     // MARK: - CoinData
     static func makeCoinData(from coin: Coin) -> CoinData {
@@ -95,15 +50,12 @@ struct CoinFactoryMock {
         return coinData
     }
     
-    static func makeBitcoinData() -> CoinData {
-        makeCoinData(from: makeBitcoin())
+    static func makeCoinData() -> CoinData {
+        let coin = makeCoin()
+        return makeCoinData(from: coin)
     }
     
-    static func makeEthereumData() -> CoinData {
-        makeCoinData(from: makeEthereum())
-    }
-    
-    static func makeCoinsData() -> [CoinData] {
-        [makeBitcoinData(), makeEthereumData()]
+    static func makeCoinsData(count: Int = 10) -> [CoinData] {
+        makeCoins(count: count).map { makeCoinData(from: $0) }
     }
 }

@@ -72,12 +72,12 @@ class PriceAlertServiceTests: XCTestCase {
     // Set Price Alert
     func testSetPriceAlert_success() async throws {
         // Setup
-        let bitcoin = CoinFactoryMock.makeBitcoinData()
-        let response = PriceAlertFactoryMock.makeBitcoinPriceAlert()
+        let coin = CoinFactoryMock.makeCoinData()
+        let response = PriceAlertFactoryMock.makePriceAlert()
         httpClient.postResponse = .success(try! httpClient.encoder.encode(response))
         
         // Action
-        let priceAlert = try await service.setPriceAlert(70000, for: bitcoin, deviceToken: deviceToken)
+        let priceAlert = try await service.setPriceAlert(70000, for: coin, deviceToken: deviceToken)
         
         // Assertions
         assertPriceAlertsEqual([priceAlert], [response])
@@ -85,14 +85,14 @@ class PriceAlertServiceTests: XCTestCase {
     
     func testSetPriceAlert_encodingError() async throws {
         // Setup
-        let bitcoin = CoinFactoryMock.makeBitcoinData()
+        let coin = CoinFactoryMock.makeCoinData()
         let error = ErrorFactoryMock.makeFailedToEncodeBodyError()
         httpClient.postResponse = .failure(error)
         
         // Action & Assertions
         await assertFailure(
             for: { [weak self] in
-                try await self!.service.setPriceAlert(70000, for: bitcoin, deviceToken: self!.deviceToken)
+                try await self!.service.setPriceAlert(70000, for: coin, deviceToken: self!.deviceToken)
             },
             expectedError: error
         )
@@ -101,7 +101,7 @@ class PriceAlertServiceTests: XCTestCase {
     // Delete Price Alert
     func testDeletePriceAlert_success() async throws {
         // Setup
-        let response = PriceAlertFactoryMock.makeBitcoinPriceAlert()
+        let response = PriceAlertFactoryMock.makePriceAlert()
         httpClient.deleteResponse = .success(try! httpClient.encoder.encode(response))
         
         // Action

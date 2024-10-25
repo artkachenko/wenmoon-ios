@@ -13,8 +13,8 @@ struct MarketDataFactoryMock {
         var marketDataDict: [String: MarketData] = [:]
         for coin in coins {
             let marketData = MarketData(
-                currentPrice: .random(in: 1000...70000),
-                priceChange: .random(in: -10...10)
+                currentPrice: .random(in: 0.01...100000),
+                priceChange: .random(in: -50...50)
             )
             marketDataDict[coin.id] = marketData
         }

@@ -105,19 +105,19 @@ class CoinListViewModelTests: XCTestCase {
     // Save Coin Tests
     func testSaveCoin_success() async throws {
         // Setup
-        let bitcoin = CoinFactoryMock.makeBitcoin()
+        let coin = CoinFactoryMock.makeCoin()
         
         // Action
-        await viewModel.saveCoin(bitcoin)
+        await viewModel.saveCoin(coin)
         
         // Assertions
         XCTAssertEqual(viewModel.coins.count, 1)
-        assertCoinsEqual(viewModel.coins, [bitcoin])
+        assertCoinsEqual(viewModel.coins, [coin])
         assertInsertAndSaveMethodsCalled()
         XCTAssertNil(viewModel.errorMessage)
         
         // Save the same coin again
-        await viewModel.saveCoin(bitcoin)
+        await viewModel.saveCoin(coin)
         XCTAssertEqual(viewModel.coins.count, 1)
     }
     
@@ -127,8 +127,8 @@ class CoinListViewModelTests: XCTestCase {
         swiftDataManager.swiftDataError = error
         
         // Action
-        let bitcoin = CoinFactoryMock.makeBitcoin()
-        await viewModel.saveCoin(bitcoin)
+        let coin = CoinFactoryMock.makeCoin()
+        await viewModel.saveCoin(coin)
         
         // Assertions
         assertInsertAndSaveMethodsCalled()
@@ -138,11 +138,11 @@ class CoinListViewModelTests: XCTestCase {
     // Delete Coin Tests
     func testDeleteCoin_success() async throws {
         // Setup
-        let bitcoin = CoinFactoryMock.makeBitcoin()
-        await viewModel.saveCoin(bitcoin)
+        let coin = CoinFactoryMock.makeCoin()
+        await viewModel.saveCoin(coin)
         
         // Action
-        await viewModel.deleteCoin(bitcoin.id)
+        await viewModel.deleteCoin(coin.id)
         
         // Assertions
         assertDeleteAndSaveMethodsCalled()
@@ -151,13 +151,13 @@ class CoinListViewModelTests: XCTestCase {
     
     func testDeleteCoin_saveError() async throws {
         // Setup
-        let bitcoin = CoinFactoryMock.makeBitcoin()
-        await viewModel.saveCoin(bitcoin)
+        let coin = CoinFactoryMock.makeCoin()
+        await viewModel.saveCoin(coin)
         let error: SwiftDataError = .failedToSaveModel
         swiftDataManager.swiftDataError = error
         
         // Action
-        await viewModel.deleteCoin(bitcoin.id)
+        await viewModel.deleteCoin(coin.id)
         
         // Assertions
         assertDeleteAndSaveMethodsCalled()
@@ -169,9 +169,8 @@ class CoinListViewModelTests: XCTestCase {
         // Setup
         let marketData = MarketDataFactoryMock.makeMarketData()
         coinScannerService.getMarketDataForCoinsResult = .success(marketData)
-        let bitcoin = CoinFactoryMock.makeBitcoinData()
-        let ethereum = CoinFactoryMock.makeEthereumData()
-        viewModel.coins.append(contentsOf: [bitcoin, ethereum])
+        let coins = CoinFactoryMock.makeCoinsData()
+        viewModel.coins.append(contentsOf: coins)
         
         // Action
         await viewModel.fetchMarketData()
@@ -199,8 +198,8 @@ class CoinListViewModelTests: XCTestCase {
         // Setup
         let error = ErrorFactoryMock.makeAPIError()
         coinScannerService.getMarketDataForCoinsResult = .failure(error)
-        let bitcoin = CoinFactoryMock.makeBitcoinData()
-        viewModel.coins.append(bitcoin)
+        let coin = CoinFactoryMock.makeCoinData()
+        viewModel.coins.append(coin)
         
         // Action
         await viewModel.fetchMarketData()
@@ -214,8 +213,8 @@ class CoinListViewModelTests: XCTestCase {
     func testFetchPriceAlerts_success() async throws {
         // Setup
         userDefaultsManager.getObjectReturnValue = ["deviceToken": deviceToken!]
-        let bitcoin = CoinFactoryMock.makeBitcoinData()
-        viewModel.coins.append(bitcoin)
+        let coin = CoinFactoryMock.makeCoinData()
+        viewModel.coins.append(coin)
         let priceAlerts = PriceAlertFactoryMock.makePriceAlerts()
         priceAlertService.getPriceAlertsResult = .success(priceAlerts)
         
@@ -223,8 +222,8 @@ class CoinListViewModelTests: XCTestCase {
         await viewModel.fetchPriceAlerts()
         
         // Assertions
-        let bitcoinPriceAlert = priceAlerts.first(where: { $0.coinId == bitcoin.id })!
-        assertCoinHasAlert(viewModel.coins.first!, bitcoinPriceAlert.targetPrice)
+        let priceAlert = priceAlerts.first(where: { $0.coinId == coin.id })!
+        assertCoinHasAlert(viewModel.coins.first!, priceAlert.targetPrice)
         XCTAssertNil(viewModel.errorMessage)
         
         // Test after alerts are cleared
@@ -238,8 +237,8 @@ class CoinListViewModelTests: XCTestCase {
     func testFetchPriceAlerts_invalidEndpoint() async throws {
         // Setup
         userDefaultsManager.getObjectReturnValue = ["deviceToken": deviceToken!]
-        let bitcoin = CoinFactoryMock.makeBitcoinData()
-        viewModel.coins.append(bitcoin)
+        let coin = CoinFactoryMock.makeCoinData()
+        viewModel.coins.append(coin)
         let error = ErrorFactoryMock.makeInvalidEndpointError()
         priceAlertService.getPriceAlertsResult = .failure(error)
         
@@ -254,14 +253,14 @@ class CoinListViewModelTests: XCTestCase {
     func testSetPriceAlert_success() async throws {
         // Setup
         userDefaultsManager.getObjectReturnValue = ["deviceToken": deviceToken!]
-        let bitcoin = CoinFactoryMock.makeBitcoinData()
+        let coin = CoinFactoryMock.makeCoinData()
         let targetPrice: Double = 70000
-        viewModel.coins.append(bitcoin)
-        let priceAlert = PriceAlertFactoryMock.makeBitcoinPriceAlert()
+        viewModel.coins.append(coin)
+        let priceAlert = PriceAlertFactoryMock.makePriceAlert()
         priceAlertService.setPriceAlertResult = .success(priceAlert)
         
         // Action - Set the price alert
-        await viewModel.setPriceAlert(for: bitcoin, targetPrice: targetPrice)
+        await viewModel.setPriceAlert(for: coin, targetPrice: targetPrice)
         
         // Assertions after setting the price alert
         assertCoinHasAlert(viewModel.coins.first!, targetPrice)
@@ -269,7 +268,7 @@ class CoinListViewModelTests: XCTestCase {
         
         // Action - Delete Price Alert
         priceAlertService.deletePriceAlertResult = .success(priceAlert)
-        await viewModel.setPriceAlert(for: bitcoin, targetPrice: nil)
+        await viewModel.setPriceAlert(for: coin, targetPrice: nil)
         
         // Assertions after deleting the price alert
         assertCoinHasNoAlert(viewModel.coins.first!)
@@ -279,36 +278,36 @@ class CoinListViewModelTests: XCTestCase {
     func testSetPriceAlert_encodingError() async throws {
         // Setup
         userDefaultsManager.getObjectReturnValue = ["deviceToken": deviceToken!]
-        let bitcoin = CoinFactoryMock.makeBitcoinData()
-        viewModel.coins.append(bitcoin)
+        let coin = CoinFactoryMock.makeCoinData()
+        viewModel.coins.append(coin)
         let error = ErrorFactoryMock.makeFailedToEncodeBodyError()
         priceAlertService.setPriceAlertResult = .failure(error)
         
         // Action
-        await viewModel.setPriceAlert(for: bitcoin, targetPrice: 70000)
+        await viewModel.setPriceAlert(for: coin, targetPrice: 70000)
         
         // Assertions
-        assertCoinHasNoAlert(bitcoin)
+        assertCoinHasNoAlert(coin)
         XCTAssertNotNil(viewModel.errorMessage)
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
     func testToggleOffPriceAlert() async throws {
         // Setup
-        let bitcoin = CoinFactoryMock.makeBitcoinData()
+        let coin = CoinFactoryMock.makeCoinData()
         let targetPrice: Double = 70000
-        bitcoin.targetPrice = targetPrice
-        bitcoin.isActive = true
-        viewModel.coins.append(bitcoin)
+        coin.targetPrice = targetPrice
+        coin.isActive = true
+        viewModel.coins.append(coin)
         
         // Assertions after setting the price alert
-        assertCoinHasAlert(bitcoin, targetPrice)
+        assertCoinHasAlert(coin, targetPrice)
         
         // Action
-        viewModel.toggleOffPriceAlert(for: bitcoin.id)
+        viewModel.toggleOffPriceAlert(for: coin.id)
         
         // Assertions after deleting the price alert
-        assertCoinHasNoAlert(bitcoin)
+        assertCoinHasNoAlert(coin)
         XCTAssert(swiftDataManager.saveMethodCalled)
     }
     

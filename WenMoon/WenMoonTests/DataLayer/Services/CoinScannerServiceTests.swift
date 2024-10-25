@@ -73,7 +73,7 @@ class CoinScannerServiceTests: XCTestCase {
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
         
         // Action
-        let coins = try await service.searchCoins(by: "sdfghjkl")
+        let coins = try await service.searchCoins(by: "invalidquery")
         
         // Assertions
         XCTAssert(coins.isEmpty)

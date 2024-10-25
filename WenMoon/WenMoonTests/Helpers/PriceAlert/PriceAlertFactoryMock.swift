@@ -10,10 +10,10 @@ import Foundation
 
 struct PriceAlertFactoryMock {
     static func makePriceAlert(
-        coinId: String,
-        coinName: String,
-        targetPrice: Double,
-        targetDirection: PriceAlert.TargetDirection
+        coinId: String = "coin-1",
+        coinName: String = "Coin 1",
+        targetPrice: Double = Double.random(in: 0.01...100000),
+        targetDirection: PriceAlert.TargetDirection = Bool.random() ? .above : .below
     ) -> PriceAlert {
         .init(
             coinId: coinId,
@@ -23,27 +23,12 @@ struct PriceAlertFactoryMock {
         )
     }
     
-    static func makeBitcoinPriceAlert() -> PriceAlert {
-        makePriceAlert(
-            coinId: "bitcoin",
-            coinName: "Bitcoin",
-            targetPrice: 70000,
-            targetDirection: .above
-        )
+    static func makePriceAlerts(count: Int = 10) -> [PriceAlert] {
+        (1...count).map { index in
+            makePriceAlert(
+                coinId: "coin-\(index)",
+                coinName: "Coin \(index)"
+            )
+        }
     }
-    
-    static func makeEthereumPriceAlert() -> PriceAlert {
-        makePriceAlert(
-            coinId: "ethereum",
-            coinName: "Ethereum",
-            targetPrice: 1000,
-            targetDirection: .below
-        )
-    }
-    
-    static func makePriceAlerts() -> [PriceAlert] {
-        [makeBitcoinPriceAlert(), makeEthereumPriceAlert()]
-    }
-    
-    static func makeEmptyPriceAlerts() -> [PriceAlert] { [] }
 }

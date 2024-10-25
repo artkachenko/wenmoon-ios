@@ -105,8 +105,7 @@ class AddCoinViewModelTests: XCTestCase {
     
     func testSearchCoinsByQuery_emptyResult() async throws {
         // Setup
-        let response = CoinFactoryMock.makeEmptyCoins()
-        service.searchCoinsByQueryResult = .success(response)
+        service.searchCoinsByQueryResult = .success([])
         
         // Action
         await viewModel.searchCoins(for: "invalidquery")
@@ -200,14 +199,14 @@ class AddCoinViewModelTests: XCTestCase {
     
     func testToggleCoinSaveState() {
         // Setup
-        let bitcoin = CoinFactoryMock.makeBitcoin()
+        let coin = CoinFactoryMock.makeCoin()
         
         // Toggle save state on
-        viewModel.toggleSaveState(for: bitcoin)
-        XCTAssert(viewModel.isCoinSaved(bitcoin))
+        viewModel.toggleSaveState(for: coin)
+        XCTAssert(viewModel.isCoinSaved(coin))
         
         // Toggle save state off
-        viewModel.toggleSaveState(for: bitcoin)
-        XCTAssertFalse(viewModel.isCoinSaved(bitcoin))
+        viewModel.toggleSaveState(for: coin)
+        XCTAssertFalse(viewModel.isCoinSaved(coin))
     }
 }
