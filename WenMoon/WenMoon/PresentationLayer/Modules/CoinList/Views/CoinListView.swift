@@ -86,7 +86,7 @@ struct CoinListView: View {
                 .swipeActions {
                     Button(role: .destructive) {
                         Task {
-                            await coinListViewModel.deleteCoin(coin)
+                            await coinListViewModel.deleteCoin(coin.id)
                         }
                     } label: {
                         Image(systemName: "trash")
@@ -157,9 +157,13 @@ struct CoinListView: View {
     }
     
     // MARK: - Private
-    private func didSelectCoin(coin: Coin) {
+    private func didSelectCoin(_ coin: Coin, shouldAdd: Bool) {
         Task {
-            await coinListViewModel.saveCoin(coin)
+            if shouldAdd {
+                await coinListViewModel.saveCoin(coin)
+            } else {
+                await coinListViewModel.deleteCoin(coin.id)
+            }
         }
     }
 }

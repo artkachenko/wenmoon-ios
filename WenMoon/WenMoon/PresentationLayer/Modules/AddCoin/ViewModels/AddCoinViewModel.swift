@@ -7,93 +7,128 @@
 
 import Foundation
 import Combine
+import SwiftData
 
 final class AddCoinViewModel: BaseViewModel {
     // MARK: - Properties
     @Published private(set) var coins: [Coin] = []
-    @Published private(set) var currentPage = 1
-    
-    private let coinScannerService: CoinScannerService
     
     var coinsCache: [Int: [Coin]] = [:]
     var searchCoinsCache: [String: [Coin]] = [:]
+    var isInSearchMode = false
+    
+    private(set) var currentPage = 1
+    private(set) var savedCoinIDs: Set<String> = []
+    
+    private let coinScannerService: CoinScannerService
     
     private var searchQuerySubject = PassthroughSubject<String, Never>()
     private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Initializers
     convenience init() {
-        self.init(coinScannerService: CoinScannerServiceImpl())
+        if let modelContainer = try? ModelContainer(for: CoinData.self) {
+            let swiftDataManager = SwiftDataManagerImpl(modelContainer: modelContainer)
+            self.init(
+                coinScannerService: CoinScannerServiceImpl(),
+                swiftDataManager: swiftDataManager
+            )
+        } else {
+            self.init(
+                coinScannerService: CoinScannerServiceImpl()
+            )
+        }
     }
     
-    init(coinScannerService: CoinScannerService) {
+    init(coinScannerService: CoinScannerService, swiftDataManager: SwiftDataManager? = nil) {
         self.coinScannerService = coinScannerService
-        super.init()
-        
+        super.init(swiftDataManager: swiftDataManager)
         searchQuerySubject
-            .debounce(for: 0.5, scheduler: RunLoop.main)
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
             .sink { [weak self] query in
                 Task {
-                    await self?.searchCoins(for: query)
+                    await self?.handleQueryChange(query)
                 }
             }
             .store(in: &cancellables)
     }
     
-    // MARK: - Methods
+    // MARK: - Internal Methods
     func fetchCoins(at page: Int = 1) async {
-        if let cachedCoins = coinsCache[page] {
-            if page > 1 {
-                coins += cachedCoins
-            } else {
-                coins = cachedCoins
-            }
+        if !isInSearchMode, let cachedCoins = coinsCache[page] {
+            coins = page > 1 ? coins + cachedCoins : cachedCoins
             currentPage = page
             return
         }
         
+        isLoading = true
+        defer { isLoading = false }
+        
         do {
-            isLoading = true
             let fetchedCoins = try await coinScannerService.getCoins(at: page)
-            coinsCache[page] = fetchedCoins
-            if page > 1 {
-                coins += fetchedCoins
-            } else {
-                coins = fetchedCoins
+            if !isInSearchMode {
+                coinsCache[page] = fetchedCoins
             }
+            coins = page > 1 ? coins + fetchedCoins : fetchedCoins
             currentPage = page
         } catch {
             setErrorMessage(error)
         }
-        isLoading = false
     }
     
-    func fetchCoinsOnNextPage() async {
-        await fetchCoins(at: currentPage + 1)
+    func fetchCoinsOnNextPageIfNeeded(_ coin: Coin) async {
+        if coin == coins.last && !isInSearchMode {
+            await fetchCoins(at: currentPage + 1)
+        }
     }
     
     func handleSearchInput(_ query: String) async {
-        guard !query.isEmpty else {
-            await fetchCoins()
-            return
-        }
         searchQuerySubject.send(query)
     }
     
     func searchCoins(for query: String) async {
-        if let cachedCoins = searchCoinsCache[query] {
+        if isInSearchMode, let cachedCoins = searchCoinsCache[query] {
             coins = cachedCoins
             return
         }
         
+        isLoading = true
+        defer { isLoading = false }
+        
         do {
-            isLoading = true
-            let coins = try await coinScannerService.searchCoins(by: query)
-            searchCoinsCache[query] = coins
-            self.coins = coins
+            let fetchedCoins = try await coinScannerService.searchCoins(by: query)
+            searchCoinsCache[query] = fetchedCoins
+            self.coins = fetchedCoins
         } catch {
             setErrorMessage(error)
         }
-        isLoading = false
+    }
+    
+    func fetchSavedCoins() {
+        let descriptor = FetchDescriptor<CoinData>()
+        savedCoinIDs = Set(fetch(descriptor).compactMap(\.id))
+    }
+    
+    func toggleSaveState(for coin: Coin) {
+        if !savedCoinIDs.insert(coin.id).inserted {
+            savedCoinIDs.remove(coin.id)
+        }
+    }
+    
+    func isCoinSaved(_ coin: Coin) -> Bool {
+        savedCoinIDs.contains(coin.id)
+    }
+    
+    // MARK: - Private Methods
+    private func handleQueryChange(_ query: String) async {
+        if query.isEmpty {
+            isInSearchMode = false
+            currentPage = 1
+            coins = []
+            await fetchCoins(at: currentPage)
+        } else {
+            isInSearchMode = true
+            await searchCoins(for: query)
+        }
     }
 }

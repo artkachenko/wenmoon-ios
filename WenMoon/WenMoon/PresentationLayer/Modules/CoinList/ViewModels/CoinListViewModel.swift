@@ -15,7 +15,6 @@ final class CoinListViewModel: BaseViewModel {
     
     private let coinScannerService: CoinScannerService
     private let priceAlertService: PriceAlertService
-    private var timer: Timer?
     
     // MARK: - Initializers
     convenience init() {
@@ -47,12 +46,12 @@ final class CoinListViewModel: BaseViewModel {
         super.init(swiftDataManager: swiftDataManager, userDefaultsManager: userDefaultsManager)
     }
     
-    // MARK: - Interface
+    // MARK: - Internal Methods
     func fetchCoins() async {
         if isFirstLaunch {
             await fetchPredefinedCoins()
         } else {
-            let descriptor = FetchDescriptor<CoinData>(sortBy: [SortDescriptor(\.rank)])
+            let descriptor = FetchDescriptor<CoinData>()
             coins = fetch(descriptor)
         }
     }
@@ -115,7 +114,8 @@ final class CoinListViewModel: BaseViewModel {
         }
     }
     
-    func deleteCoin(_ coin: CoinData) async {
+    func deleteCoin(_ coinID: String) async {
+        guard let coin = coins.first(where: { $0.id == coinID }) else { return }
         if coin.targetPrice != nil {
             await deletePriceAlert(for: coin)
         }
@@ -145,7 +145,7 @@ final class CoinListViewModel: BaseViewModel {
         save()
     }
     
-    // MARK: - Private
+    // MARK: - Private Methods
     private func fetchPredefinedCoins() async {
         let predefinedCoins = CoinData.predefinedCoins
         for coin in predefinedCoins {
@@ -165,7 +165,7 @@ final class CoinListViewModel: BaseViewModel {
     private func setPriceAlert(_ targetPrice: Double, for coin: CoinData) async {
         guard let deviceToken else { return }
         do {
-            let priceAlert = try await priceAlertService.setPriceAlert(targetPrice, for: coin, deviceToken: deviceToken)
+            let _ = try await priceAlertService.setPriceAlert(targetPrice, for: coin, deviceToken: deviceToken)
             coin.targetPrice = targetPrice
             coin.isActive = true
         } catch {
@@ -178,7 +178,7 @@ final class CoinListViewModel: BaseViewModel {
     private func deletePriceAlert(for coin: CoinData) async {
         guard let deviceToken else { return }
         do {
-            let priceAlert = try await priceAlertService.deletePriceAlert(for: coin.id, deviceToken: deviceToken)
+            let _ = try await priceAlertService.deletePriceAlert(for: coin.id, deviceToken: deviceToken)
             coin.targetPrice = nil
             coin.isActive = false
         } catch {

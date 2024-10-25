@@ -138,11 +138,11 @@ class CoinListViewModelTests: XCTestCase {
     // Delete Coin Tests
     func testDeleteCoin_success() async throws {
         // Setup
-        let bitcoin = CoinFactoryMock.makeBitcoinData()
-        try swiftDataManager.insert(bitcoin)
+        let bitcoin = CoinFactoryMock.makeBitcoin()
+        await viewModel.saveCoin(bitcoin)
         
         // Action
-        await viewModel.deleteCoin(bitcoin)
+        await viewModel.deleteCoin(bitcoin.id)
         
         // Assertions
         assertDeleteAndSaveMethodsCalled()
@@ -151,13 +151,13 @@ class CoinListViewModelTests: XCTestCase {
     
     func testDeleteCoin_saveError() async throws {
         // Setup
-        let bitcoin = CoinFactoryMock.makeBitcoinData()
-        try swiftDataManager.insert(bitcoin)
+        let bitcoin = CoinFactoryMock.makeBitcoin()
+        await viewModel.saveCoin(bitcoin)
         let error: SwiftDataError = .failedToSaveModel
         swiftDataManager.swiftDataError = error
         
         // Action
-        await viewModel.deleteCoin(bitcoin)
+        await viewModel.deleteCoin(bitcoin.id)
         
         // Assertions
         assertDeleteAndSaveMethodsCalled()

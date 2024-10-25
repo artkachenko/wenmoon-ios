@@ -32,7 +32,7 @@ struct CoinFactoryMock {
         makeCoin(
             id: "bitcoin",
             name: "Bitcoin",
-            imageURL: URL(string: "https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579")!,
+            imageURL: nil,
             marketCapRank: 1,
             currentPrice: 65000,
             priceChangePercentage24H: -5
@@ -43,15 +43,42 @@ struct CoinFactoryMock {
         makeCoin(
             id: "ethereum",
             name: "Ethereum",
-            imageURL: URL(string: "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880")!,
+            imageURL: nil,
             marketCapRank: 2,
             currentPrice: 2000,
             priceChangePercentage24H: 2
         )
     }
     
-    static func makeCoins() -> [Coin] {
-        [makeBitcoin(), makeEthereum()]
+    static func makeBNB() -> Coin {
+        makeCoin(
+            id: "binancecoin",
+            name: "BNB",
+            imageURL: nil,
+            marketCapRank: 3,
+            currentPrice: 600,
+            priceChangePercentage24H: -1
+        )
+    }
+    
+    static func makeSolana() -> Coin {
+        makeCoin(
+            id: "solana",
+            name: "Solana",
+            imageURL: nil,
+            marketCapRank: 4,
+            currentPrice: 150,
+            priceChangePercentage24H: 10
+        )
+    }
+    
+    static func makeCoins(at page: Int = 1) -> [Coin] {
+        switch page {
+        case 1:
+            return [makeBitcoin(), makeEthereum()]
+        default:
+            return [makeBNB(), makeSolana()]
+        }
     }
     
     static func makeEmptyCoins() -> [Coin] { [] }
