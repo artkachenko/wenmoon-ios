@@ -14,7 +14,7 @@ extension Double {
 }
 
 extension Double {
-    func formatValue(minimumFractionDigits: Int = 2, maximumFractionDigits: Int = 2, shouldShowPrefix: Bool = false) -> String {
+    func formatValue(minimumFractionDigits: Int = 0, maximumFractionDigits: Int = 2, shouldShowPrefix: Bool = false) -> String {
         let numberFormatter = NumberFormatter()
         numberFormatter.minimumFractionDigits = minimumFractionDigits
         numberFormatter.maximumFractionDigits = maximumFractionDigits

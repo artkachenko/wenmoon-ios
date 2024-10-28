@@ -14,6 +14,7 @@
 		D22D339D2CB92ABC007997DD /* SwiftDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D339C2CB92ABC007997DD /* SwiftDataManager.swift */; };
 		D22D33A02CB9342A007997DD /* SwiftDataError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D339F2CB9342A007997DD /* SwiftDataError.swift */; };
 		D22D33A32CB958A5007997DD /* DescriptiveError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D33A22CB958A5007997DD /* DescriptiveError.swift */; };
+		D2AAC1EE2CCFD17B00CBAFB0 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2AAC1ED2CCFD17B00CBAFB0 /* Color+Extensions.swift */; };
 		D2D0F9EC2CC2DF3F00712717 /* CoinFactoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D0F9EB2CC2DF3F00712717 /* CoinFactoryMock.swift */; };
 		D2D0F9EE2CC2E0C300712717 /* Coin+Assertations.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D0F9ED2CC2E0C300712717 /* Coin+Assertations.swift */; };
 		D2F6DD642CC650D4009EF857 /* PriceAlertServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F6DD632CC650D4009EF857 /* PriceAlertServiceTests.swift */; };
@@ -70,6 +71,7 @@
 		D22D339C2CB92ABC007997DD /* SwiftDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataManager.swift; sourceTree = "<group>"; };
 		D22D339F2CB9342A007997DD /* SwiftDataError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataError.swift; sourceTree = "<group>"; };
 		D22D33A22CB958A5007997DD /* DescriptiveError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptiveError.swift; sourceTree = "<group>"; };
+		D2AAC1ED2CCFD17B00CBAFB0 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
 		D2D0F9EB2CC2DF3F00712717 /* CoinFactoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinFactoryMock.swift; sourceTree = "<group>"; };
 		D2D0F9ED2CC2E0C300712717 /* Coin+Assertations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coin+Assertations.swift"; sourceTree = "<group>"; };
 		D2F6DD632CC650D4009EF857 /* PriceAlertServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertServiceTests.swift; sourceTree = "<group>"; };
@@ -226,6 +228,7 @@
 			children = (
 				FAE0231C2A1E11E4009BA135 /* Notification */,
 				FA07AC2F29F93292008F6484 /* Double+Extensions.swift */,
+				D2AAC1ED2CCFD17B00CBAFB0 /* Color+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -623,6 +626,7 @@
 				FA07AC2629F91120008F6484 /* CoinMarketData.swift in Sources */,
 				D22D339D2CB92ABC007997DD /* SwiftDataManager.swift in Sources */,
 				FA8A08902A1CFD040083B8DB /* UserDefaultsManager.swift in Sources */,
+				D2AAC1EE2CCFD17B00CBAFB0 /* Color+Extensions.swift in Sources */,
 				FA61B3F12A41B71D008A9FB9 /* BaseViewModel.swift in Sources */,
 				FA8A08922A1CFD130083B8DB /* UserDefaultsError.swift in Sources */,
 				FAB361F729F447DB00A88050 /* WenMoonApp.swift in Sources */,

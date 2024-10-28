@@ -9,123 +9,62 @@ import SwiftUI
 
 struct CoinListView: View {
     // MARK: - Properties
-    @ObservedObject private var coinListViewModel = CoinListViewModel()
-    @ObservedObject private var addCoinViewModel = AddCoinViewModel()
+    @StateObject private var viewModel = CoinListViewModel()
     
-    @State private var showAddCoinView = false
+    @State private var shouldShowAddCoinView = false
     @State private var showErrorAlert = false
     @State private var showSetPriceAlertConfirmation = false
-    
     @State private var capturedCoin: CoinData?
     @State private var targetPrice: Double?
-    
     @State private var toggleOffCoinID: String?
     
     // MARK: - Body
     var body: some View {
         NavigationView {
-            List(coinListViewModel.coins, id: \.self) { coin in
-                HStack(spacing: .zero) {
-                    if let data = coin.imageData,
-                       let uiImage = UIImage(data: data) {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 48, height: 48)
-                            .cornerRadius(24)
-                    } else {
-                        Image(systemName: "photo")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 48, height: 48)
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(coin.name)
-                            .font(.headline)
-                        
-                        // TODO: - Move the formatting of values to the CoinListViewModel
-                        HStack(spacing: 4) {
-                            Text("\(coin.currentPrice.formatValue()) $")
-                                .foregroundColor(.gray)
-                                .font(.caption)
-                            Text("\(coin.priceChange.formatValue(shouldShowPrefix: true))%")
-                                .foregroundColor(coin.priceChange.isNegative ? .red : .green)
-                                .font(.caption2)
-                        }
-                    }
-                    .padding(.leading, 16)
-                    
-                    Spacer()
-                    
-                    VStack(alignment: .trailing, spacing: 8) {
-                        Toggle("", isOn: Binding<Bool>(
-                            get: { coin.isActive },
-                            set: { isActive in
-                                if isActive {
-                                    capturedCoin = coin
-                                    showSetPriceAlertConfirmation = true
-                                } else {
-                                    Task {
-                                        await coinListViewModel.setPriceAlert(for: coin, targetPrice: nil)
-                                    }
-                                }
-                            }
-                        ))
-                        
-                        if let targetPrice = coin.targetPrice {
-                            Text("\(targetPrice.formatValue()) $")
-                                .font(.caption)
-                        } else {
-                            Text("Not set")
-                                .foregroundColor(.gray)
-                                .font(.caption)
-                        }
-                    }
+            List {
+                ForEach(viewModel.coins, id: \.self) { coin in
+                    makeCoinView(coin)
                 }
-                .swipeActions {
-                    Button(role: .destructive) {
-                        Task {
-                            await coinListViewModel.deleteCoin(coin.id)
-                        }
-                    } label: {
-                        Image(systemName: "trash")
+                
+                Button(action: {
+                    shouldShowAddCoinView.toggle()
+                }) {
+                    HStack {
+                        Image(systemName: "slider.horizontal.3")
+                        Text("Add Coins")
                     }
+                    .frame(maxWidth: .infinity)
                 }
+                .listRowSeparator(.hidden)
+                .buttonStyle(.borderless)
             }
-            .animation(.default, value: coinListViewModel.coins)
-            .navigationTitle("Coins")
+            .listStyle(.plain)
+            .animation(.default, value: viewModel.coins)
             .refreshable {
                 Task {
-                    await coinListViewModel.fetchCoins()
+                    await viewModel.fetchCoins()
                 }
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        showAddCoinView = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                }
-            }
+            .navigationTitle("Coins")
             .onAppear {
-                //.onReceive(NotificationCenter.default.publisher(for: .appDidBecomeActive)) { _ in
                 Task {
-                    await coinListViewModel.fetchCoins()
-                    await coinListViewModel.fetchMarketData()
-                    await coinListViewModel.fetchPriceAlerts()
+                    await viewModel.fetchCoins()
+                    await viewModel.fetchMarketData()
+                    await viewModel.fetchPriceAlerts()
                 }
             }
             .onReceive(NotificationCenter.default.publisher(for: .targetPriceReached)) { notification in
                 if let coinID = notification.userInfo?["coinID"] as? String {
-                    coinListViewModel.toggleOffPriceAlert(for: coinID)
+                    viewModel.toggleOffPriceAlert(for: coinID)
                 }
             }
-            .onChange(of: coinListViewModel.errorMessage) { _, errorMessage in
+            .onChange(of: viewModel.errorMessage) { _, errorMessage in
                 showErrorAlert = errorMessage != nil
             }
-            .alert(coinListViewModel.errorMessage ?? "", isPresented: $showErrorAlert) {
+            .sheet(isPresented: $shouldShowAddCoinView) {
+                AddCoinView(didToggleCoin: handleCoinSelection)
+            }
+            .alert(viewModel.errorMessage ?? "", isPresented: $showErrorAlert) {
                 Button("OK", role: .cancel) { }
             }
             .alert("Set Price Alert", isPresented: $showSetPriceAlertConfirmation, actions: {
@@ -135,7 +74,7 @@ struct CoinListView: View {
                 Button("Confirm") {
                     if let coin = capturedCoin {
                         Task {
-                            await coinListViewModel.setPriceAlert(for: coin, targetPrice: targetPrice)
+                            await viewModel.setPriceAlert(for: coin, targetPrice: targetPrice)
                             capturedCoin = nil
                             targetPrice = nil
                         }
@@ -149,21 +88,67 @@ struct CoinListView: View {
             }) {
                 Text("Please enter your target price in USD, and our system will notify you when it is reached")
             }
-            .sheet(isPresented: $showAddCoinView) {
-                AddCoinView(didSelectCoin: didSelectCoin)
-                    .environmentObject(addCoinViewModel)
-            }
         }
     }
     
-    // MARK: - Private
-    private func didSelectCoin(_ coin: Coin, shouldAdd: Bool) {
+    // MARK: - Private Methods
+    @ViewBuilder
+    private func makeCoinView(_ coin: CoinData) -> some View {
+        HStack(spacing: .zero) {
+            if let data = coin.imageData,
+               let uiImage = UIImage(data: data) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 48, height: 48)
+                    .cornerRadius(24)
+                    .grayscale(0.5)
+            } else {
+                ProgressView()
+            }
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(coin.name)
+                    .font(.headline)
+                
+                HStack(spacing: 4) {
+                    Text("\(coin.currentPrice.formatValue()) $")
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                    Text("\(coin.priceChange.formatValue(shouldShowPrefix: true))%")
+                        .font(.caption2)
+                }
+            }
+            .padding(.leading, 16)
+            
+            Spacer()
+        }
+        .swipeActions {
+            Button(role: .destructive) {
+                Task {
+                    await viewModel.deleteCoin(coin.id)
+                }
+            } label: {
+                Image(systemName: "heart.slash.fill")
+            }
+            .tint(.wmPink)
+        }
+    }
+    
+    private func handleCoinSelection(coin: Coin, shouldAdd: Bool) {
         Task {
             if shouldAdd {
-                await coinListViewModel.saveCoin(coin)
+                await viewModel.saveCoin(coin)
             } else {
-                await coinListViewModel.deleteCoin(coin.id)
+                await viewModel.deleteCoin(coin.id)
             }
         }
+    }
+}
+
+// MARK: - Previews
+struct CoinListView_Previews: PreviewProvider {
+    static var previews: some View {
+        CoinListView()
     }
 }

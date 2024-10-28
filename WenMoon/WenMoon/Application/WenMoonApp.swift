@@ -17,6 +17,7 @@ struct WenMoonApp: App {
     var body: some Scene {
         WindowGroup {
             CoinListView()
+                .preferredColorScheme(.dark)
         }
         .onChange(of: scenePhase) { _, newPhase in
             if newPhase == .active {
