@@ -1,5 +1,5 @@
 //
-//  PriceAlert+Assertations.swift
+//  PriceAlert+Assertions.swift
 //  WenMoonTests
 //
 //  Created by Artur Tkachenko on 21.10.24.

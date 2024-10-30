@@ -1,5 +1,5 @@
 //
-//  Error+Assertations.swift
+//  Error+Assertions.swift
 //  WenMoonTests
 //
 //  Created by Artur Tkachenko on 24.10.24.

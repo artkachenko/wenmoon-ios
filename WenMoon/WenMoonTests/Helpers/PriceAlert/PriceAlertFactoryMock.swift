@@ -12,7 +12,7 @@ struct PriceAlertFactoryMock {
     static func makePriceAlert(
         coinId: String = "coin-1",
         coinName: String = "Coin 1",
-        targetPrice: Double = Double.random(in: 0.01...100000),
+        targetPrice: Double = .random(in: 0.01...100000),
         targetDirection: PriceAlert.TargetDirection = Bool.random() ? .above : .below
     ) -> PriceAlert {
         .init(

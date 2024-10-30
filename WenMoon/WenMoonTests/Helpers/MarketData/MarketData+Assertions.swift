@@ -1,5 +1,5 @@
 //
-//  MarketData+Assertations.swift
+//  MarketData+Assertions.swift
 //  WenMoonTests
 //
 //  Created by Artur Tkachenko on 24.10.24.

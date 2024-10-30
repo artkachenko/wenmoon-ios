@@ -101,15 +101,12 @@ final class CoinListViewModel: BaseViewModel {
             let newCoin = CoinData()
             newCoin.id = coin.id
             newCoin.name = coin.name
-            newCoin.imageURL = coin.imageURL
-            newCoin.rank = coin.marketCapRank ?? .max
-            newCoin.currentPrice = coin.currentPrice ?? .zero
-            newCoin.priceChange = coin.priceChangePercentage24H ?? .zero
+            newCoin.rank = coin.marketCapRank
+            newCoin.imageData = coin.imageData
+            newCoin.currentPrice = coin.currentPrice
+            newCoin.priceChange = coin.priceChange
             newCoin.targetPrice = nil
             newCoin.isActive = false
-            if let url = coin.imageURL {
-                newCoin.imageData = await loadImage(from: url)
-            }
             insertAndSave(newCoin)
         }
     }
@@ -149,9 +146,6 @@ final class CoinListViewModel: BaseViewModel {
     private func fetchPredefinedCoins() async {
         let predefinedCoins = CoinData.predefinedCoins
         for coin in predefinedCoins {
-            if let url = coin.imageURL {
-                coin.imageData = await loadImage(from: url)
-            }
             insertAndSave(coin)
         }
         self.coins = predefinedCoins

@@ -77,14 +77,15 @@ struct AddCoinView: View {
     private func makeCoinView(_ coin: Coin) -> some View {
         ZStack(alignment: .trailing) {
             HStack(spacing: .zero) {
-                AsyncImage(url: coin.imageURL) { image in
-                    image
+                if let data = coin.imageData,
+                   let image = UIImage(data: data) {
+                    Image(uiImage: image)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 36, height: 36)
                         .cornerRadius(24)
                         .grayscale(0.5)
-                } placeholder: {
+                } else {
                     ProgressView()
                 }
                 

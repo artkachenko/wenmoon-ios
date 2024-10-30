@@ -1,5 +1,5 @@
 //
-//  Coin+Assertations.swift
+//  Coin+Assertions.swift
 //  WenMoonTests
 //
 //  Created by Artur Tkachenko on 18.10.24.
@@ -16,10 +16,10 @@ func assertCoinsEqual(_ coins: [Coin], _ expectedCoins: [Coin]) {
         let expectedCoin = expectedCoins[index]
         XCTAssertEqual(coin.id, expectedCoin.id)
         XCTAssertEqual(coin.name, expectedCoin.name)
-        XCTAssertEqual(coin.imageURL, expectedCoin.imageURL)
+        XCTAssertEqual(coin.imageData, expectedCoin.imageData)
         XCTAssertEqual(coin.marketCapRank, expectedCoin.marketCapRank)
         XCTAssertEqual(coin.currentPrice, expectedCoin.currentPrice)
-        XCTAssertEqual(coin.priceChangePercentage24H, expectedCoin.priceChangePercentage24H)
+        XCTAssertEqual(coin.priceChange, expectedCoin.priceChange)
     }
 }
 
@@ -30,7 +30,7 @@ func assertCoinsEqual(_ coins: [CoinData], _ expectedCoins: [CoinData]) {
         let expectedCoin = expectedCoins[index]
         XCTAssertEqual(coin.id, expectedCoin.id)
         XCTAssertEqual(coin.name, expectedCoin.name)
-        XCTAssertEqual(coin.imageURL, expectedCoin.imageURL)
+        XCTAssertEqual(coin.imageData, expectedCoin.imageData)
         XCTAssertEqual(coin.rank, expectedCoin.rank)
         XCTAssertEqual(coin.currentPrice, expectedCoin.currentPrice)
         XCTAssertEqual(coin.priceChange, expectedCoin.priceChange)
@@ -44,9 +44,9 @@ func assertCoinsEqual(_ coins: [CoinData], _ expectedCoins: [Coin]) {
         let expectedCoin = expectedCoins[index]
         XCTAssertEqual(coin.id, expectedCoin.id)
         XCTAssertEqual(coin.name, expectedCoin.name)
-        XCTAssertEqual(coin.imageURL, expectedCoin.imageURL)
+        XCTAssertEqual(coin.imageData, expectedCoin.imageData)
         XCTAssertEqual(coin.rank, expectedCoin.marketCapRank)
         XCTAssertEqual(coin.currentPrice, expectedCoin.currentPrice)
-        XCTAssertEqual(coin.priceChange, expectedCoin.priceChangePercentage24H)
+        XCTAssertEqual(coin.priceChange, expectedCoin.priceChange)
     }
 }

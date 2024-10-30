@@ -77,7 +77,7 @@ final class AddCoinViewModel: BaseViewModel {
     }
     
     func fetchCoinsOnNextPageIfNeeded(_ coin: Coin) async {
-        if coin == coins.last && !isInSearchMode {
+        if coin.id == coins.last?.id && !isInSearchMode {
             await fetchCoins(at: currentPage + 1)
         }
     }
