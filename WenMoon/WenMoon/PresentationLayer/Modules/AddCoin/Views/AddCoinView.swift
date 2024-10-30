@@ -81,12 +81,21 @@ struct AddCoinView: View {
                    let image = UIImage(data: data) {
                     Image(uiImage: image)
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
+                        .scaledToFit()
                         .frame(width: 36, height: 36)
-                        .cornerRadius(24)
-                        .grayscale(0.5)
+                        .clipShape(Circle())
+                        .grayscale(0.4)
                 } else {
-                    ProgressView()
+                    ZStack {
+                        Circle()
+                            .fill(Color.gray)
+                            .frame(width: 36, height: 36)
+                        
+                        Text(coin.name.prefix(1))
+                            .font(.title3)
+                            .foregroundColor(.white)
+                    }
+                    .brightness(-0.1)
                 }
                 
                 Text(coin.name)

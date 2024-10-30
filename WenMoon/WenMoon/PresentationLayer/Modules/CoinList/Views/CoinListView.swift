@@ -99,12 +99,21 @@ struct CoinListView: View {
                let uiImage = UIImage(data: data) {
                 Image(uiImage: uiImage)
                     .resizable()
-                    .aspectRatio(contentMode: .fit)
+                    .scaledToFit()
                     .frame(width: 48, height: 48)
-                    .cornerRadius(24)
-                    .grayscale(0.5)
+                    .clipShape(Circle())
+                    .grayscale(0.4)
             } else {
-                ProgressView()
+                ZStack {
+                    Circle()
+                        .fill(Color.gray)
+                        .frame(width: 48, height: 48)
+                    
+                    Text(coin.name.prefix(1))
+                        .font(.title2)
+                        .foregroundColor(.white)
+                }
+                .brightness(-0.1)
             }
             
             VStack(alignment: .leading, spacing: 4) {
