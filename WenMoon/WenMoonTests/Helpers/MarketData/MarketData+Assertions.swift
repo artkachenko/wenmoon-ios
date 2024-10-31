@@ -20,11 +20,11 @@ func assertMarketDataEqual(for coins: [CoinData], with marketData: [String: Mark
 func assertMarketDataEqual(
     _ marketData: [String: MarketData],
     _ expectedMarketData: [String: MarketData],
-    for coinIDs: [String]
+    for ids: [String]
 ) {
     XCTAssertEqual(marketData.count, expectedMarketData.count)
-    for coinID in coinIDs {
-        XCTAssertEqual(marketData[coinID]!.currentPrice, expectedMarketData[coinID]!.currentPrice)
-        XCTAssertEqual(marketData[coinID]!.priceChange, expectedMarketData[coinID]!.priceChange)
+    for id in ids {
+        XCTAssertEqual(marketData[id]!.currentPrice, expectedMarketData[id]!.currentPrice)
+        XCTAssertEqual(marketData[id]!.priceChange, expectedMarketData[id]!.priceChange)
     }
 }

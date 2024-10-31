@@ -34,15 +34,31 @@ class AddCoinViewModelTests: XCTestCase {
     // Fetch Coins
     func testFetchCoins_success() async throws {
         // Setup
-        let response = CoinFactoryMock.makeCoins()
-        service.getCoinsAtPageResult = .success(response)
+        let coins = CoinFactoryMock.makeCoins()
+        service.getCoinsAtPageResult = .success(coins)
         
         // Action
         await viewModel.fetchCoins()
         
         // Assertions
-        let coins = viewModel.coins
-        assertCoinsEqual(coins, response)
+        assertCoinsEqual(viewModel.coins, coins)
+        XCTAssertNil(viewModel.errorMessage)
+    }
+    
+    func testFetchCoins_nextPage() async throws {
+        // Setup
+        let firstPageCoins = CoinFactoryMock.makeCoins()
+        let secondPageCoins = CoinFactoryMock.makeCoins(at: 2)
+        service.getCoinsAtPageResult = .success(firstPageCoins)
+        await viewModel.fetchCoins()
+        service.getCoinsAtPageResult = .success(secondPageCoins)
+        
+        // Action
+        await viewModel.fetchCoinsOnNextPageIfNeeded(firstPageCoins.last!)
+        
+        // Assertions
+        XCTAssertEqual(viewModel.currentPage, 2)
+        assertCoinsEqual(viewModel.coins, firstPageCoins + secondPageCoins)
         XCTAssertNil(viewModel.errorMessage)
     }
     
@@ -71,35 +87,17 @@ class AddCoinViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
-    func testFetchCoinsOnNextPage() async throws {
-        // Setup
-        let firstPageCoins = CoinFactoryMock.makeCoins()
-        let secondPageCoins = CoinFactoryMock.makeCoins(at: 2)
-        service.getCoinsAtPageResult = .success(firstPageCoins)
-        await viewModel.fetchCoins()
-        
-        service.getCoinsAtPageResult = .success(secondPageCoins)
-        
-        // Action
-        await viewModel.fetchCoinsOnNextPageIfNeeded(firstPageCoins.last!)
-        
-        // Assertions
-        XCTAssertEqual(viewModel.currentPage, 2)
-        assertCoinsEqual(viewModel.coins, firstPageCoins + secondPageCoins)
-        XCTAssertNil(viewModel.errorMessage)
-    }
-    
     // Search Coins
     func testSearchCoinsByQuery_success() async throws {
         // Setup
-        let response = CoinFactoryMock.makeCoins()
-        service.searchCoinsByQueryResult = .success(response)
+        let coins = CoinFactoryMock.makeCoins()
+        service.searchCoinsByQueryResult = .success(coins)
         
         // Action
-        await viewModel.searchCoins(for: "bit")
+        await viewModel.searchCoins(for: "")
         
         // Assertions
-        assertCoinsEqual(viewModel.coins, response)
+        assertCoinsEqual(viewModel.coins, coins)
         XCTAssertNil(viewModel.errorMessage)
     }
     
@@ -108,7 +106,7 @@ class AddCoinViewModelTests: XCTestCase {
         service.searchCoinsByQueryResult = .success([])
         
         // Action
-        await viewModel.searchCoins(for: "invalidquery")
+        await viewModel.searchCoins(for: "")
         
         // Assertions
         XCTAssert(viewModel.coins.isEmpty)
@@ -118,26 +116,26 @@ class AddCoinViewModelTests: XCTestCase {
     func testSearchCoins_usesCache() async throws {
         // Setup
         let cachedCoins = CoinFactoryMock.makeCoins()
-        viewModel.searchCoinsCache["bit"] = cachedCoins
+        viewModel.searchCoinsCache[""] = cachedCoins
         viewModel.isInSearchMode = true
         
         // Action
-        await viewModel.searchCoins(for: "bit")
+        await viewModel.searchCoins(for: "")
         
         // Assertions
         assertCoinsEqual(viewModel.coins, cachedCoins)
     }
     
-    func testSearchCoins_cachesResults() async throws {
+    func testSearchCoins_cachesResult() async throws {
         // Setup
-        let response = CoinFactoryMock.makeCoins()
-        service.searchCoinsByQueryResult = .success(response)
+        let coins = CoinFactoryMock.makeCoins()
+        service.searchCoinsByQueryResult = .success(coins)
         
         // Action
-        await viewModel.searchCoins(for: "bit")
+        await viewModel.searchCoins(for: "")
         
         // Assertions
-        XCTAssertEqual(viewModel.searchCoinsCache["bit"], response)
+        XCTAssertEqual(viewModel.searchCoinsCache[""], coins)
     }
     
     func testSearchCoinsByQuery_decodingError() async throws {
@@ -146,7 +144,7 @@ class AddCoinViewModelTests: XCTestCase {
         service.searchCoinsByQueryResult = .failure(error)
         
         // Action
-        await viewModel.searchCoins(for: "bit")
+        await viewModel.searchCoins(for: "")
         
         // Assertions
         XCTAssertNotNil(viewModel.errorMessage)

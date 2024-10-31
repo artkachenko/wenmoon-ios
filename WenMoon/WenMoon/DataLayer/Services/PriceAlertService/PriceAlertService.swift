@@ -32,7 +32,7 @@ final class PriceAlertServiceImpl: BaseBackendService, PriceAlertService {
                 coinId: coin.id,
                 coinName: coin.name,
                 targetPrice: targetPrice,
-                targetDirection: (coin.currentPrice ?? .zero) < targetPrice ? .above : .below
+                targetDirection: coin.currentPrice < targetPrice ? .above : .below
             )
             let body = try encoder.encode(request)
             let data = try await httpClient.post(path: "price-alert", headers: ["X-Device-ID": deviceToken], body: body)

@@ -42,14 +42,13 @@ struct CoinListView: View {
             .animation(.default, value: viewModel.coins)
             .refreshable {
                 Task {
-                    await viewModel.fetchCoins()
+                    await viewModel.fetchMarketData()
                 }
             }
             .navigationTitle("Coins")
             .onAppear {
                 Task {
                     await viewModel.fetchCoins()
-                    await viewModel.fetchMarketData()
                     await viewModel.fetchPriceAlerts()
                 }
             }

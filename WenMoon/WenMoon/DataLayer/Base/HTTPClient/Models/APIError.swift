@@ -22,7 +22,7 @@ enum APIError: DescriptiveError, Equatable {
         case let .invalidEndpoint(endpoint):
             return "Invalid endpoint: \(endpoint)"
         case .noNetworkConnection:
-            return "No internet connection"
+            return "No network connection"
         case .failedToEncodeBody:
             return "Failed to encode request body"
         case .failedToDecodeResponse:
