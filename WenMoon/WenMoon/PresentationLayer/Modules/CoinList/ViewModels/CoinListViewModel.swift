@@ -53,6 +53,7 @@ final class CoinListViewModel: BaseViewModel {
         } else {
             let descriptor = FetchDescriptor<CoinData>()
             coins = fetch(descriptor)
+            await fetchMarketData()
         }
     }
     
@@ -107,7 +108,9 @@ final class CoinListViewModel: BaseViewModel {
             newCoin.priceChange = coin.priceChange
             newCoin.targetPrice = nil
             newCoin.isActive = false
-            insertAndSave(newCoin)
+            
+            coins.append(newCoin)
+            insert(newCoin)
         }
     }
     
@@ -144,16 +147,15 @@ final class CoinListViewModel: BaseViewModel {
     
     // MARK: - Private Methods
     private func fetchPredefinedCoins() async {
-        let predefinedCoins = CoinData.predefinedCoins
-        for coin in predefinedCoins {
-            insertAndSave(coin)
+        do {
+            let ids = CoinData.predefinedCoins.map(\.id)
+            let coins = try await coinScannerService.getCoins(by: ids)
+            for coin in coins {
+                await saveCoin(coin)
+            }
+        } catch {
+            setErrorMessage(error)
         }
-        self.coins = predefinedCoins
-    }
-    
-    private func insertAndSave(_ coin: CoinData) {
-        coins.append(coin)
-        insert(coin)
     }
     
     private func setPriceAlert(_ targetPrice: Double, for coin: CoinData) async {

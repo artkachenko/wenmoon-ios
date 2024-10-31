@@ -48,31 +48,49 @@ class CoinListViewModelTests: XCTestCase {
     func testFetchCoins_isFirstLaunch() async throws {
         // Setup
         userDefaultsManager.getObjectReturnValue = ["isFirstLaunch": true]
+        let coins = CoinFactoryMock.makeCoins()
+        coinScannerService.getCoinsByIDsResult = .success(coins)
         
         // Action
         await viewModel.fetchCoins()
         
         // Assertions
-        assertCoinsEqual(viewModel.coins, CoinData.predefinedCoins)
+        assertCoinsEqual(viewModel.coins, coins)
         assertInsertAndSaveMethodsCalled()
         XCTAssertNil(viewModel.errorMessage)
+    }
+    
+    func testFetchCoins_isFirstLaunch_networkError() async throws {
+        // Setup
+        userDefaultsManager.getObjectReturnValue = ["isFirstLaunch": true]
+        let error = ErrorFactoryMock.makeNoNetworkConnectionError()
+        coinScannerService.getCoinsByIDsResult = .failure(error)
+        
+        // Action
+        await viewModel.fetchCoins()
+        
+        // Assertions
+        XCTAssertNotNil(viewModel.errorMessage)
+        XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
     func testFetchCoins_isNotFirstLaunch_success() async throws {
         // Setup
         userDefaultsManager.getObjectReturnValue = ["isFirstLaunch": false]
-        let mockCoins = CoinFactoryMock.makeCoins()
-        for coin in mockCoins {
+        let coins = CoinFactoryMock.makeCoins()
+        for coin in coins {
             let newCoin = CoinFactoryMock.makeCoinData(from: coin)
             swiftDataManager.fetchResult.append(newCoin)
         }
+        let marketData = MarketDataFactoryMock.makeMarketData(for: coins)
+        coinScannerService.getMarketDataForCoinsResult = .success(marketData)
         
         // Action
         await viewModel.fetchCoins()
         
         // Assertions
         XCTAssert(swiftDataManager.fetchMethodCalled)
-        assertCoinsEqual(viewModel.coins, mockCoins)
+        assertCoinsEqual(viewModel.coins, coins, marketData: marketData)
         XCTAssertNil(viewModel.errorMessage)
     }
     

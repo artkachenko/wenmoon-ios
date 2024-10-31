@@ -28,7 +28,7 @@ class CoinScannerServiceTests: XCTestCase {
     
     // MARK: - Tests
     // Get Coins
-    func testGetCoins_success() async throws {
+    func testGetCoinsAtPage_success() async throws {
         // Setup
         let response = CoinFactoryMock.makeCoins()
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
@@ -40,7 +40,7 @@ class CoinScannerServiceTests: XCTestCase {
         assertCoinsEqual(coins, response)
     }
     
-    func testGetCoins_apiError() async throws {
+    func testGetCoinsAtPage_apiError() async throws {
         // Setup
         let error = ErrorFactoryMock.makeAPIError()
         httpClient.getResponse = .failure(error)
@@ -54,6 +54,32 @@ class CoinScannerServiceTests: XCTestCase {
         )
     }
     
+    func testGetCoinsByIDs_success() async throws {
+        // Setup
+        let response = CoinFactoryMock.makeCoins()
+        httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
+        
+        // Action
+        let coins = try await service.getCoins(by: [])
+        
+        // Assertions
+        assertCoinsEqual(coins, response)
+    }
+    
+    func testGetCoinsByIDs_invalidEndpoint() async throws {
+        // Setup
+        let error = ErrorFactoryMock.makeInvalidEndpointError()
+        httpClient.getResponse = .failure(error)
+        
+        // Action & Assertions
+        await assertFailure(
+            for: { [weak self] in
+                try await self!.service.getCoins(by: [])
+            },
+            expectedError: error
+        )
+    }
+    
     // Search Coins
     func testSearchCoinsByQuery_success() async throws {
         // Setup
@@ -61,7 +87,7 @@ class CoinScannerServiceTests: XCTestCase {
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
         
         // Action
-        let coins = try await service.searchCoins(by: "bit")
+        let coins = try await service.searchCoins(by: "")
         
         // Assertions
         assertCoinsEqual(coins, response)
@@ -73,21 +99,21 @@ class CoinScannerServiceTests: XCTestCase {
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
         
         // Action
-        let coins = try await service.searchCoins(by: "invalidquery")
+        let coins = try await service.searchCoins(by: "")
         
         // Assertions
         XCTAssert(coins.isEmpty)
     }
     
-    func testSearchCoinsByQuery_invalidEndpoint() async throws {
+    func testSearchCoinsByQuery_networkError() async throws {
         // Setup
-        let error = ErrorFactoryMock.makeInvalidEndpointError()
+        let error = ErrorFactoryMock.makeNoNetworkConnectionError()
         httpClient.getResponse = .failure(error)
         
         // Action & Assertions
         await assertFailure(
             for: { [weak self] in
-                try await self!.service.searchCoins(by: "bit")
+                try await self!.service.searchCoins(by: "")
             },
             expectedError: error
         )
@@ -96,27 +122,26 @@ class CoinScannerServiceTests: XCTestCase {
     // Get Market Data
     func testGetMarketDataForCoins_success() async throws {
         // Setup
-        let coinIDs = CoinFactoryMock.makeCoins().map { $0.id }
+        let ids = CoinFactoryMock.makeCoins().map { $0.id }
         let response = MarketDataFactoryMock.makeMarketData()
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
         
         // Action
-        let marketData = try await service.getMarketData(for: coinIDs)
+        let marketData = try await service.getMarketData(for: ids)
         
         // Assertions
-        assertMarketDataEqual(marketData, response, for: coinIDs)
+        assertMarketDataEqual(marketData, response, for: ids)
     }
     
-    func testGetMarketDataForCoins_networkError() async throws {
+    func testGetMarketDataForCoins_decodingError() async throws {
         // Setup
-        let coinIDs = CoinFactoryMock.makeCoins().map { $0.id }
-        let error = ErrorFactoryMock.makeNoNetworkConnectionError()
+        let error = ErrorFactoryMock.makeFailedToDecodeResponseError()
         httpClient.getResponse = .failure(error)
         
         // Action & Assertions
         await assertFailure(
             for: { [weak self] in
-                try await self!.service.getMarketData(for: coinIDs)
+                try await self!.service.getMarketData(for: [])
             },
             expectedError: error
         )

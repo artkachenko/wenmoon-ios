@@ -11,6 +11,7 @@ import XCTest
 class CoinScannerServiceMock: CoinScannerService {
     // MARK: - Properties
     var getCoinsAtPageResult: Result<[Coin], APIError>!
+    var getCoinsByIDsResult: Result<[Coin], APIError>!
     var searchCoinsByQueryResult: Result<[Coin], APIError>!
     var getMarketDataForCoinsResult: Result<[String: MarketData], APIError>!
     
@@ -23,6 +24,18 @@ class CoinScannerServiceMock: CoinScannerService {
             throw error
         case .none:
             XCTFail("getCoinsAtPageResult not set")
+            throw APIError.unknown(response: URLResponse())
+        }
+    }
+    
+    func getCoins(by ids: [String]) async throws -> [Coin] {
+        switch getCoinsByIDsResult {
+        case .success(let coins):
+            return coins
+        case .failure(let error):
+            throw error
+        case .none:
+            XCTFail("getCoinsByIDsResult not set")
             throw APIError.unknown(response: URLResponse())
         }
     }

@@ -9,6 +9,7 @@ import Foundation
 
 protocol CoinScannerService {
     func getCoins(at page: Int) async throws -> [Coin]
+    func getCoins(by ids: [String]) async throws -> [Coin]
     func searchCoins(by query: String) async throws -> [Coin]
     func getMarketData(for coinIDs: [String]) async throws -> [String: MarketData]
 }
@@ -16,12 +17,20 @@ protocol CoinScannerService {
 final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
     // MARK: - CoinScannerService
     func getCoins(at page: Int) async throws -> [Coin] {
-        let path = "coins"
-        let data = try await httpClient.get(path: path, parameters: ["page": String(page)])
+        let parameters = ["page": String(page)]
         do {
-            let coins = try decoder.decode([Coin].self, from: data)
-            print("Fetched coins: \(coins)")
-            return coins
+            let data = try await httpClient.get(path: "coins", parameters: parameters)
+            return try decoder.decode([Coin].self, from: data)
+        } catch {
+            throw mapToAPIError(error)
+        }
+    }
+    
+    func getCoins(by ids: [String]) async throws -> [Coin] {
+        let parameters = ["ids": ids.joined(separator: ",")]
+        do {
+            let data = try await httpClient.get(path: "coins", parameters: parameters)
+            return try decoder.decode([Coin].self, from: data)
         } catch {
             throw mapToAPIError(error)
         }
