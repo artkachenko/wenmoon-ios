@@ -8,7 +8,6 @@
 import XCTest
 @testable import WenMoon
 
-@MainActor
 class AddCoinViewModelTests: XCTestCase {
     // MARK: - Properties
     var viewModel: AddCoinViewModel!

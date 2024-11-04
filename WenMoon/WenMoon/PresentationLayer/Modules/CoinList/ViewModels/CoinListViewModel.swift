@@ -15,6 +15,7 @@ final class CoinListViewModel: BaseViewModel {
     
     private let coinScannerService: CoinScannerService
     private let priceAlertService: PriceAlertService
+    private var cacheTimer: Timer?
     
     // MARK: - Initializers
     convenience init() {
@@ -44,9 +45,16 @@ final class CoinListViewModel: BaseViewModel {
         self.coinScannerService = coinScannerService
         self.priceAlertService = priceAlertService
         super.init(swiftDataManager: swiftDataManager, userDefaultsManager: userDefaultsManager)
+        
+        startCacheTimer()
+    }
+    
+    deinit {
+        cacheTimer?.invalidate()
     }
     
     // MARK: - Internal Methods
+    @MainActor
     func fetchCoins() async {
         if isFirstLaunch {
             await fetchPredefinedCoins()
@@ -57,6 +65,7 @@ final class CoinListViewModel: BaseViewModel {
         }
     }
     
+    @MainActor
     func fetchMarketData() async {
         let coinIDs = coins.map { $0.id }
         let existingMarketData = coinIDs.compactMap { marketData[$0] }
@@ -78,6 +87,14 @@ final class CoinListViewModel: BaseViewModel {
         }
     }
     
+    func clearCacheIfNeeded() {
+        if !marketData.isEmpty {
+            marketData.removeAll()
+            print("Cache cleared.")
+        }
+    }
+    
+    @MainActor
     func fetchPriceAlerts() async {
         guard let deviceToken, !coins.isEmpty else { return }
         do {
@@ -97,6 +114,7 @@ final class CoinListViewModel: BaseViewModel {
         }
     }
     
+    @MainActor
     func saveCoin(_ coin: Coin) async {
         if !coins.contains(where: { $0.id == coin.id }) {
             let newCoin = CoinData()
@@ -117,6 +135,7 @@ final class CoinListViewModel: BaseViewModel {
         }
     }
     
+    @MainActor
     func deleteCoin(_ coinID: String) async {
         guard let coin = coins.first(where: { $0.id == coinID }) else { return }
         if coin.targetPrice != nil {
@@ -149,6 +168,7 @@ final class CoinListViewModel: BaseViewModel {
     }
     
     // MARK: - Private Methods
+    @MainActor
     private func fetchPredefinedCoins() async {
         do {
             let ids = CoinData.predefinedCoins.map(\.id)
@@ -161,6 +181,7 @@ final class CoinListViewModel: BaseViewModel {
         }
     }
     
+    @MainActor
     private func setPriceAlert(_ targetPrice: Double, for coin: CoinData) async {
         guard let deviceToken else { return }
         do {
@@ -174,6 +195,7 @@ final class CoinListViewModel: BaseViewModel {
         }
     }
     
+    @MainActor
     private func deletePriceAlert(for coin: CoinData) async {
         guard let deviceToken else { return }
         do {
@@ -182,6 +204,12 @@ final class CoinListViewModel: BaseViewModel {
             coin.isActive = false
         } catch {
             setErrorMessage(error)
+        }
+    }
+    
+    private func startCacheTimer() {
+        cacheTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            self?.clearCacheIfNeeded()
         }
     }
 }

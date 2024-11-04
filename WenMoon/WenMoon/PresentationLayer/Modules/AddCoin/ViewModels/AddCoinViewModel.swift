@@ -54,6 +54,7 @@ final class AddCoinViewModel: BaseViewModel {
     }
     
     // MARK: - Internal Methods
+    @MainActor
     func fetchCoins(at page: Int = 1) async {
         if !isInSearchMode, let cachedCoins = coinsCache[page] {
             coins = page > 1 ? coins + cachedCoins : cachedCoins
@@ -86,6 +87,7 @@ final class AddCoinViewModel: BaseViewModel {
         searchQuerySubject.send(query)
     }
     
+    @MainActor
     func searchCoins(for query: String) async {
         if isInSearchMode, let cachedCoins = searchCoinsCache[query] {
             coins = cachedCoins
@@ -120,6 +122,7 @@ final class AddCoinViewModel: BaseViewModel {
     }
     
     // MARK: - Private Methods
+    @MainActor
     private func handleQueryChange(_ query: String) async {
         if query.isEmpty {
             isInSearchMode = false

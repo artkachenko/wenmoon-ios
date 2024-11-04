@@ -8,7 +8,6 @@
 import Foundation
 import SwiftData
 
-@MainActor
 class BaseViewModel: ObservableObject {
     // MARK: - Properties
     @Published var errorMessage: String?
@@ -82,6 +81,7 @@ class BaseViewModel: ObservableObject {
         }
     }
     
+    @MainActor
     func loadImage(from url: URL) async -> Data? {
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
@@ -92,7 +92,6 @@ class BaseViewModel: ObservableObject {
         }
     }
 
-    
     func setErrorMessage(_ error: Error) {
         if let descriptiveError = error as? DescriptiveError {
             errorMessage = descriptiveError.errorDescription

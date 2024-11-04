@@ -8,7 +8,6 @@
 import XCTest
 @testable import WenMoon
 
-@MainActor
 class CoinListViewModelTests: XCTestCase {
     // MARK: - Properties
     var viewModel: CoinListViewModel!
@@ -225,6 +224,18 @@ class CoinListViewModelTests: XCTestCase {
         // Assertions
         XCTAssertNotNil(viewModel.errorMessage)
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
+    }
+    
+    func testClearCache_resetsMarketData() async throws {
+        // Setup
+        let marketData = MarketDataFactoryMock.makeMarketData()
+        viewModel.marketData = marketData
+        
+        // Action
+        viewModel.clearCacheIfNeeded()
+        
+        // Assertions
+        XCTAssert(viewModel.marketData.isEmpty)
     }
     
     // Price Alerts Tests
