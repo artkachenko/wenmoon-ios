@@ -82,6 +82,17 @@ class BaseViewModel: ObservableObject {
         }
     }
     
+    func loadImage(from url: URL) async -> Data? {
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            return data
+        } catch {
+            errorMessage = "Error downloading image: \(error.localizedDescription)"
+            return nil
+        }
+    }
+
+    
     func setErrorMessage(_ error: Error) {
         if let descriptiveError = error as? DescriptiveError {
             errorMessage = descriptiveError.errorDescription

@@ -16,7 +16,7 @@ func assertCoinsEqual(_ coins: [Coin], _ expectedCoins: [Coin]) {
         let expectedCoin = expectedCoins[index]
         XCTAssertEqual(coin.id, expectedCoin.id)
         XCTAssertEqual(coin.name, expectedCoin.name)
-        XCTAssertEqual(coin.imageData, expectedCoin.imageData)
+        XCTAssertEqual(coin.image, expectedCoin.image)
         XCTAssertEqual(coin.marketCapRank, expectedCoin.marketCapRank)
         XCTAssertEqual(coin.currentPrice, expectedCoin.currentPrice)
         XCTAssertEqual(coin.priceChange, expectedCoin.priceChange)
@@ -30,7 +30,6 @@ func assertCoinsEqual(_ coins: [CoinData], _ expectedCoins: [CoinData]) {
         let expectedCoin = expectedCoins[index]
         XCTAssertEqual(coin.id, expectedCoin.id)
         XCTAssertEqual(coin.name, expectedCoin.name)
-        XCTAssertEqual(coin.imageData, expectedCoin.imageData)
         XCTAssertEqual(coin.rank, expectedCoin.rank)
         XCTAssertEqual(coin.currentPrice, expectedCoin.currentPrice)
         XCTAssertEqual(coin.priceChange, expectedCoin.priceChange)
@@ -44,7 +43,6 @@ func assertCoinsEqual(_ coins: [CoinData], _ expectedCoins: [Coin], marketData: 
         let expectedCoin = expectedCoins[index]
         XCTAssertEqual(coin.id, expectedCoin.id)
         XCTAssertEqual(coin.name, expectedCoin.name)
-        XCTAssertEqual(coin.imageData, expectedCoin.imageData)
         XCTAssertEqual(coin.rank, expectedCoin.marketCapRank)
         if let marketData {
             XCTAssertEqual(coin.currentPrice, marketData[expectedCoin.id]!.currentPrice)

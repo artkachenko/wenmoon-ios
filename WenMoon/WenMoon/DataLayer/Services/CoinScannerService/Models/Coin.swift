@@ -10,10 +10,10 @@ import Foundation
 struct Coin: Codable {
     let id: String
     let name: String
-    let imageData: Data?
-    let marketCapRank: Int64
-    let currentPrice: Double
-    let priceChange: Double
+    let image: URL?
+    let marketCapRank: Int64?
+    let currentPrice: Double?
+    let priceChange: Double?
 }
 
 extension Coin: Hashable {}

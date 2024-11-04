@@ -77,14 +77,17 @@ struct AddCoinView: View {
     private func makeCoinView(_ coin: Coin) -> some View {
         ZStack(alignment: .trailing) {
             HStack(spacing: .zero) {
-                if let data = coin.imageData,
-                   let image = UIImage(data: data) {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 36, height: 36)
-                        .clipShape(Circle())
-                        .grayscale(0.4)
+                if let url = coin.image {
+                    AsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                            .scaledToFit()
+                            .clipShape(Circle())
+                            .grayscale(0.4)
+                    } placeholder: {
+                        ProgressView()
+                    }
+                    .frame(width: 36, height: 36)
                 } else {
                     ZStack {
                         Circle()
@@ -100,7 +103,10 @@ struct AddCoinView: View {
                 
                 Text(coin.name)
                     .font(.headline)
-                    .padding(.leading, 16)
+                    .frame(maxWidth: 240, alignment: .leading)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .padding(.leading, 12)
                 
                 Spacer()
             }

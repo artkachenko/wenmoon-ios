@@ -13,15 +13,15 @@ struct CoinFactoryMock {
     static func makeCoin(
         id: String = "coin-1",
         name: String = "Coin 1",
-        imageData: Data? = nil,
-        marketCapRank: Int64 = .random(in: 1...2500),
-        currentPrice: Double = .random(in: 0.01...100000),
-        priceChange: Double = .random(in: -50...50)
+        image: URL? = nil,
+        marketCapRank: Int64? = .random(in: 1...2500),
+        currentPrice: Double? = .random(in: 0.01...100000),
+        priceChange: Double? = .random(in: -50...50)
     ) -> Coin {
         .init(
             id: id,
             name: name,
-            imageData: imageData,
+            image: image,
             marketCapRank: marketCapRank,
             currentPrice: currentPrice,
             priceChange: priceChange
@@ -40,14 +40,13 @@ struct CoinFactoryMock {
     
     // MARK: - CoinData
     static func makeCoinData(from coin: Coin) -> CoinData {
-        let coinData = CoinData()
-        coinData.id = coin.id
-        coinData.name = coin.name
-        coinData.imageData = coin.imageData
-        coinData.rank = coin.marketCapRank
-        coinData.currentPrice = coin.currentPrice
-        coinData.priceChange = coin.priceChange
-        return coinData
+        CoinData(
+            id: coin.id,
+            name: coin.name,
+            rank: coin.marketCapRank ?? .max,
+            currentPrice: coin.currentPrice ?? .zero,
+            priceChange: coin.priceChange ?? .zero
+        )
     }
     
     static func makeCoinData() -> CoinData {

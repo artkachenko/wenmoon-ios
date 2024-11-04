@@ -102,12 +102,15 @@ final class CoinListViewModel: BaseViewModel {
             let newCoin = CoinData()
             newCoin.id = coin.id
             newCoin.name = coin.name
-            newCoin.rank = coin.marketCapRank
-            newCoin.imageData = coin.imageData
-            newCoin.currentPrice = coin.currentPrice
-            newCoin.priceChange = coin.priceChange
+            newCoin.rank = coin.marketCapRank ?? .max
+            newCoin.currentPrice = coin.currentPrice ?? .zero
+            newCoin.priceChange = coin.priceChange ?? .zero
             newCoin.targetPrice = nil
             newCoin.isActive = false
+            
+            if let url = coin.image {
+                newCoin.imageData = await loadImage(from: url)
+            }
             
             coins.append(newCoin)
             insert(newCoin)
