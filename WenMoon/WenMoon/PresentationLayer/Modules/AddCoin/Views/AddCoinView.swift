@@ -75,54 +75,62 @@ struct AddCoinView: View {
     // MARK: - Private Methods
     @ViewBuilder
     private func makeCoinView(_ coin: Coin) -> some View {
-        ZStack(alignment: .trailing) {
-            HStack(spacing: .zero) {
-                if let url = coin.image {
-                    AsyncImage(url: url) { image in
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .clipShape(Circle())
-                            .grayscale(0.4)
-                    } placeholder: {
-                        ProgressView()
-                    }
-                    .frame(width: 36, height: 36)
-                } else {
-                    ZStack {
-                        Circle()
-                            .fill(Color.gray)
-                            .frame(width: 36, height: 36)
-                        
-                        Text(coin.name.prefix(1))
-                            .font(.title3)
-                            .foregroundColor(.white)
-                    }
-                    .brightness(-0.1)
-                }
-                
-                Text(coin.name)
-                    .font(.headline)
-                    .frame(maxWidth: 240, alignment: .leading)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.5)
-                    .padding(.leading, 12)
-                
-                Spacer()
-            }
+        ZStack(alignment: .leading) {
+            Text(coin.marketCapRank != nil ? "\(coin.marketCapRank!)" : "-")
+                .font(.caption)
+                .foregroundColor(.gray)
             
-            Toggle("", isOn: Binding<Bool>(
-                get: { viewModel.isCoinSaved(coin) },
-                set: { isSaved in
-                    didToggleCoin?(coin, isSaved)
-                    viewModel.toggleSaveState(for: coin)
+            ZStack(alignment: .trailing) {
+                HStack(spacing: .zero) {
+                    if let url = coin.image {
+                        AsyncImage(url: url) { image in
+                            image
+                                .resizable()
+                                .scaledToFit()
+                                .clipShape(Circle())
+                                .grayscale(0.4)
+                        } placeholder: {
+                            ProgressView()
+                        }
+                        .frame(width: 36, height: 36)
+                    } else {
+                        ZStack {
+                            Circle()
+                                .fill(Color.gray)
+                                .frame(width: 36, height: 36)
+                            
+                            Text(coin.name.prefix(1))
+                                .font(.title3)
+                                .foregroundColor(.white)
+                        }
+                        .brightness(-0.1)
+                    }
+                    
+                    Text(coin.name)
+                        .font(.headline)
+                        .frame(maxWidth: 200, alignment: .leading)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                        .padding(.leading, 12)
+                    
+                    Spacer()
                 }
-            ))
-            .tint(.wmPink)
-            .scaleEffect(0.85)
-            .padding(.trailing, -28)
+                
+                Toggle("", isOn: Binding<Bool>(
+                    get: { viewModel.isCoinSaved(coin) },
+                    set: { isSaved in
+                        didToggleCoin?(coin, isSaved)
+                        viewModel.toggleSaveState(for: coin)
+                    }
+                ))
+                .tint(.wmPink)
+                .scaleEffect(0.85)
+                .padding(.trailing, -28)
+            }
+            .padding([.top, .bottom], 4)
+            .padding(.leading, 36)
+
         }
-        .padding([.top, .bottom], 4)
     }
 }
 
