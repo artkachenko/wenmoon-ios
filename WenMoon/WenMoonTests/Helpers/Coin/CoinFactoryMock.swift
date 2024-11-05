@@ -16,7 +16,7 @@ struct CoinFactoryMock {
         image: URL? = nil,
         marketCapRank: Int64? = .random(in: 1...2500),
         currentPrice: Double? = .random(in: 0.01...100000),
-        priceChange: Double? = .random(in: -50...50)
+        priceChangePercentage24H: Double? = .random(in: -50...50)
     ) -> Coin {
         .init(
             id: id,
@@ -24,7 +24,7 @@ struct CoinFactoryMock {
             image: image,
             marketCapRank: marketCapRank,
             currentPrice: currentPrice,
-            priceChange: priceChange
+            priceChangePercentage24H: priceChangePercentage24H
         )
     }
     
@@ -45,7 +45,7 @@ struct CoinFactoryMock {
             name: coin.name,
             rank: coin.marketCapRank ?? .max,
             currentPrice: coin.currentPrice ?? .zero,
-            priceChange: coin.priceChange ?? .zero
+            priceChangePercentage24H: coin.priceChangePercentage24H ?? .zero
         )
     }
     

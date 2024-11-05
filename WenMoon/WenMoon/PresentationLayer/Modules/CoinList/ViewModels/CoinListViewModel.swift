@@ -78,7 +78,7 @@ final class CoinListViewModel: BaseViewModel {
                 if let coinMarketData = fetchedMarketData[coinID] {
                     marketData[coinID] = coinMarketData
                     coins[index].currentPrice = coinMarketData.currentPrice ?? .zero
-                    coins[index].priceChange = coinMarketData.priceChange ?? .zero
+                    coins[index].priceChangePercentage24H = coinMarketData.priceChangePercentage24H ?? .zero
                 }
             }
             save()
@@ -122,7 +122,7 @@ final class CoinListViewModel: BaseViewModel {
             newCoin.name = coin.name
             newCoin.rank = coin.marketCapRank ?? .max
             newCoin.currentPrice = coin.currentPrice ?? .zero
-            newCoin.priceChange = coin.priceChange ?? .zero
+            newCoin.priceChangePercentage24H = coin.priceChangePercentage24H ?? .zero
             newCoin.targetPrice = nil
             newCoin.isActive = false
             

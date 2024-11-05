@@ -49,7 +49,10 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
     
     func getMarketData(for coinIDs: [String]) async throws -> [String: MarketData] {
         do {
-            let data = try await httpClient.get(path: "market-data", parameters: ["ids": coinIDs.joined(separator: ",")])
+            let data = try await httpClient.get(
+                path: "market-data",
+                parameters: ["ids": coinIDs.joined(separator: ",")]
+            )
             let marketData = try decoder.decode([String: MarketData].self, from: data)
             print("Market Data: \(marketData)")
             return marketData

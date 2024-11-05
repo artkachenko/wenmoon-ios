@@ -123,7 +123,7 @@ struct CoinListView: View {
                     Text("\(coin.currentPrice.formatValue()) $")
                         .font(.caption)
                         .foregroundColor(.gray)
-                    Text("\(coin.priceChange.formatValue(shouldShowPrefix: true))%")
+                    Text("\(coin.priceChangePercentage24H.formatValue(shouldShowPrefix: true))%")
                         .font(.caption2)
                 }
             }

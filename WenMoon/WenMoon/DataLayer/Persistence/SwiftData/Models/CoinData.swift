@@ -16,7 +16,7 @@ final class CoinData {
     var imageData: Data?
     var rank: Int64
     var currentPrice: Double
-    var priceChange: Double
+    var priceChangePercentage24H: Double
     var targetPrice: Double?
     var isActive: Bool
     
@@ -26,7 +26,7 @@ final class CoinData {
         imageData: Data? = nil,
         rank: Int64 = .max,
         currentPrice: Double = .zero,
-        priceChange: Double = .zero,
+        priceChangePercentage24H: Double = .zero,
         targetPrice: Double? = nil,
         isActive: Bool = false
     ) {
@@ -35,7 +35,7 @@ final class CoinData {
         self.imageData = imageData
         self.rank = rank
         self.currentPrice = currentPrice
-        self.priceChange = priceChange
+        self.priceChangePercentage24H = priceChangePercentage24H
         self.targetPrice = targetPrice
         self.isActive = isActive
     }

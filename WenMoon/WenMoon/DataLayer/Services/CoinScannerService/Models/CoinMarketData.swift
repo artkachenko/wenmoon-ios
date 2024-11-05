@@ -9,5 +9,5 @@ import Foundation
 
 struct MarketData: Codable {
     let currentPrice: Double?
-    let priceChange: Double?
+    let priceChangePercentage24H: Double?
 }

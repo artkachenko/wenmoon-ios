@@ -13,7 +13,7 @@ struct Coin: Codable {
     let image: URL?
     let marketCapRank: Int64?
     let currentPrice: Double?
-    let priceChange: Double?
+    let priceChangePercentage24H: Double?
 }
 
 extension Coin: Hashable {}
