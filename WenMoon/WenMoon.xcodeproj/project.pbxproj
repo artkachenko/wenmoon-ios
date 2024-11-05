@@ -18,6 +18,8 @@
 		D2AAC1F62CCFF83B00CBAFB0 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D2AAC1F52CCFF83B00CBAFB0 /* Colors.xcassets */; };
 		D2D0F9EC2CC2DF3F00712717 /* CoinFactoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D0F9EB2CC2DF3F00712717 /* CoinFactoryMock.swift */; };
 		D2D0F9EE2CC2E0C300712717 /* Coin+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D0F9ED2CC2E0C300712717 /* Coin+Assertions.swift */; };
+		D2EFF9032CDA2EDE004AA5A5 /* ChartShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2EFF9022CDA2EDE004AA5A5 /* ChartShape.swift */; };
+		D2EFF9052CDA2F32004AA5A5 /* Comparable+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2EFF9042CDA2F32004AA5A5 /* Comparable+Extensions.swift */; };
 		D2F6DD642CC650D4009EF857 /* PriceAlertServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F6DD632CC650D4009EF857 /* PriceAlertServiceTests.swift */; };
 		D2F6DD682CC6514E009EF857 /* PriceAlertFactoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F6DD672CC6514E009EF857 /* PriceAlertFactoryMock.swift */; };
 		D2F6DD6A2CC65216009EF857 /* PriceAlert+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F6DD692CC65216009EF857 /* PriceAlert+Assertions.swift */; };
@@ -77,6 +79,8 @@
 		D2AAC1F52CCFF83B00CBAFB0 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		D2D0F9EB2CC2DF3F00712717 /* CoinFactoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinFactoryMock.swift; sourceTree = "<group>"; };
 		D2D0F9ED2CC2E0C300712717 /* Coin+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coin+Assertions.swift"; sourceTree = "<group>"; };
+		D2EFF9022CDA2EDE004AA5A5 /* ChartShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartShape.swift; sourceTree = "<group>"; };
+		D2EFF9042CDA2F32004AA5A5 /* Comparable+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Comparable+Extensions.swift"; sourceTree = "<group>"; };
 		D2F6DD632CC650D4009EF857 /* PriceAlertServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertServiceTests.swift; sourceTree = "<group>"; };
 		D2F6DD672CC6514E009EF857 /* PriceAlertFactoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertFactoryMock.swift; sourceTree = "<group>"; };
 		D2F6DD692CC65216009EF857 /* PriceAlert+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PriceAlert+Assertions.swift"; sourceTree = "<group>"; };
@@ -190,6 +194,14 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
+		D2EFF9012CDA2ED3004AA5A5 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				D2EFF9022CDA2EDE004AA5A5 /* ChartShape.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		D2F6DD652CC65123009EF857 /* Coin */ = {
 			isa = PBXGroup;
 			children = (
@@ -232,6 +244,7 @@
 				FAE0231C2A1E11E4009BA135 /* Notification */,
 				FA07AC2F29F93292008F6484 /* Double+Extensions.swift */,
 				D2AAC1ED2CCFD17B00CBAFB0 /* Color+Extensions.swift */,
+				D2EFF9042CDA2F32004AA5A5 /* Comparable+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -354,6 +367,7 @@
 			isa = PBXGroup;
 			children = (
 				FAB3622C29F4487200A88050 /* Modules */,
+				D2EFF9012CDA2ED3004AA5A5 /* Views */,
 			);
 			path = PresentationLayer;
 			sourceTree = "<group>";
@@ -649,8 +663,10 @@
 				FAB3625729F457DC00A88050 /* AddCoinView.swift in Sources */,
 				FAB3624A29F453FC00A88050 /* CoinScannerService.swift in Sources */,
 				FAB3623C29F4517800A88050 /* BaseBackendService.swift in Sources */,
+				D2EFF9032CDA2EDE004AA5A5 /* ChartShape.swift in Sources */,
 				FAB3625A29F4580C00A88050 /* AddCoinViewModel.swift in Sources */,
 				FAB3626A29F4651F00A88050 /* CoinListViewModel.swift in Sources */,
+				D2EFF9052CDA2F32004AA5A5 /* Comparable+Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

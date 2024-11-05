@@ -11,6 +11,7 @@ struct CoinListView: View {
     // MARK: - Properties
     @StateObject private var viewModel = CoinListViewModel()
     
+    @State private var chartDrawProgress: CGFloat = .zero
     @State private var shouldShowAddCoinView = false
     @State private var showErrorAlert = false
     @State private var showSetPriceAlertConfirmation = false
@@ -119,17 +120,28 @@ struct CoinListView: View {
                 Text(coin.name)
                     .font(.headline)
                 
-                HStack(spacing: 4) {
-                    Text("\(coin.currentPrice.formatValue()) $")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                    Text("\(coin.priceChangePercentage24H.formatValue(shouldShowPrefix: true))%")
-                        .font(.caption2)
-                }
+                Text("\(coin.currentPrice.formatValue()) $")
+                    .font(.caption)
+                    .foregroundColor(.gray)
             }
             .padding(.leading, 16)
             
             Spacer()
+            
+            VStack(alignment: .trailing, spacing: 8) {
+                ChartShape(value: coin.priceChangePercentage24H)
+                    .trim(from: .zero, to: chartDrawProgress)
+                    .stroke(Color.wmPink, lineWidth: 2)
+                    .frame(width: 50, height: 10)
+                    .onAppear {
+                        withAnimation {
+                            chartDrawProgress = 1
+                        }
+                    }
+                
+                Text("\(coin.priceChangePercentage24H.formatValue(shouldShowPrefix: true))%")
+                    .font(.caption2)
+            }
         }
         .swipeActions {
             Button(role: .destructive) {
