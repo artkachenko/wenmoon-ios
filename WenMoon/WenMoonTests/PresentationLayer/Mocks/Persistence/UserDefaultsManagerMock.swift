@@ -17,14 +17,22 @@ class UserDefaultsManagerMock: UserDefaultsManager {
     var getObjectReturnValue: [String: Any] = [:]
     var setObjectValue: [String: Any] = [:]
     
+    var userDefaultsError: WenMoon.UserDefaultsError!
+    
     // MARK: - UserDefaultsManager
-    func setObject<T: Encodable>(_ object: T, forKey key: String) {
+    func setObject<T: Encodable>(_ object: T, forKey key: String) throws {
         setObjectCalled = true
+        if let error = userDefaultsError {
+            throw error
+        }
         setObjectValue[key] = object
     }
     
-    func getObject<T: Decodable>(forKey key: String, objectType: T.Type) -> T? {
+    func getObject<T: Decodable>(forKey key: String, objectType: T.Type) throws -> T? {
         getObjectCalled = true
+        if let error = userDefaultsError {
+            throw error
+        }
         return getObjectReturnValue[key] as? T
     }
     

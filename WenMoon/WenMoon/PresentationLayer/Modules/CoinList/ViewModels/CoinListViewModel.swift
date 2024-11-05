@@ -60,7 +60,18 @@ final class CoinListViewModel: BaseViewModel {
             await fetchPredefinedCoins()
         } else {
             let descriptor = FetchDescriptor<CoinData>()
-            coins = fetch(descriptor)
+            var fetchedCoins = fetch(descriptor)
+            do {
+                let savedOrder = try userDefaultsManager?.getObject(forKey: "coinOrder", objectType: [String].self) ?? []
+                fetchedCoins.sort { coin1, coin2 in
+                    let index1 = savedOrder.firstIndex(of: coin1.id) ?? .max
+                    let index2 = savedOrder.firstIndex(of: coin2.id) ?? .max
+                    return index1 < index2
+                }
+                coins = fetchedCoins
+            } catch {
+                setErrorMessage(error)
+            }
             await fetchMarketData()
         }
     }
@@ -90,7 +101,7 @@ final class CoinListViewModel: BaseViewModel {
     func clearCacheIfNeeded() {
         if !marketData.isEmpty {
             marketData.removeAll()
-            print("Cache cleared.")
+            print("Market Data cache cleared.")
         }
     }
     
@@ -132,6 +143,15 @@ final class CoinListViewModel: BaseViewModel {
             
             coins.append(newCoin)
             insert(newCoin)
+        }
+    }
+    
+    func saveCoinOrder() {
+        do {
+            let ids = coins.map { $0.id }
+            try userDefaultsManager?.setObject(ids, forKey: "coinOrder")
+        } catch {
+            setErrorMessage(error)
         }
     }
     

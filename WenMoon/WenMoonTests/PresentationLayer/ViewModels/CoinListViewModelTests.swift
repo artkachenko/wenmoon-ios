@@ -43,7 +43,7 @@ class CoinListViewModelTests: XCTestCase {
     }
     
     // MARK: - Tests
-    // Fetch Coins Tests
+    // Fetch Coins
     func testFetchCoins_isFirstLaunch() async throws {
         // Setup
         userDefaultsManager.getObjectReturnValue = ["isFirstLaunch": true]
@@ -71,6 +71,31 @@ class CoinListViewModelTests: XCTestCase {
         // Assertions
         XCTAssertNotNil(viewModel.errorMessage)
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
+    }
+    
+    func testFetchCoins_isNotFirstLaunch_savedOrder() async throws {
+        // Setup
+        let coins = CoinFactoryMock.makeCoins().shuffled()
+        let savedOrder = coins.map(\.id)
+        userDefaultsManager.getObjectReturnValue = [
+            "isFirstLaunch": false,
+            "coinOrder": savedOrder
+        ]
+        for coin in coins {
+            let newCoin = CoinFactoryMock.makeCoinData(from: coin)
+            swiftDataManager.fetchResult.append(newCoin)
+        }
+        let marketData = MarketDataFactoryMock.makeMarketData(for: coins)
+        coinScannerService.getMarketDataForCoinsResult = .success(marketData)
+        
+        // Action
+        await viewModel.fetchCoins()
+        
+        // Assertions
+        XCTAssert(swiftDataManager.fetchMethodCalled)
+        XCTAssertEqual(viewModel.coins.map(\.id), savedOrder)
+        assertCoinsEqual(viewModel.coins, coins, marketData: marketData)
+        XCTAssertNil(viewModel.errorMessage)
     }
     
     func testFetchCoins_isNotFirstLaunch_success() async throws {
@@ -115,11 +140,11 @@ class CoinListViewModelTests: XCTestCase {
         await viewModel.fetchCoins()
         
         // Assertions
-        XCTAssertTrue(viewModel.coins.isEmpty)
+        XCTAssert(viewModel.coins.isEmpty)
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    // Save Coin Tests
+    // Save Coin/Order
     func testSaveCoin_success() async throws {
         // Setup
         let coin = CoinFactoryMock.makeCoin()
@@ -152,7 +177,35 @@ class CoinListViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
-    // Delete Coin Tests
+    func testSaveCoinOrder_success() throws {
+        // Setup
+        let coins = CoinFactoryMock.makeCoinsData()
+        viewModel.coins = coins
+        
+        // Action
+        viewModel.saveCoinOrder()
+        
+        // Assertions
+        XCTAssert(userDefaultsManager.setObjectCalled)
+        XCTAssertEqual(userDefaultsManager.setObjectValue["coinOrder"] as! [String], coins.map(\.id))
+        XCTAssertNil(viewModel.errorMessage)
+    }
+    
+    func testSaveCoinOrder_encodingError() throws {
+        // Setup
+        viewModel.coins = CoinFactoryMock.makeCoinsData()
+        let error: UserDefaultsError = .failedToEncodeObject
+        userDefaultsManager.userDefaultsError = error
+        
+        // Action
+        viewModel.saveCoinOrder()
+        
+        // Assertions
+        XCTAssert(userDefaultsManager.setObjectCalled)
+        XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
+    }
+    
+    // Delete Coin
     func testDeleteCoin_success() async throws {
         // Setup
         let coin = CoinFactoryMock.makeCoin()
@@ -238,7 +291,7 @@ class CoinListViewModelTests: XCTestCase {
         XCTAssert(viewModel.marketData.isEmpty)
     }
     
-    // Price Alerts Tests
+    // Price Alerts
     func testFetchPriceAlerts_success() async throws {
         // Setup
         userDefaultsManager.getObjectReturnValue = ["deviceToken": deviceToken!]

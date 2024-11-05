@@ -11,6 +11,7 @@ struct CoinListView: View {
     // MARK: - Properties
     @StateObject private var viewModel = CoinListViewModel()
     
+    @State private var isEditMode: EditMode = .inactive
     @State private var chartDrawProgress: CGFloat = .zero
     @State private var shouldShowAddCoinView = false
     @State private var showErrorAlert = false
@@ -25,7 +26,11 @@ struct CoinListView: View {
             List {
                 ForEach(viewModel.coins, id: \.self) { coin in
                     makeCoinView(coin)
+                        .onLongPressGesture {
+                            isEditMode = .active
+                        }
                 }
+                .onMove(perform: moveCoin)
                 
                 Button(action: {
                     shouldShowAddCoinView.toggle()
@@ -40,19 +45,20 @@ struct CoinListView: View {
                 .buttonStyle(.borderless)
             }
             .listStyle(.plain)
+            .environment(\.editMode, $isEditMode)
             .animation(.default, value: viewModel.coins)
             .refreshable {
                 Task {
                     await viewModel.fetchMarketData()
                 }
             }
-            .navigationTitle("Coins")
             .onAppear {
                 Task {
                     await viewModel.fetchCoins()
                     await viewModel.fetchPriceAlerts()
                 }
             }
+            .navigationTitle("Coins")
             .onReceive(NotificationCenter.default.publisher(for: .targetPriceReached)) { notification in
                 if let coinID = notification.userInfo?["coinID"] as? String {
                     viewModel.toggleOffPriceAlert(for: coinID)
@@ -155,6 +161,11 @@ struct CoinListView: View {
         }
     }
     
+    private func moveCoin(from source: IndexSet, to destination: Int) {
+        viewModel.coins.move(fromOffsets: source, toOffset: destination)
+        viewModel.saveCoinOrder()
+    }
+    
     private func handleCoinSelection(coin: Coin, shouldAdd: Bool) {
         Task {
             if shouldAdd {
@@ -162,6 +173,7 @@ struct CoinListView: View {
             } else {
                 await viewModel.deleteCoin(coin.id)
             }
+            viewModel.saveCoinOrder()
         }
     }
 }

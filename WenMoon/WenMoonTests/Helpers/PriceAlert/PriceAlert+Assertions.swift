@@ -23,7 +23,7 @@ func assertPriceAlertsEqual(_ priceAlerts: [PriceAlert], _ expectedPriceAlerts: 
 
 func assertCoinHasAlert(_ coin: CoinData, _ targetPrice: Double) {
     XCTAssertEqual(coin.targetPrice, targetPrice)
-    XCTAssertTrue(coin.isActive)
+    XCTAssert(coin.isActive)
 }
 
 func assertCoinHasNoAlert(_ coin: CoinData) {

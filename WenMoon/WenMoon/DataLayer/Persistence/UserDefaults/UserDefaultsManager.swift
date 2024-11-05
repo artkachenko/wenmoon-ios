@@ -31,7 +31,6 @@ final class UserDefaultsManagerImpl: UserDefaultsManager {
         guard let data = userDefaults.data(forKey: key) else {
             return nil
         }
-        
         do {
             let object = try JSONDecoder().decode(objectType, from: data)
             return object
