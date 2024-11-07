@@ -20,15 +20,15 @@ struct CoinListView: View {
     @State private var targetPrice: Double?
     @State private var toggleOffCoinID: String?
     
+    @State private var selectedCoin: CoinData!
+    @State private var shouldShowCoinDetailsView = false
+    
     // MARK: - Body
     var body: some View {
         NavigationView {
             List {
                 ForEach(viewModel.coins, id: \.self) { coin in
                     makeCoinView(coin)
-                        .onLongPressGesture {
-                            isEditMode = .active
-                        }
                 }
                 .onMove(perform: moveCoin)
                 
@@ -69,6 +69,13 @@ struct CoinListView: View {
             }
             .sheet(isPresented: $shouldShowAddCoinView) {
                 AddCoinView(didToggleCoin: handleCoinSelection)
+            }
+            .sheet(item: $selectedCoin, onDismiss: {
+                selectedCoin = nil
+            }) { coin in
+                CoinDetailsView(coin: coin)
+                    .presentationDetents([.medium])
+                    .presentationCornerRadius(48)
             }
             .alert(viewModel.errorMessage ?? "", isPresented: $showErrorAlert) {
                 Button("OK", role: .cancel) { }
@@ -126,7 +133,7 @@ struct CoinListView: View {
                 Text(coin.symbol.uppercased())
                     .font(.headline)
                 
-                Text("\(coin.currentPrice.formattedOrNone()) $")
+                Text(coin.currentPrice.formattedAsCurrency())
                     .font(.caption)
                     .foregroundColor(.gray)
             }
@@ -145,9 +152,16 @@ struct CoinListView: View {
                         }
                     }
                 
-                Text("\(coin.priceChangePercentage24H.formattedOrNone(shouldShowPrefix: true))%")
+                Text(coin.priceChangePercentage24H.formattedAsPercentage())
                     .font(.caption2)
             }
+        }
+        .contentShape(Rectangle())
+        .onTapGesture {
+            selectedCoin = coin
+        }
+        .onLongPressGesture {
+            isEditMode = .active
         }
         .swipeActions {
             Button(role: .destructive) {
@@ -178,9 +192,7 @@ struct CoinListView: View {
     }
 }
 
-// MARK: - Previews
-struct CoinListView_Previews: PreviewProvider {
-    static var previews: some View {
-        CoinListView()
-    }
+// MARK: - Preview
+#Preview {
+    CoinListView()
 }

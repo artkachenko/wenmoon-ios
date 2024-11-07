@@ -14,17 +14,47 @@ extension Double {
 }
 
 extension Double {
-    func formatValue(minimumFractionDigits: Int = 0, maximumFractionDigits: Int = 2, shouldShowPrefix: Bool = false) -> String {
-        let numberFormatter = NumberFormatter()
-        numberFormatter.minimumFractionDigits = minimumFractionDigits
-        numberFormatter.maximumFractionDigits = maximumFractionDigits
-        numberFormatter.numberStyle = .decimal
-        numberFormatter.groupingSeparator = "."
-        numberFormatter.decimalSeparator = ","
-        if shouldShowPrefix {
-            numberFormatter.positivePrefix = "+"
-            numberFormatter.negativePrefix = "-"
+    func formattedWithAbbreviation(suffix: String = "") -> String {
+        let number = abs(self)
+        let sign = self < 0 ? "-" : suffix
+        
+        switch number {
+        case 1_000_000_000_000...:
+            return "\(sign)\(String(format: "%.2f", number / 1_000_000_000_000)) T"
+        case 1_000_000_000...:
+            return "\(sign)\(String(format: "%.2f", number / 1_000_000_000)) B"
+        case 1_000_000...:
+            return "\(sign)\(String(format: "%.2f", number / 1_000_000)) M"
+        case 1_000...:
+            return "\(sign)\(String(format: "%.2f", number / 1_000)) K"
+        default:
+            return "\(sign)\(String(format: "%.2f", number))"
         }
-        return numberFormatter.string(from: NSNumber(value: self)) ?? ""
+    }
+}
+
+extension Double {
+    func formattedAsCurrency(currencySymbol: String = "$", maximumFractionDigits: Int = 6) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencySymbol = currencySymbol
+        formatter.maximumFractionDigits = maximumFractionDigits
+        return formatter.string(from: NSNumber(value: self)) ?? "\(self)"
+    }
+}
+
+extension Double {
+    func formattedAsPercentage(includePlusSign: Bool = true) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .percent
+        formatter.maximumFractionDigits = 2
+        
+        let formattedValue = formatter.string(from: NSNumber(value: self / 100)) ?? "\(self)%"
+        
+        if includePlusSign && self > 0 {
+            return "+\(formattedValue)"
+        }
+        
+        return formattedValue
     }
 }

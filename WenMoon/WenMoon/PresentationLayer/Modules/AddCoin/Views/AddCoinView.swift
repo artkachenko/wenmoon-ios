@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AddCoinView: View {
     // MARK: - Properties
-    @Environment(\.presentationMode) private var presentationMode
+    @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = AddCoinViewModel()
     
     @State private var searchText = ""
@@ -37,7 +37,7 @@ struct AddCoinView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button("Close") {
-                            presentationMode.wrappedValue.dismiss()
+                            dismiss()
                         }
                     }
                 }
@@ -108,13 +108,11 @@ struct AddCoinView: View {
     }
 }
 
-// MARK: - Previews
-struct AddCoinView_Previews: PreviewProvider {
-    static var previews: some View {
-        AddCoinView(
-            didToggleCoin: { coin, isSaved in
-                print("Toggled \(coin.name): \(isSaved)")
-            }
-        )
-    }
+// MARK: - Preview
+#Preview {
+    AddCoinView(
+        didToggleCoin: { coin, isSaved in
+            print("Toggled \(coin.name): \(isSaved)")
+        }
+    )
 }

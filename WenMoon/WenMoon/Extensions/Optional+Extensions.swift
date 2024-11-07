@@ -7,22 +7,38 @@
 
 import Foundation
 
-extension Optional where Wrapped == Double {
-    func formattedOrNone(shouldShowPrefix: Bool = false) -> String {
-        if let value = self {
-            return "\(value.formatValue(shouldShowPrefix: shouldShowPrefix))"
-        } else {
+extension Optional where Wrapped == Int64 {
+    func formattedOrNone() -> String {
+        guard let value = self else {
             return "-"
         }
+        return String(value)
     }
 }
 
-extension Optional where Wrapped == Int64 {
-    func formattedOrNone() -> String {
-        if let value = self {
-            return String(format: "%lld", value)
-        } else {
+extension Optional where Wrapped == Double {
+    func formattedWithAbbreviation(placeholder: String = "-", suffix: String = "") -> String {
+        guard let value = self else {
+            return placeholder
+        }
+        return value.formattedWithAbbreviation(suffix: suffix)
+    }
+}
+
+extension Optional where Wrapped == Double {
+    func formattedAsCurrency(currencySymbol: String = "$", maximumFractionDigits: Int = 6) -> String {
+        guard let value = self else {
             return "-"
         }
+        return value.formattedAsCurrency(currencySymbol: currencySymbol, maximumFractionDigits: maximumFractionDigits)
+    }
+}
+
+extension Optional where Wrapped == Double {
+    func formattedAsPercentage(includePlusSign: Bool = true) -> String {
+        guard let value = self else {
+            return "-"
+        }
+        return value.formattedAsPercentage(includePlusSign: includePlusSign)
     }
 }

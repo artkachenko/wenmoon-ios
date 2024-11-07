@@ -15,14 +15,14 @@ struct CoinFactoryMock {
         symbol: String = "SYM-1",
         name: String = "Coin 1",
         image: URL? = nil,
-        currentPrice: Double? = .random(in: 0.01...100000),
-        marketCap: Double? = .random(in: 1000...1_000_000_000),
-        marketCapRank: Int64? = .random(in: 1...2500),
+        currentPrice: Double? = .random(in: 0.01...100_000),
+        marketCap: Double? = .random(in: 1_000...1_000_000_000),
+        marketCapRank: Int64? = .random(in: 1...1_000),
         fullyDilutedValuation: Double? = .random(in: 1_000_000...10_000_000_000),
-        totalVolume: Double? = .random(in: 1000...1_000_000),
+        totalVolume: Double? = .random(in: 1_000...1_000_000),
         high24H: Double? = .random(in: 0.01...100_000),
         low24H: Double? = .random(in: 0.01...100_000),
-        priceChange24H: Double? = .random(in: -1000...1000),
+        priceChange24H: Double? = .random(in: -1_000...1_000),
         priceChangePercentage24H: Double? = .random(in: -50...50),
         marketCapChange24H: Double? = .random(in: -1_000_000...1_000_000),
         marketCapChangePercentage24H: Double? = .random(in: -50...50),
@@ -33,7 +33,7 @@ struct CoinFactoryMock {
         athChangePercentage: Double? = .random(in: -90...0),
         athDate: String? = "2023-01-01T00:00:00Z",
         atl: Double? = .random(in: 0.001...10),
-        atlChangePercentage: Double? = .random(in: 0...1000),
+        atlChangePercentage: Double? = .random(in: 0...1_000),
         atlDate: String? = "2022-01-01T00:00:00Z"
     ) -> Coin {
         .init(
