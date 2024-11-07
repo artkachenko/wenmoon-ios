@@ -11,7 +11,7 @@ struct ChartShape: Shape {
     var value: Double
     var baseAmplitude: CGFloat = 15
     var frequency: Int = 3
-    var maxTilt: CGFloat = 10
+    var maxTilt: CGFloat = 15
     
     func path(in rect: CGRect) -> Path {
         var path = Path()

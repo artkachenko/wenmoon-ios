@@ -76,42 +76,17 @@ struct AddCoinView: View {
     @ViewBuilder
     private func makeCoinView(_ coin: Coin) -> some View {
         ZStack(alignment: .leading) {
-            Text(coin.marketCapRank != nil ? "\(coin.marketCapRank!)" : "-")
-                .font(.caption)
+            Text(coin.marketCapRank != nil ? String(format: "%lld", coin.marketCapRank!) : "-")
+                .font(.caption2)
                 .foregroundColor(.gray)
             
             ZStack(alignment: .trailing) {
                 HStack(spacing: .zero) {
-                    if let url = coin.image {
-                        AsyncImage(url: url) { image in
-                            image
-                                .resizable()
-                                .scaledToFit()
-                                .clipShape(Circle())
-                                .grayscale(0.4)
-                        } placeholder: {
-                            ProgressView()
-                        }
-                        .frame(width: 36, height: 36)
-                    } else {
-                        ZStack {
-                            Circle()
-                                .fill(Color.gray)
-                                .frame(width: 36, height: 36)
-                            
-                            Text(coin.name.prefix(1))
-                                .font(.title3)
-                                .foregroundColor(.white)
-                        }
-                        .brightness(-0.1)
-                    }
-                    
                     Text(coin.name)
                         .font(.headline)
-                        .frame(maxWidth: 200, alignment: .leading)
+                        .frame(maxWidth: 240, alignment: .leading)
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
-                        .padding(.leading, 12)
                     
                     Spacer()
                 }
@@ -129,7 +104,6 @@ struct AddCoinView: View {
             }
             .padding([.top, .bottom], 4)
             .padding(.leading, 36)
-
         }
     }
 }
