@@ -20,6 +20,7 @@
 		D2D0F9EE2CC2E0C300712717 /* Coin+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D0F9ED2CC2E0C300712717 /* Coin+Assertions.swift */; };
 		D2EFF9032CDA2EDE004AA5A5 /* ChartShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2EFF9022CDA2EDE004AA5A5 /* ChartShape.swift */; };
 		D2EFF9052CDA2F32004AA5A5 /* Comparable+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2EFF9042CDA2F32004AA5A5 /* Comparable+Extensions.swift */; };
+		D2EFF9072CDCF6EF004AA5A5 /* Optional+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2EFF9062CDCF6EE004AA5A5 /* Optional+Extensions.swift */; };
 		D2F6DD642CC650D4009EF857 /* PriceAlertServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F6DD632CC650D4009EF857 /* PriceAlertServiceTests.swift */; };
 		D2F6DD682CC6514E009EF857 /* PriceAlertFactoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F6DD672CC6514E009EF857 /* PriceAlertFactoryMock.swift */; };
 		D2F6DD6A2CC65216009EF857 /* PriceAlert+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2F6DD692CC65216009EF857 /* PriceAlert+Assertions.swift */; };
@@ -81,6 +82,7 @@
 		D2D0F9ED2CC2E0C300712717 /* Coin+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Coin+Assertions.swift"; sourceTree = "<group>"; };
 		D2EFF9022CDA2EDE004AA5A5 /* ChartShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartShape.swift; sourceTree = "<group>"; };
 		D2EFF9042CDA2F32004AA5A5 /* Comparable+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Comparable+Extensions.swift"; sourceTree = "<group>"; };
+		D2EFF9062CDCF6EE004AA5A5 /* Optional+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Optional+Extensions.swift"; sourceTree = "<group>"; };
 		D2F6DD632CC650D4009EF857 /* PriceAlertServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertServiceTests.swift; sourceTree = "<group>"; };
 		D2F6DD672CC6514E009EF857 /* PriceAlertFactoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertFactoryMock.swift; sourceTree = "<group>"; };
 		D2F6DD692CC65216009EF857 /* PriceAlert+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PriceAlert+Assertions.swift"; sourceTree = "<group>"; };
@@ -245,6 +247,7 @@
 				FA07AC2F29F93292008F6484 /* Double+Extensions.swift */,
 				D2AAC1ED2CCFD17B00CBAFB0 /* Color+Extensions.swift */,
 				D2EFF9042CDA2F32004AA5A5 /* Comparable+Extensions.swift */,
+				D2EFF9062CDCF6EE004AA5A5 /* Optional+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -648,6 +651,7 @@
 				FA8A08902A1CFD040083B8DB /* UserDefaultsManager.swift in Sources */,
 				D2AAC1EE2CCFD17B00CBAFB0 /* Color+Extensions.swift in Sources */,
 				FA61B3F12A41B71D008A9FB9 /* BaseViewModel.swift in Sources */,
+				D2EFF9072CDCF6EF004AA5A5 /* Optional+Extensions.swift in Sources */,
 				FA8A08922A1CFD130083B8DB /* UserDefaultsError.swift in Sources */,
 				FAB361F729F447DB00A88050 /* WenMoonApp.swift in Sources */,
 				D22D33A02CB9342A007997DD /* SwiftDataError.swift in Sources */,

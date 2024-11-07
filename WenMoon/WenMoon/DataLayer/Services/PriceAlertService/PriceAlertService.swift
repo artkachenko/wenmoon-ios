@@ -31,7 +31,7 @@ final class PriceAlertServiceImpl: BaseBackendService, PriceAlertService {
             coinId: coin.id,
             coinName: coin.name,
             targetPrice: targetPrice,
-            targetDirection: coin.currentPrice < targetPrice ? .above : .below
+            targetDirection: (coin.currentPrice ?? .zero) < targetPrice ? .above : .below
         )
         do {
             let body = try encoder.encode(request)

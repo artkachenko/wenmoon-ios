@@ -89,6 +89,8 @@ final class CoinListViewModel: BaseViewModel {
                 if let coinMarketData = fetchedMarketData[coinID] {
                     marketData[coinID] = coinMarketData
                     coins[index].currentPrice = coinMarketData.currentPrice ?? .zero
+                    coins[index].marketCap = coinMarketData.marketCap ?? .zero
+                    coins[index].totalVolume = coinMarketData.totalVolume ?? .zero
                     coins[index].priceChangePercentage24H = coinMarketData.priceChangePercentage24H ?? .zero
                 }
             }
@@ -127,23 +129,11 @@ final class CoinListViewModel: BaseViewModel {
     
     @MainActor
     func saveCoin(_ coin: Coin) async {
-        if !coins.contains(where: { $0.id == coin.id }) {
-            let newCoin = CoinData()
-            newCoin.id = coin.id
-            newCoin.name = coin.name
-            newCoin.rank = coin.marketCapRank ?? .max
-            newCoin.currentPrice = coin.currentPrice ?? .zero
-            newCoin.priceChangePercentage24H = coin.priceChangePercentage24H ?? .zero
-            newCoin.targetPrice = nil
-            newCoin.isActive = false
-            
-            if let url = coin.image {
-                newCoin.imageData = await loadImage(from: url)
-            }
-            
-            coins.append(newCoin)
-            insert(newCoin)
-        }
+        guard !coins.contains(where: { $0.id == coin.id }) else { return }
+        let imageData = coin.image != nil ? await loadImage(from: coin.image!) : nil
+        let newCoin = CoinData(from: coin, imageData: imageData)
+        coins.append(newCoin)
+        insert(newCoin)
     }
     
     func saveCoinOrder() {

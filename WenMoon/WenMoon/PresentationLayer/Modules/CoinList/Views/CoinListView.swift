@@ -105,9 +105,9 @@ struct CoinListView: View {
                let uiImage = UIImage(data: data) {
                 Image(uiImage: uiImage)
                     .resizable()
-                    .scaledToFit()
+                    .scaledToFill()
                     .frame(width: 48, height: 48)
-                    .clipShape(Circle())
+                    .cornerRadius(8)
                     .grayscale(0.4)
             } else {
                 ZStack {
@@ -123,10 +123,10 @@ struct CoinListView: View {
             }
             
             VStack(alignment: .leading, spacing: 4) {
-                Text(coin.name)
+                Text(coin.symbol.uppercased())
                     .font(.headline)
                 
-                Text("\(coin.currentPrice.formatValue()) $")
+                Text("\(coin.currentPrice.formattedOrNone()) $")
                     .font(.caption)
                     .foregroundColor(.gray)
             }
@@ -135,7 +135,7 @@ struct CoinListView: View {
             Spacer()
             
             VStack(alignment: .trailing, spacing: 8) {
-                ChartShape(value: coin.priceChangePercentage24H)
+                ChartShape(value: coin.priceChangePercentage24H ?? .zero)
                     .trim(from: .zero, to: chartDrawProgress)
                     .stroke(Color.wmPink, lineWidth: 2)
                     .frame(width: 50, height: 10)
@@ -145,7 +145,7 @@ struct CoinListView: View {
                         }
                     }
                 
-                Text("\(coin.priceChangePercentage24H.formatValue(shouldShowPrefix: true))%")
+                Text("\(coin.priceChangePercentage24H.formattedOrNone(shouldShowPrefix: true))%")
                     .font(.caption2)
             }
         }

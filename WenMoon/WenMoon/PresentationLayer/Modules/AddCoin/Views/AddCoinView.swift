@@ -76,13 +76,13 @@ struct AddCoinView: View {
     @ViewBuilder
     private func makeCoinView(_ coin: Coin) -> some View {
         ZStack(alignment: .leading) {
-            Text(coin.marketCapRank != nil ? String(format: "%lld", coin.marketCapRank!) : "-")
+            Text(coin.marketCapRank.formattedOrNone())
                 .font(.caption2)
                 .foregroundColor(.gray)
             
             ZStack(alignment: .trailing) {
                 HStack(spacing: .zero) {
-                    Text(coin.name)
+                    Text(coin.name + " (" + coin.symbol.uppercased() + ")")
                         .font(.headline)
                         .frame(maxWidth: 240, alignment: .leading)
                         .lineLimit(1)
