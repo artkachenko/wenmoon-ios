@@ -54,15 +54,15 @@ struct AddCoinView: View {
                         viewModel.fetchSavedCoins()
                     }
                 }
+                .onChange(of: viewModel.errorMessage) { _, errorMessage in
+                    showErrorAlert = errorMessage != nil
+                }
                 .alert(isPresented: $showErrorAlert) {
                     Alert(
                         title: Text("Error"),
                         message: Text(viewModel.errorMessage!),
                         dismissButton: .default(Text("OK"))
                     )
-                }
-                .onChange(of: viewModel.errorMessage) { _, errorMessage in
-                    showErrorAlert = errorMessage != nil
                 }
                 
                 if viewModel.isLoading {

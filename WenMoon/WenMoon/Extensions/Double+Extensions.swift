@@ -17,7 +17,6 @@ extension Double {
     func formattedWithAbbreviation(suffix: String = "") -> String {
         let number = abs(self)
         let sign = self < 0 ? "-" : suffix
-        
         switch number {
         case 1_000_000_000_000...:
             return "\(sign)\(String(format: "%.2f", number / 1_000_000_000_000)) T"
@@ -34,11 +33,17 @@ extension Double {
 }
 
 extension Double {
-    func formattedAsCurrency(currencySymbol: String = "$", maximumFractionDigits: Int = 6) -> String {
+    func formattedAsCurrency(currencySymbol: String = "$") -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.currencySymbol = currencySymbol
-        formatter.maximumFractionDigits = maximumFractionDigits
+        if self < 0.01 {
+            formatter.maximumFractionDigits = 6
+        } else if self < 1 {
+            formatter.maximumFractionDigits = 4
+        } else {
+            formatter.maximumFractionDigits = 2
+        }
         return formatter.string(from: NSNumber(value: self)) ?? "\(self)"
     }
 }
@@ -48,13 +53,10 @@ extension Double {
         let formatter = NumberFormatter()
         formatter.numberStyle = .percent
         formatter.maximumFractionDigits = 2
-        
         let formattedValue = formatter.string(from: NSNumber(value: self / 100)) ?? "\(self)%"
-        
         if includePlusSign && self > 0 {
             return "+\(formattedValue)"
         }
-        
         return formattedValue
     }
 }

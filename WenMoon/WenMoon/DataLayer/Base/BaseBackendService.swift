@@ -23,9 +23,9 @@ class BaseBackendService {
     }
     
     // MARK: - Initializers
-    convenience init() {
+    convenience init(baseURLString: String = "http://localhost:8080/") {
         #if DEBUG
-        let baseURL = URL(string: "http://localhost:8080/")!
+        let baseURL = URL(string: baseURLString)!
         #else
         let baseURL = URL(string: "https://wenmoon-vapor.herokuapp.com/")!
         #endif

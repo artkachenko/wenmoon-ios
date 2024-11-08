@@ -75,7 +75,7 @@ struct CoinListView: View {
             }) { coin in
                 CoinDetailsView(coin: coin)
                     .presentationDetents([.medium])
-                    .presentationCornerRadius(48)
+                    .presentationCornerRadius(36)
             }
             .alert(viewModel.errorMessage ?? "", isPresented: $showErrorAlert) {
                 Button("OK", role: .cancel) { }

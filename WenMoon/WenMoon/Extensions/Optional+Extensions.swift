@@ -26,11 +26,11 @@ extension Optional where Wrapped == Double {
 }
 
 extension Optional where Wrapped == Double {
-    func formattedAsCurrency(currencySymbol: String = "$", maximumFractionDigits: Int = 6) -> String {
+    func formattedAsCurrency(currencySymbol: String = "$") -> String {
         guard let value = self else {
             return "-"
         }
-        return value.formattedAsCurrency(currencySymbol: currencySymbol, maximumFractionDigits: maximumFractionDigits)
+        return value.formattedAsCurrency(currencySymbol: currencySymbol)
     }
 }
 
