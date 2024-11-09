@@ -90,8 +90,23 @@ final class CoinListViewModel: BaseViewModel {
                     marketData[coinID] = coinMarketData
                     coins[index].currentPrice = coinMarketData.currentPrice ?? .zero
                     coins[index].marketCap = coinMarketData.marketCap ?? .zero
+                    coins[index].marketCapRank = coinMarketData.marketCapRank ?? .zero
+                    coins[index].fullyDilutedValuation = coinMarketData.fullyDilutedValuation ?? .zero
                     coins[index].totalVolume = coinMarketData.totalVolume ?? .zero
+                    coins[index].high24H = coinMarketData.high24H ?? .zero
+                    coins[index].low24H = coinMarketData.low24H ?? .zero
+                    coins[index].priceChange24H = coinMarketData.priceChange24H ?? .zero
                     coins[index].priceChangePercentage24H = coinMarketData.priceChangePercentage24H ?? .zero
+                    coins[index].marketCapChange24H = coinMarketData.marketCapChange24H ?? .zero
+                    coins[index].marketCapChangePercentage24H = coinMarketData.marketCapChangePercentage24H ?? .zero
+                    coins[index].circulatingSupply = coinMarketData.circulatingSupply ?? .zero
+                    coins[index].totalSupply = coinMarketData.totalSupply ?? .zero
+                    coins[index].ath = coinMarketData.ath ?? .zero
+                    coins[index].athChangePercentage = coinMarketData.athChangePercentage ?? .zero
+                    coins[index].athDate = coinMarketData.athDate ?? ""
+                    coins[index].atl = coinMarketData.atl ?? .zero
+                    coins[index].atlChangePercentage = coinMarketData.atlChangePercentage ?? .zero
+                    coins[index].atlDate = coinMarketData.atlDate ?? ""
                 }
             }
             save()
