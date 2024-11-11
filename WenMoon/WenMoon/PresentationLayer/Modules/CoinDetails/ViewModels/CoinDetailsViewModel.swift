@@ -12,6 +12,8 @@ final class CoinDetailsViewModel: BaseViewModel {
     @Published var coin: CoinData
     @Published private(set) var chartData: ChartData?
     
+    var chartDataCache: [ChartTimeframe: ChartData] = [:]
+    
     private let chartDataService: ChartDataService
     
     // MARK: - Initializers
@@ -25,11 +27,19 @@ final class CoinDetailsViewModel: BaseViewModel {
     }
     
     @MainActor
-    func fetchChartData(on timeframe: ChartTimeframe) async {
+    func fetchChartData(on timeframe: ChartTimeframe = .oneDay) async {
         isLoading = true
         defer { isLoading = false }
+        
+        if let cachedData = chartDataCache[timeframe] {
+            chartData = cachedData
+            return
+        }
+        
         do {
-            chartData = try await chartDataService.getChartData(for: coin.id, timeframe: timeframe.value)
+            let fetchedData = try await chartDataService.getChartData(for: coin.id, timeframe: timeframe)
+            chartDataCache[timeframe] = fetchedData
+            chartData = fetchedData
         } catch {
             setErrorMessage(error)
         }
@@ -37,19 +47,17 @@ final class CoinDetailsViewModel: BaseViewModel {
 }
 
 enum ChartTimeframe: String, CaseIterable {
-    case oneDay = "1D"
-    case oneWeek = "1W"
-    case oneMonth = "1M"
-    case oneYear = "1Y"
+    case oneDay = "1"
+    case oneWeek = "7"
+    case oneMonth = "31"
+    case oneYear = "365"
     
-    var displayName: String { rawValue }
-    
-    var value: String {
+    var title: String {
         switch self {
-        case .oneDay: return "1"
-        case .oneWeek: return "7"
-        case .oneMonth: return "31"
-        case .oneYear: return "365"
+        case .oneDay: return "1D"
+        case .oneWeek: return "1W"
+        case .oneMonth: return "1M"
+        case .oneYear: return "1Y"
         }
     }
 }

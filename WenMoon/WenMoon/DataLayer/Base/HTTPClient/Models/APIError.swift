@@ -10,6 +10,7 @@ import Foundation
 enum APIError: DescriptiveError, Equatable {
     case apiError(description: String)
     case invalidEndpoint(endpoint: String)
+    case invalidParameter(parameter: String)
     case noNetworkConnection
     case failedToEncodeBody
     case failedToDecodeResponse
@@ -21,6 +22,8 @@ enum APIError: DescriptiveError, Equatable {
             return description
         case let .invalidEndpoint(endpoint):
             return "Invalid endpoint: \(endpoint)"
+        case let .invalidParameter(parameter):
+            return "Invalid parameter: \(parameter)"
         case .noNetworkConnection:
             return "No network connection"
         case .failedToEncodeBody:
@@ -28,7 +31,7 @@ enum APIError: DescriptiveError, Equatable {
         case .failedToDecodeResponse:
             return "Failed to decode response"
         case let .unknown(response):
-            return "Unknown error occured. Reason: \(response.description)"
+            return "Unknown error occurred. Reason: \(response.description)"
         }
     }
 }

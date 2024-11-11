@@ -13,7 +13,7 @@ struct CoinDetailsView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: CoinDetailsViewModel
     
-    @State private var animatedChartData: [ChartData.ChartDataPoint] = []
+    @State private var animatedChartData: [ChartData.Point] = []
     @State private var selectedPrice: String
     @State private var selectedDate = ""
     @State private var selectedXPosition: CGFloat?
@@ -100,7 +100,7 @@ struct CoinDetailsView: View {
             
             Picker("Select Timeframe", selection: $selectedTimeframe) {
                 ForEach(ChartTimeframe.allCases, id: \.self) { timeframe in
-                    Text(timeframe.rawValue).tag(timeframe)
+                    Text(timeframe.title).tag(timeframe)
                 }
             }
             .pickerStyle(.segmented)
@@ -161,7 +161,7 @@ struct CoinDetailsView: View {
     
     // MARK: - Private Methods
     @ViewBuilder
-    private func makeChartView(_ data: [ChartData.ChartDataPoint]) -> some View {
+    private func makeChartView(_ data: [ChartData.Point]) -> some View {
         let prices = data.map { $0.price }
         let minPrice = prices.min() ?? 0
         let maxPrice = prices.max() ?? 1
@@ -186,7 +186,7 @@ struct CoinDetailsView: View {
     }
     
     @ViewBuilder
-    private func makeChartOverlay(proxy: ChartProxy, data: [ChartData.ChartDataPoint]) -> some View {
+    private func makeChartOverlay(proxy: ChartProxy, data: [ChartData.Point]) -> some View {
         GeometryReader { geometry in
             Rectangle()
                 .fill(Color.clear)
@@ -237,7 +237,7 @@ struct CoinDetailsView: View {
     private func updateSelectedData(
         location: CGPoint,
         proxy: ChartProxy,
-        data: [ChartData.ChartDataPoint],
+        data: [ChartData.Point],
         geometry: GeometryProxy
     ) {
         guard location.x >= 0, location.x <= geometry.size.width else {

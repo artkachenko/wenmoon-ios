@@ -8,9 +8,14 @@
 import Foundation
 
 struct ChartData: Codable, Equatable {
-    struct ChartDataPoint: Codable, Equatable {
+    struct Point: Codable, Equatable {
         let date: Date
         let price: Double
+        
+        init(date: Date, price: Double) {
+            self.date = date
+            self.price = price
+        }
         
         init(from decoder: Decoder) throws {
             var container = try decoder.unkeyedContainer()
@@ -26,5 +31,5 @@ struct ChartData: Codable, Equatable {
         }
     }
     
-    let prices: [ChartDataPoint]
+    let prices: [Point]
 }

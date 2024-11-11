@@ -17,6 +17,10 @@ struct ErrorFactoryMock {
         .invalidEndpoint(endpoint: endpoint)
     }
     
+    static func makeInvalidParameterError(parameter: String = "Mocked invalid parameter") -> APIError {
+        .invalidParameter(parameter: parameter)
+    }
+    
     static func makeNoNetworkConnectionError() -> APIError {
         .noNetworkConnection
     }
