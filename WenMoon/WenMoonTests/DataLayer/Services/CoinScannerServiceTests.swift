@@ -146,4 +146,31 @@ class CoinScannerServiceTests: XCTestCase {
             expectedError: error
         )
     }
+    
+    // Get Chart Data
+    func testGetChartData_success() async throws {
+        // Setup
+        let response = ChartDataFactoryMock.makeChartDataForTimeframes()
+        httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
+        
+        // Action
+        let chartData = try await service.getChartData(for: "", currency: .usd)
+        
+        // Assertions
+        assertChartDataForTimeframesEqual(chartData, response)
+    }
+    
+    func testGetChartData_invalidParameter() async throws {
+        // Setup
+        let error = ErrorFactoryMock.makeInvalidParameterError()
+        httpClient.getResponse = .failure(error)
+        
+        // Action & Assertions
+        await assertFailure(
+            for: { [weak self] in
+                try await self!.service.getChartData(for: "", currency: .usd)
+            },
+            expectedError: error
+        )
+    }
 }

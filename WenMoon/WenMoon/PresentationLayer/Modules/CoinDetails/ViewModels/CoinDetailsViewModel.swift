@@ -10,54 +10,44 @@ import Foundation
 final class CoinDetailsViewModel: BaseViewModel {
     // MARK: - Properties
     @Published var coin: CoinData
-    @Published private(set) var chartData: ChartData?
+    @Published private(set) var chartData: [ChartData] = []
     
-    var chartDataCache: [ChartTimeframe: ChartData] = [:]
+    var chartDataCache: [String: [ChartData]] = [:]
     
-    private let chartDataService: ChartDataService
+    private let service: CoinScannerService
     
     // MARK: - Initializers
-    convenience init(coin: CoinData) {
-        self.init(coin: coin, chartDataService: ChartDataServiceImpl())
-    }
-    
-    init(coin: CoinData, chartDataService: ChartDataService) {
+    init(coin: CoinData, chartData: [String: [ChartData]], service: CoinScannerService = CoinScannerServiceImpl()) {
         self.coin = coin
-        self.chartDataService = chartDataService
+        self.service = service
+        
+        if !chartData.isEmpty {
+            self.chartDataCache = chartData
+            self.chartData = chartData[Timeframe.oneHour.rawValue] ?? []
+        }
     }
     
+    // MARK: - Internal Methods
     @MainActor
-    func fetchChartData(on timeframe: ChartTimeframe = .oneDay) async {
+    func fetchChartData(on timeframe: Timeframe = .oneHour) async {
         isLoading = true
         defer { isLoading = false }
         
-        if let cachedData = chartDataCache[timeframe] {
+        if let cachedData = chartDataCache[timeframe.rawValue] {
             chartData = cachedData
             return
         }
         
         do {
-            let fetchedData = try await chartDataService.getChartData(for: coin.id, timeframe: timeframe)
-            chartDataCache[timeframe] = fetchedData
-            chartData = fetchedData
+            let fetchedData = try await service.getChartData(for: coin.symbol, currency: .usd)
+            for timeframe in Timeframe.allCases {
+                if let data = fetchedData[timeframe.rawValue] {
+                    chartDataCache[timeframe.rawValue] = data
+                }
+            }
+            chartData = chartDataCache[timeframe.rawValue] ?? []
         } catch {
             setErrorMessage(error)
-        }
-    }
-}
-
-enum ChartTimeframe: String, CaseIterable {
-    case oneDay = "1"
-    case oneWeek = "7"
-    case oneMonth = "31"
-    case oneYear = "365"
-    
-    var title: String {
-        switch self {
-        case .oneDay: return "1D"
-        case .oneWeek: return "1W"
-        case .oneMonth: return "1M"
-        case .oneYear: return "1Y"
         }
     }
 }

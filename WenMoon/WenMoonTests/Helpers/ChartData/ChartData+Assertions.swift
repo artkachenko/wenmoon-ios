@@ -9,12 +9,20 @@ import Foundation
 import XCTest
 @testable import WenMoon
 
-func assertChartDataEqual(_ chartData: ChartData, _ expectedChartData: ChartData) {
-    XCTAssertEqual(chartData.prices.count, expectedChartData.prices.count)
-    for (index, _) in chartData.prices.enumerated() {
-        let point = chartData.prices[index]
-        let expectedPoint = expectedChartData.prices[index]
-        XCTAssertEqual(point.date.timeIntervalSince1970, expectedPoint.date.timeIntervalSince1970, accuracy: 1)
-        XCTAssertEqual(point.price, expectedPoint.price)
+func assertChartDataForTimeframesEqual(_ chartData: [String: [ChartData]], _ expectedChartData: [String: [ChartData]]) {
+    XCTAssertEqual(chartData.keys.count, expectedChartData.keys.count)
+    
+    for (timeframe, expectedData) in expectedChartData {
+        let actualData = chartData[timeframe]!
+        assertChartDataEqual(actualData, expectedData)
+    }
+}
+
+func assertChartDataEqual(_ chartData: [ChartData], _ expectedChartData: [ChartData]) {
+    XCTAssertEqual(chartData.count, expectedChartData.count)
+    for (index, actualPoint) in chartData.enumerated() {
+        let expectedPoint = expectedChartData[index]
+        XCTAssertEqual(actualPoint.date.timeIntervalSince1970, expectedPoint.date.timeIntervalSince1970, accuracy: 1)
+        XCTAssertEqual(actualPoint.price, expectedPoint.price)
     }
 }

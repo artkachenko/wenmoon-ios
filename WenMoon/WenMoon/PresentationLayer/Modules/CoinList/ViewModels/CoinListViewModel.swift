@@ -12,10 +12,12 @@ final class CoinListViewModel: BaseViewModel {
     // MARK: - Properties
     @Published var coins: [CoinData] = []
     @Published var marketData: [String: MarketData] = [:]
+    @Published var chartData: [String: [String: [ChartData]]] = [:]
     
     private let coinScannerService: CoinScannerService
     private let priceAlertService: PriceAlertService
     private var cacheTimer: Timer?
+    private var chartDataFetchTimer: Timer?
     
     // MARK: - Initializers
     convenience init() {
@@ -47,10 +49,12 @@ final class CoinListViewModel: BaseViewModel {
         super.init(swiftDataManager: swiftDataManager, userDefaultsManager: userDefaultsManager)
         
         startCacheTimer()
+        startPeriodicChartDataFetch()
     }
     
     deinit {
         cacheTimer?.invalidate()
+        chartDataFetchTimer?.invalidate()
     }
     
     // MARK: - Internal Methods
@@ -192,6 +196,25 @@ final class CoinListViewModel: BaseViewModel {
         save()
     }
     
+    @MainActor
+    func fetchChartData(for symbol: String) async {
+        do {
+            chartData[symbol] = try await coinScannerService.getChartData(for: symbol, currency: .usd)
+        } catch {
+            print("Failed to fetch data for \(symbol): \(error)")
+        }
+    }
+    
+    func fetchChartData() async {
+        await withTaskGroup(of: Void.self) { group in
+            for coin in coins {
+                group.addTask { [weak self] in
+                    await self?.fetchChartData(for: coin.symbol)
+                }
+            }
+        }
+    }
+    
     // MARK: - Private Methods
     @MainActor
     private func fetchPredefinedCoins() async {
@@ -235,6 +258,12 @@ final class CoinListViewModel: BaseViewModel {
     private func startCacheTimer() {
         cacheTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
             self?.clearCacheIfNeeded()
+        }
+    }
+    
+    private func startPeriodicChartDataFetch() {
+        chartDataFetchTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
+            Task { await self?.fetchChartData() }
         }
     }
 }

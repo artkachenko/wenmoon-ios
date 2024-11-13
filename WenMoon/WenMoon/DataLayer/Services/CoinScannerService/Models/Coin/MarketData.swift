@@ -1,5 +1,5 @@
 //
-//  CoinMarketData.swift
+//  MarketData.swift
 //  WenMoon
 //
 //  Created by Artur Tkachenko on 26.04.23.

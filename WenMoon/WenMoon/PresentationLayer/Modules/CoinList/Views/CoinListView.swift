@@ -52,55 +52,54 @@ struct CoinListView: View {
                     await viewModel.fetchMarketData()
                 }
             }
-            .onAppear {
-                Task {
-                    await viewModel.fetchCoins()
-                    await viewModel.fetchPriceAlerts()
-                }
-            }
             .navigationTitle("Coins")
-            .onReceive(NotificationCenter.default.publisher(for: .targetPriceReached)) { notification in
-                if let coinID = notification.userInfo?["coinID"] as? String {
-                    viewModel.toggleOffPriceAlert(for: coinID)
-                }
-            }
-            .onChange(of: viewModel.errorMessage) { _, errorMessage in
-                showErrorAlert = errorMessage != nil
-            }
-            .sheet(isPresented: $shouldShowAddCoinView) {
-                AddCoinView(didToggleCoin: handleCoinSelection)
-            }
-            .sheet(item: $selectedCoin, onDismiss: {
-                selectedCoin = nil
-            }) { coin in
-                CoinDetailsView(coin: coin)
-                    .presentationDetents([.medium])
-                    .presentationCornerRadius(36)
-            }
-            .alert(viewModel.errorMessage ?? "", isPresented: $showErrorAlert) {
-                Button("OK", role: .cancel) { }
-            }
-            .alert("Set Price Alert", isPresented: $showSetPriceAlertConfirmation, actions: {
-                TextField("Target Price", value: $targetPrice, format: .number)
-                    .keyboardType(.decimalPad)
-                
-                Button("Confirm") {
-                    if let coin = capturedCoin {
-                        Task {
-                            await viewModel.setPriceAlert(for: coin, targetPrice: targetPrice)
-                            capturedCoin = nil
-                            targetPrice = nil
-                        }
+        }
+        .sheet(isPresented: $shouldShowAddCoinView) {
+            AddCoinView(didToggleCoin: handleCoinSelection)
+        }
+        .sheet(item: $selectedCoin, onDismiss: {
+            selectedCoin = nil
+        }) { coin in
+            CoinDetailsView(coin: coin, chartData: viewModel.chartData[coin.symbol] ?? [:])
+                .presentationDetents([.medium])
+                .presentationCornerRadius(36)
+        }
+        .alert(viewModel.errorMessage ?? "", isPresented: $showErrorAlert) {
+            Button("OK", role: .cancel) { }
+        }
+        .alert("Set Price Alert", isPresented: $showSetPriceAlertConfirmation, actions: {
+            TextField("Target Price", value: $targetPrice, format: .number)
+                .keyboardType(.decimalPad)
+            
+            Button("Confirm") {
+                if let coin = capturedCoin {
+                    Task {
+                        await viewModel.setPriceAlert(for: coin, targetPrice: targetPrice)
+                        capturedCoin = nil
+                        targetPrice = nil
                     }
                 }
-                
-                Button("Cancel", role: .cancel) {
-                    capturedCoin = nil
-                    targetPrice = nil
-                }
-            }) {
-                Text("Please enter your target price in USD, and our system will notify you when it is reached")
             }
+            
+            Button("Cancel", role: .cancel) {
+                capturedCoin = nil
+                targetPrice = nil
+            }
+        }) {
+            Text("Please enter your target price in USD, and our system will notify you when it is reached")
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .targetPriceReached)) { notification in
+            if let coinID = notification.userInfo?["coinID"] as? String {
+                viewModel.toggleOffPriceAlert(for: coinID)
+            }
+        }
+        .onChange(of: viewModel.errorMessage) { _, errorMessage in
+            showErrorAlert = errorMessage != nil
+        }
+        .task {
+            await viewModel.fetchCoins()
+            await viewModel.fetchChartData()
+            await viewModel.fetchPriceAlerts()
         }
     }
     
@@ -184,6 +183,7 @@ struct CoinListView: View {
         Task {
             if shouldAdd {
                 await viewModel.saveCoin(coin)
+                await viewModel.fetchChartData(for: coin.symbol)
             } else {
                 await viewModel.deleteCoin(coin.id)
             }

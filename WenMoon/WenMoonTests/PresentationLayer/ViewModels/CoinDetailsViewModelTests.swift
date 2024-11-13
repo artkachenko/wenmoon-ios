@@ -11,13 +11,13 @@ import XCTest
 class CoinDetailsViewModelTests: XCTestCase {
     // MARK: - Properties
     var viewModel: CoinDetailsViewModel!
-    var service: ChartDataServiceMock!
+    var service: CoinScannerServiceMock!
     
     // MARK: - Setup
     override func setUp() {
         super.setUp()
-        service = ChartDataServiceMock()
-        viewModel = CoinDetailsViewModel(coin: CoinData(), chartDataService: service)
+        service = CoinScannerServiceMock()
+        viewModel = CoinDetailsViewModel(coin: CoinData(), chartData: [:], service: service)
     }
     
     override func tearDown() {
@@ -29,27 +29,27 @@ class CoinDetailsViewModelTests: XCTestCase {
     // MARK: - Tests
     func testFetchChartData_success() async throws {
         // Setup
-        let chartData = ChartDataFactoryMock.makeChartData()
+        let chartData = ChartDataFactoryMock.makeChartDataForTimeframes()
         service.getChartDataResult = .success(chartData)
         
         // Action
         await viewModel.fetchChartData()
         
         // Assertions
-        assertChartDataEqual(viewModel.chartData!, chartData)
+        assertChartDataEqual(viewModel.chartData, chartData[Timeframe.oneHour.rawValue]!)
         XCTAssertNil(viewModel.errorMessage)
     }
     
     func testFetchChartData_usesCache() async throws {
         // Setup
-        let cachedChartData = ChartDataFactoryMock.makeChartData()
-        viewModel.chartDataCache[.oneDay] = cachedChartData
+        let cachedChartData = ChartDataFactoryMock.makeChartDataForTimeframes()
+        viewModel.chartDataCache = cachedChartData
         
         // Action
         await viewModel.fetchChartData()
         
         // Assertions
-        assertChartDataEqual(viewModel.chartData!, cachedChartData)
+        assertChartDataEqual(viewModel.chartData, cachedChartData[Timeframe.oneHour.rawValue]!)
     }
     
     func testFetchChartData_invalidParameterError() async throws {

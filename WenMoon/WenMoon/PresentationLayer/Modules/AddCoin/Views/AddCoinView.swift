@@ -24,10 +24,8 @@ struct AddCoinView: View {
                 List {
                     ForEach(viewModel.coins, id: \.self) { coin in
                         makeCoinView(coin)
-                            .onAppear {
-                                Task {
-                                    await viewModel.fetchCoinsOnNextPageIfNeeded(coin)
-                                }
+                            .task {
+                                await viewModel.fetchCoinsOnNextPageIfNeeded(coin)
                             }
                     }
                 }
@@ -43,31 +41,31 @@ struct AddCoinView: View {
                 }
                 .searchable(text: $searchText, placement: .toolbar, prompt: "e.g. Bitcoin")
                 .scrollDismissesKeyboard(.immediately)
-                .onChange(of: searchText) { _, query in
-                    Task {
-                        await viewModel.handleSearchInput(query)
-                    }
-                }
-                .onAppear {
-                    Task {
-                        await viewModel.fetchCoins()
-                        viewModel.fetchSavedCoins()
-                    }
-                }
-                .onChange(of: viewModel.errorMessage) { _, errorMessage in
-                    showErrorAlert = errorMessage != nil
-                }
-                .alert(isPresented: $showErrorAlert) {
-                    Alert(
-                        title: Text("Error"),
-                        message: Text(viewModel.errorMessage!),
-                        dismissButton: .default(Text("OK"))
-                    )
-                }
                 
                 if viewModel.isLoading {
                     ProgressView()
                 }
+            }
+            .alert(isPresented: $showErrorAlert) {
+                Alert(
+                    title: Text("Error"),
+                    message: Text(viewModel.errorMessage!),
+                    dismissButton: .default(Text("OK"))
+                )
+            }
+            .onChange(of: searchText) { _, query in
+                Task {
+                    await viewModel.handleSearchInput(query)
+                }
+            }
+            .onChange(of: viewModel.errorMessage) { _, errorMessage in
+                showErrorAlert = errorMessage != nil
+            }
+            .task {
+                await viewModel.fetchCoins()
+            }
+            .onAppear {
+                viewModel.fetchSavedCoins()
             }
         }
     }

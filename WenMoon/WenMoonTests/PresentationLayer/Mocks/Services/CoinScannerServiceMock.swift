@@ -13,7 +13,8 @@ class CoinScannerServiceMock: CoinScannerService {
     var getCoinsAtPageResult: Result<[Coin], APIError>!
     var getCoinsByIDsResult: Result<[Coin], APIError>!
     var searchCoinsByQueryResult: Result<[Coin], APIError>!
-    var getMarketDataForCoinsResult: Result<[String: MarketData], APIError>!
+    var getMarketDataResult: Result<[String: MarketData], APIError>!
+    var getChartDataResult: Result<[String: [ChartData]], APIError>!
     
     // MARK: - CoinScannerService
     func getCoins(at page: Int) async throws -> [Coin] {
@@ -53,13 +54,25 @@ class CoinScannerServiceMock: CoinScannerService {
     }
     
     func getMarketData(for coinIDs: [String]) async throws -> [String: MarketData] {
-        switch getMarketDataForCoinsResult {
+        switch getMarketDataResult {
         case .success(let marketData):
             return marketData
         case .failure(let error):
             throw error
         case .none:
-            XCTFail("getMarketDataForCoinIDsResult not set")
+            XCTFail("getMarketDataResult not set")
+            throw APIError.unknown(response: URLResponse())
+        }
+    }
+    
+    func getChartData(for symbol: String, currency: Currency) async throws -> [String: [ChartData]] {
+        switch getChartDataResult {
+        case .success(let chartData):
+            return chartData
+        case .failure(let error):
+            throw error
+        case .none:
+            XCTFail("getChartDataResult not set")
             throw APIError.unknown(response: URLResponse())
         }
     }

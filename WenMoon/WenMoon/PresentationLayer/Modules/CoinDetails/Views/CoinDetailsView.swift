@@ -13,16 +13,15 @@ struct CoinDetailsView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: CoinDetailsViewModel
     
-    @State private var animatedChartData: [ChartData.Point] = []
     @State private var selectedPrice: String
     @State private var selectedDate = ""
     @State private var selectedXPosition: CGFloat?
-    @State private var selectedTimeframe: ChartTimeframe = .oneDay
+    @State private var selectedTimeframe: Timeframe = .oneHour
     @State private var showErrorAlert = false
     
     // MARK: - Initializers
-    init(coin: CoinData) {
-        _viewModel = StateObject(wrappedValue: CoinDetailsViewModel(coin: coin))
+    init(coin: CoinData, chartData: [String: [ChartData]]) {
+        _viewModel = StateObject(wrappedValue: CoinDetailsViewModel(coin: coin, chartData: chartData))
         selectedPrice = coin.currentPrice.formattedAsCurrency()
     }
     
@@ -88,8 +87,9 @@ struct CoinDetailsView: View {
             Spacer()
             
             ZStack {
-                if !animatedChartData.isEmpty {
-                    makeChartView(animatedChartData)
+                if !viewModel.chartData.isEmpty {
+                    makeChartView(viewModel.chartData)
+                        .animation(.easeInOut(duration: 0.5), value: viewModel.chartData)
                 }
                 
                 if viewModel.isLoading {
@@ -99,8 +99,8 @@ struct CoinDetailsView: View {
             .frame(height: 100)
             
             Picker("Select Timeframe", selection: $selectedTimeframe) {
-                ForEach(ChartTimeframe.allCases, id: \.self) { timeframe in
-                    Text(timeframe.title).tag(timeframe)
+                ForEach(Timeframe.allCases, id: \.self) { timeframe in
+                    Text(timeframe.rawValue.uppercased()).tag(timeframe)
                 }
             }
             .pickerStyle(.segmented)
@@ -135,13 +135,6 @@ struct CoinDetailsView: View {
                 await viewModel.fetchChartData(on: timeframe)
             }
         }
-        .onChange(of: viewModel.chartData) { _, newData in
-            if let newData = newData?.prices {
-                withAnimation {
-                    animatedChartData = newData
-                }
-            }
-        }
         .onChange(of: viewModel.errorMessage) { _, errorMessage in
             showErrorAlert = errorMessage != nil
         }
@@ -152,16 +145,14 @@ struct CoinDetailsView: View {
                 dismissButton: .default(Text("OK"))
             )
         }
-        .onAppear {
-            Task {
-                await viewModel.fetchChartData(on: selectedTimeframe)
-            }
+        .task {
+            await viewModel.fetchChartData(on: selectedTimeframe)
         }
     }
     
     // MARK: - Private Methods
     @ViewBuilder
-    private func makeChartView(_ data: [ChartData.Point]) -> some View {
+    private func makeChartView(_ data: [ChartData]) -> some View {
         let prices = data.map { $0.price }
         let minPrice = prices.min() ?? 0
         let maxPrice = prices.max() ?? 1
@@ -186,7 +177,7 @@ struct CoinDetailsView: View {
     }
     
     @ViewBuilder
-    private func makeChartOverlay(proxy: ChartProxy, data: [ChartData.Point]) -> some View {
+    private func makeChartOverlay(proxy: ChartProxy, data: [ChartData]) -> some View {
         GeometryReader { geometry in
             Rectangle()
                 .fill(Color.clear)
@@ -237,7 +228,7 @@ struct CoinDetailsView: View {
     private func updateSelectedData(
         location: CGPoint,
         proxy: ChartProxy,
-        data: [ChartData.Point],
+        data: [ChartData],
         geometry: GeometryProxy
     ) {
         guard location.x >= 0, location.x <= geometry.size.width else {
@@ -254,7 +245,7 @@ struct CoinDetailsView: View {
                 
                 let formatType: Date.FormatType
                 switch selectedTimeframe {
-                case .oneDay:
+                case .oneHour, .oneDay:
                     formatType = .timeOnly
                 case .oneWeek:
                     formatType = .dateAndTime
@@ -280,5 +271,5 @@ struct CoinDetailsView: View {
 
 // MARK: - Preview
 #Preview {
-    CoinDetailsView(coin: CoinData())
+    CoinDetailsView(coin: CoinData(), chartData: [:])
 }

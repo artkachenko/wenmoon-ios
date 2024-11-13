@@ -86,7 +86,7 @@ class CoinListViewModelTests: XCTestCase {
             swiftDataManager.fetchResult.append(newCoin)
         }
         let marketData = MarketDataFactoryMock.makeMarketData(for: coins)
-        coinScannerService.getMarketDataForCoinsResult = .success(marketData)
+        coinScannerService.getMarketDataResult = .success(marketData)
         
         // Action
         await viewModel.fetchCoins()
@@ -107,7 +107,7 @@ class CoinListViewModelTests: XCTestCase {
             swiftDataManager.fetchResult.append(newCoin)
         }
         let marketData = MarketDataFactoryMock.makeMarketData(for: coins)
-        coinScannerService.getMarketDataForCoinsResult = .success(marketData)
+        coinScannerService.getMarketDataResult = .success(marketData)
         
         // Action
         await viewModel.fetchCoins()
@@ -238,7 +238,7 @@ class CoinListViewModelTests: XCTestCase {
     func testFetchMarketData_success() async throws {
         // Setup
         let marketData = MarketDataFactoryMock.makeMarketData()
-        coinScannerService.getMarketDataForCoinsResult = .success(marketData)
+        coinScannerService.getMarketDataResult = .success(marketData)
         let coins = CoinFactoryMock.makeCoinsData()
         viewModel.coins.append(contentsOf: coins)
         
@@ -267,7 +267,7 @@ class CoinListViewModelTests: XCTestCase {
     func testFetchMarketData_apiError() async throws {
         // Setup
         let error = ErrorFactoryMock.makeAPIError()
-        coinScannerService.getMarketDataForCoinsResult = .failure(error)
+        coinScannerService.getMarketDataResult = .failure(error)
         let coin = CoinFactoryMock.makeCoinData()
         viewModel.coins.append(coin)
         

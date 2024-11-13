@@ -12,6 +12,7 @@ protocol CoinScannerService {
     func getCoins(by ids: [String]) async throws -> [Coin]
     func searchCoins(by query: String) async throws -> [Coin]
     func getMarketData(for coinIDs: [String]) async throws -> [String: MarketData]
+    func getChartData(for symbol: String, currency: Currency) async throws -> [String: [ChartData]]
 }
 
 final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
@@ -56,6 +57,16 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
             let marketData = try decoder.decode([String: MarketData].self, from: data)
             print("Market Data: \(marketData)")
             return marketData
+        } catch {
+            throw mapToAPIError(error)
+        }
+    }
+    
+    func getChartData(for symbol: String, currency: Currency) async throws -> [String: [ChartData]] {
+        let parameters = ["symbol": symbol, "currency": currency.rawValue]
+        do {
+            let data = try await httpClient.get(path: "ohlc", parameters: parameters)
+            return try decoder.decode([String: [ChartData]].self, from: data)
         } catch {
             throw mapToAPIError(error)
         }
