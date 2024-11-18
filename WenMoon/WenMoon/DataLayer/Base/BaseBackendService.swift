@@ -9,7 +9,6 @@ import Foundation
 
 class BaseBackendService {
     // MARK: - Properties
-    private let baseURL: URL
     private(set) var httpClient: HTTPClient
     
     var encoder: JSONEncoder {
@@ -21,23 +20,16 @@ class BaseBackendService {
         httpClient.decoder.keyDecodingStrategy = .convertFromSnakeCase
         return httpClient.decoder
     }
-    
+
     // MARK: - Initializers
-    convenience init(baseURLString: String = "http://localhost:8080/") {
-        #if DEBUG
-        let baseURL = URL(string: baseURLString)!
-        #else
-        let baseURL = URL(string: "https://wenmoon-vapor.herokuapp.com/")!
-        #endif
-        let httpClient = HTTPClientImpl(baseURL: baseURL)
-        self.init(httpClient: httpClient, baseURL: baseURL)
+    convenience init() {
+        self.init(httpClient: HTTPClientImpl())
     }
     
-    init(httpClient: HTTPClient, baseURL: URL) {
+    init(httpClient: HTTPClient) {
         self.httpClient = httpClient
-        self.baseURL = baseURL
     }
-    
+
     // MARK: - Methods
     func mapToAPIError(_ error: Error) -> APIError {
         if let apiError = error as? APIError {

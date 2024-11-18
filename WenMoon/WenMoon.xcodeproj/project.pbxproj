@@ -14,6 +14,7 @@
 		D22D339D2CB92ABC007997DD /* SwiftDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D339C2CB92ABC007997DD /* SwiftDataManager.swift */; };
 		D22D33A02CB9342A007997DD /* SwiftDataError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D339F2CB9342A007997DD /* SwiftDataError.swift */; };
 		D22D33A32CB958A5007997DD /* DescriptiveError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D33A22CB958A5007997DD /* DescriptiveError.swift */; };
+		D2A52FDD2CEBC415003C1275 /* AppConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A52FDC2CEBC415003C1275 /* AppConfig.swift */; };
 		D2AAC1EE2CCFD17B00CBAFB0 /* Color+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2AAC1ED2CCFD17B00CBAFB0 /* Color+Extensions.swift */; };
 		D2AAC1F62CCFF83B00CBAFB0 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D2AAC1F52CCFF83B00CBAFB0 /* Colors.xcassets */; };
 		D2ADB8F22CE5FCD0004DA208 /* ChartTimeframe.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2ADB8F12CE5FCD0004DA208 /* ChartTimeframe.swift */; };
@@ -84,8 +85,11 @@
 		D22D339C2CB92ABC007997DD /* SwiftDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataManager.swift; sourceTree = "<group>"; };
 		D22D339F2CB9342A007997DD /* SwiftDataError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataError.swift; sourceTree = "<group>"; };
 		D22D33A22CB958A5007997DD /* DescriptiveError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptiveError.swift; sourceTree = "<group>"; };
+		D2A52FDA2CEB8B38003C1275 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		D2A52FDB2CEB8C0C003C1275 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		D2A52FDC2CEBC415003C1275 /* AppConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfig.swift; sourceTree = "<group>"; };
 		D2AAC1ED2CCFD17B00CBAFB0 /* Color+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Extensions.swift"; sourceTree = "<group>"; };
-		D2AAC1F42CCFF3A900CBAFB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		D2AAC1F42CCFF3A900CBAFB0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D2AAC1F52CCFF83B00CBAFB0 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		D2ADB8F12CE5FCD0004DA208 /* ChartTimeframe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartTimeframe.swift; sourceTree = "<group>"; };
 		D2ADB8F42CE5FCF2004DA208 /* Currency.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Currency.swift; sourceTree = "<group>"; };
@@ -201,6 +205,16 @@
 				D22D33962CB92707007997DD /* SwiftData */,
 			);
 			path = Persistence;
+			sourceTree = "<group>";
+		};
+		D2A52FDE2CEBCA6C003C1275 /* SupportingFiles */ = {
+			isa = PBXGroup;
+			children = (
+				D2A52FDB2CEB8C0C003C1275 /* Release.xcconfig */,
+				D2A52FDA2CEB8B38003C1275 /* Debug.xcconfig */,
+				D2AAC1F42CCFF3A900CBAFB0 /* Info.plist */,
+			);
+			path = SupportingFiles;
 			sourceTree = "<group>";
 		};
 		D2ADB8F32CE5FCD3004DA208 /* Chart */ = {
@@ -390,12 +404,12 @@
 		FAB361F529F447DB00A88050 /* WenMoon */ = {
 			isa = PBXGroup;
 			children = (
-				D2AAC1F42CCFF3A900CBAFB0 /* Info.plist */,
 				FAB3622629F447F400A88050 /* Application */,
 				FA07AC2E29F93282008F6484 /* Extensions */,
 				FAB3622829F4482B00A88050 /* DataLayer */,
 				FAB3622B29F4485500A88050 /* PresentationLayer */,
 				FAB3622729F4480F00A88050 /* Resources */,
+				D2A52FDE2CEBCA6C003C1275 /* SupportingFiles */,
 			);
 			path = WenMoon;
 			sourceTree = "<group>";
@@ -414,6 +428,7 @@
 			isa = PBXGroup;
 			children = (
 				FAB361F629F447DB00A88050 /* WenMoonApp.swift */,
+				D2A52FDC2CEBC415003C1275 /* AppConfig.swift */,
 				FA8A08842A1CF8500083B8DB /* AppDelegate.swift */,
 				FAB3620129F447DC00A88050 /* WenMoon.entitlements */,
 			);
@@ -747,6 +762,7 @@
 				FAB3624A29F453FC00A88050 /* CoinScannerService.swift in Sources */,
 				FAB3623C29F4517800A88050 /* BaseBackendService.swift in Sources */,
 				D2EFF9032CDA2EDE004AA5A5 /* ChartShape.swift in Sources */,
+				D2A52FDD2CEBC415003C1275 /* AppConfig.swift in Sources */,
 				FAB3625A29F4580C00A88050 /* AddCoinViewModel.swift in Sources */,
 				FAB3626A29F4651F00A88050 /* CoinListViewModel.swift in Sources */,
 				D2ADB8F22CE5FCD0004DA208 /* ChartTimeframe.swift in Sources */,
@@ -908,6 +924,7 @@
 		};
 		FAB3621E29F447DC00A88050 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D2A52FDA2CEB8B38003C1275 /* Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -920,7 +937,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = WenMoon/Info.plist;
+				INFOPLIST_FILE = WenMoon/SupportingFiles/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -950,6 +967,7 @@
 		};
 		FAB3621F29F447DC00A88050 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = D2A52FDB2CEB8C0C003C1275 /* Release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -962,7 +980,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = WenMoon/Info.plist;
+				INFOPLIST_FILE = WenMoon/SupportingFiles/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

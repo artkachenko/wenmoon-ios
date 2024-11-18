@@ -32,18 +32,21 @@ extension HTTPClient {
 
 final class HTTPClientImpl: HTTPClient {
     // MARK: - Properties
-    let baseURL: URL
-    let session: URLSession
-    let encoder: JSONEncoder
-    let decoder: JSONDecoder
+    private let baseURL: URL
+    private let apiKey: String
+    private let session: URLSession
+    
+    private(set) var encoder: JSONEncoder
+    private(set) var decoder: JSONDecoder
     
     // MARK: - Initializers
-    convenience init(baseURL: URL) {
-        self.init(baseURL: baseURL, session: .shared, encoder: .init(), decoder: .init())
+    convenience init(baseURL: URL = API.baseURL, apiKey: String = API.key) {
+        self.init(baseURL: baseURL, apiKey: apiKey, session: .shared, encoder: .init(), decoder: .init())
     }
     
-    init(baseURL: URL, session: URLSession, encoder: JSONEncoder, decoder: JSONDecoder) {
+    init(baseURL: URL, apiKey: String, session: URLSession, encoder: JSONEncoder, decoder: JSONDecoder) {
         self.baseURL = baseURL
+        self.apiKey = apiKey
         self.session = session
         self.encoder = encoder
         self.decoder = decoder
@@ -77,6 +80,7 @@ final class HTTPClientImpl: HTTPClient {
         urlRequest.httpBody = httpRequest.body
         
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        urlRequest.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
         httpRequest.headers?.forEach { urlRequest.setValue($0.value, forHTTPHeaderField: $0.key) }
         
         let (data, response) = try await session.data(for: urlRequest)
