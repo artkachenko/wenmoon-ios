@@ -21,35 +21,28 @@ final class CoinListViewModel: BaseViewModel {
     
     // MARK: - Initializers
     convenience init() {
-        if let modelContainer = try? ModelContainer(for: CoinData.self) {
-            let swiftDataManager = SwiftDataManagerImpl(modelContainer: modelContainer)
-            self.init(
-                coinScannerService: CoinScannerServiceImpl(),
-                priceAlertService: PriceAlertServiceImpl(),
-                userDefaultsManager: UserDefaultsManagerImpl(),
-                swiftDataManager: swiftDataManager
-            )
-        } else {
-            self.init(
-                coinScannerService: CoinScannerServiceImpl(),
-                priceAlertService: PriceAlertServiceImpl(),
-                userDefaultsManager: UserDefaultsManagerImpl()
-            )
-        }
+        self.init(
+            coinScannerService: CoinScannerServiceImpl(),
+            priceAlertService: PriceAlertServiceImpl(),
+            firebaseAuthService: FirebaseAuthServiceImpl()
+        )
     }
     
     init(
         coinScannerService: CoinScannerService,
         priceAlertService: PriceAlertService,
-        userDefaultsManager: UserDefaultsManager,
+        firebaseAuthService: FirebaseAuthService,
+        userDefaultsManager: UserDefaultsManager? = nil,
         swiftDataManager: SwiftDataManager? = nil
     ) {
         self.coinScannerService = coinScannerService
         self.priceAlertService = priceAlertService
-        super.init(swiftDataManager: swiftDataManager, userDefaultsManager: userDefaultsManager)
-        
+        super.init(
+            firebaseAuthService: firebaseAuthService,
+            userDefaultsManager: userDefaultsManager,
+            swiftDataManager: swiftDataManager
+        )
         startCacheTimer()
-        startPeriodicChartDataFetch()
     }
     
     deinit {
@@ -63,19 +56,16 @@ final class CoinListViewModel: BaseViewModel {
         if isFirstLaunch {
             await fetchPredefinedCoins()
         } else {
-            let descriptor = FetchDescriptor<CoinData>()
+            let descriptor = FetchDescriptor<CoinData>(sortBy: [SortDescriptor(\.marketCapRank)])
             var fetchedCoins = fetch(descriptor)
-            do {
-                let savedOrder = try userDefaultsManager?.getObject(forKey: "coinOrder", objectType: [String].self) ?? []
+            if let savedOrder = try? userDefaultsManager.getObject(forKey: "coinOrder", objectType: [String].self) {
                 fetchedCoins.sort { coin1, coin2 in
                     let index1 = savedOrder.firstIndex(of: coin1.id) ?? .max
                     let index2 = savedOrder.firstIndex(of: coin2.id) ?? .max
                     return index1 < index2
                 }
-                coins = fetchedCoins
-            } catch {
-                setErrorMessage(error)
             }
+            coins = fetchedCoins
             await fetchMarketData()
         }
     }
@@ -128,19 +118,21 @@ final class CoinListViewModel: BaseViewModel {
     
     @MainActor
     func fetchPriceAlerts() async {
-        guard let deviceToken, !coins.isEmpty else { return }
-        do {
-            let priceAlerts = try await priceAlertService.getPriceAlerts(deviceToken: deviceToken)
-            for (index, coin) in coins.enumerated() {
-                if let matchingPriceAlert = priceAlerts.first(where: { $0.coinId == coin.id }) {
-                    coins[index].targetPrice = matchingPriceAlert.targetPrice
-                    coins[index].isActive = true
-                } else {
-                    coins[index].targetPrice = nil
-                    coins[index].isActive = false
-                }
+        guard let userID, let deviceToken, !coins.isEmpty else {
+            print("User ID is nil, or the device token is nil, or the coins array is empty")
+            coins = coins.map { coin in
+                let updatedCoin = coin
+                updatedCoin.priceAlerts = []
+                return updatedCoin
             }
-            save()
+            return
+        }
+        do {
+            let priceAlerts = try await priceAlertService.getPriceAlerts(userID: userID, deviceToken: deviceToken)
+            for (index, coin) in coins.enumerated() {
+                let matchingPriceAlerts = priceAlerts.filter({ $0.id.contains(coin.id) })
+                coins[index].priceAlerts = matchingPriceAlerts
+            }
         } catch {
             setErrorMessage(error)
         }
@@ -158,7 +150,7 @@ final class CoinListViewModel: BaseViewModel {
     func saveCoinOrder() {
         do {
             let ids = coins.map { $0.id }
-            try userDefaultsManager?.setObject(ids, forKey: "coinOrder")
+            try userDefaultsManager.setObject(ids, forKey: "coinOrder")
         } catch {
             setErrorMessage(error)
         }
@@ -167,33 +159,20 @@ final class CoinListViewModel: BaseViewModel {
     @MainActor
     func deleteCoin(_ coinID: String) async {
         guard let coin = coins.first(where: { $0.id == coinID }) else { return }
-        if coin.targetPrice != nil {
-            await deletePriceAlert(for: coin)
-        }
-        
         if let index = coins.firstIndex(of: coin) {
             coins.remove(at: index)
         }
-        
         delete(coin)
-    }
-    
-    func setPriceAlert(for coin: CoinData, targetPrice: Double?) async {
-        if let targetPrice {
-            await setPriceAlert(targetPrice, for: coin)
-        } else {
-            await deletePriceAlert(for: coin)
-        }
-        save()
     }
     
     // When the target price has been reached
     func toggleOffPriceAlert(for id: String) {
-        if let index = coins.firstIndex(where: { $0.id == id }) {
-            coins[index].targetPrice = nil
-            coins[index].isActive = false
+        for index in coins.indices {
+            if let alertIndex = coins[index].priceAlerts.firstIndex(where: { $0.id == id }) {
+                coins[index].priceAlerts.remove(at: alertIndex)
+                break
+            }
         }
-        save()
     }
     
     @MainActor
@@ -229,41 +208,9 @@ final class CoinListViewModel: BaseViewModel {
         }
     }
     
-    @MainActor
-    private func setPriceAlert(_ targetPrice: Double, for coin: CoinData) async {
-        guard let deviceToken else { return }
-        do {
-            let _ = try await priceAlertService.setPriceAlert(targetPrice, for: coin, deviceToken: deviceToken)
-            coin.targetPrice = targetPrice
-            coin.isActive = true
-        } catch {
-            coin.targetPrice = nil
-            coin.isActive = false
-            setErrorMessage(error)
-        }
-    }
-    
-    @MainActor
-    private func deletePriceAlert(for coin: CoinData) async {
-        guard let deviceToken else { return }
-        do {
-            let _ = try await priceAlertService.deletePriceAlert(for: coin.id, deviceToken: deviceToken)
-            coin.targetPrice = nil
-            coin.isActive = false
-        } catch {
-            setErrorMessage(error)
-        }
-    }
-    
     private func startCacheTimer() {
         cacheTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
             self?.clearCacheIfNeeded()
-        }
-    }
-    
-    private func startPeriodicChartDataFetch() {
-        chartDataFetchTimer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
-            Task { await self?.fetchChartData() }
         }
     }
 }

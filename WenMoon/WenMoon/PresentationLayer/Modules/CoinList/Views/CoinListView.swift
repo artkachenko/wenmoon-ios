@@ -11,16 +11,13 @@ struct CoinListView: View {
     // MARK: - Properties
     @StateObject private var viewModel = CoinListViewModel()
     
+    @State private var selectedCoin: CoinData!
+    @State private var swipedCoin: CoinData!
     @State private var isEditMode: EditMode = .inactive
     @State private var chartDrawProgress: CGFloat = .zero
-    @State private var shouldShowAddCoinView = false
-    @State private var showSetPriceAlertConfirmation = false
-    @State private var capturedCoin: CoinData?
-    @State private var targetPrice: Double?
-    @State private var toggleOffCoinID: String?
     
-    @State private var selectedCoin: CoinData!
-    @State private var shouldShowCoinDetailsView = false
+    @State private var showAddCoinView = false
+    @State private var showAuthAlert = false
     
     // MARK: - Body
     var body: some View {
@@ -33,7 +30,7 @@ struct CoinListView: View {
                     .onMove(perform: moveCoin)
                     
                     Button(action: {
-                        shouldShowAddCoinView.toggle()
+                        showAddCoinView.toggle()
                     }) {
                         HStack {
                             Image(systemName: "slider.horizontal.3")
@@ -50,50 +47,42 @@ struct CoinListView: View {
                 .refreshable {
                     Task {
                         await viewModel.fetchMarketData()
+                        await viewModel.fetchPriceAlerts()
                     }
                 }
                 .navigationTitle("Coins")
             }
         }
-        .sheet(isPresented: $shouldShowAddCoinView) {
+        .fullScreenCover(isPresented: $showAddCoinView) {
             AddCoinView(didToggleCoin: handleCoinSelection)
         }
-        .sheet(item: $selectedCoin, onDismiss: {
+        .fullScreenCover(item: $selectedCoin, onDismiss: {
             selectedCoin = nil
         }) { coin in
             CoinDetailsView(coin: coin, chartData: viewModel.chartData[coin.symbol] ?? [:])
-                .presentationDetents([.medium])
                 .presentationCornerRadius(36)
         }
-        .alert("Set Price Alert", isPresented: $showSetPriceAlertConfirmation, actions: {
-            TextField("Target Price", value: $targetPrice, format: .number)
-                .keyboardType(.decimalPad)
-            
-            Button("Confirm") {
-                if let coin = capturedCoin {
-                    Task {
-                        await viewModel.setPriceAlert(for: coin, targetPrice: targetPrice)
-                        capturedCoin = nil
-                        targetPrice = nil
-                    }
-                }
-            }
-            
-            Button("Cancel", role: .cancel) {
-                capturedCoin = nil
-                targetPrice = nil
-            }
-        }) {
-            Text("Please enter your target price in USD, and our system will notify you when it is reached")
+        .sheet(item: $swipedCoin, onDismiss: {
+            swipedCoin = nil
+        }) { coin in
+            PriceAlertsView(coin: coin)
+                .presentationDetents([.medium, .large])
+                .presentationCornerRadius(36)
+        }
+        .alert(isPresented: $showAuthAlert) {
+            Alert(
+                title: Text("Need to Sign In, Buddy!"),
+                message: Text("You gotta slide over to the Account tab and log in to check out your price alerts."),
+                dismissButton: .default(Text("OK"))
+            )
         }
         .onReceive(NotificationCenter.default.publisher(for: .targetPriceReached)) { notification in
-            if let coinID = notification.userInfo?["coinID"] as? String {
-                viewModel.toggleOffPriceAlert(for: coinID)
+            if let priceAlertID = notification.userInfo?["priceAlertID"] as? String {
+                viewModel.toggleOffPriceAlert(for: priceAlertID)
             }
         }
         .task {
             await viewModel.fetchCoins()
-            await viewModel.fetchChartData()
             await viewModel.fetchPriceAlerts()
         }
     }
@@ -102,25 +91,39 @@ struct CoinListView: View {
     @ViewBuilder
     private func makeCoinView(_ coin: CoinData) -> some View {
         HStack(spacing: .zero) {
-            if let data = coin.imageData,
-               let uiImage = UIImage(data: data) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 48, height: 48)
-                    .cornerRadius(8)
-                    .grayscale(0.4)
-            } else {
+            ZStack(alignment: .topTrailing) {
                 ZStack {
                     Circle()
-                        .fill(Color.gray)
+                        .fill(Color.white)
                         .frame(width: 48, height: 48)
                     
-                    Text(coin.name.prefix(1))
-                        .font(.title2)
-                        .foregroundColor(.white)
+                    if let data = coin.imageData,
+                       let uiImage = UIImage(data: data) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
+                            .clipShape(.circle)
+                    } else {
+                        Text(coin.name.prefix(1))
+                            .font(.body)
+                            .foregroundColor(.wmBlack)
+                    }
                 }
                 .brightness(-0.1)
+                
+                if !coin.priceAlerts.isEmpty {
+                    Image(systemName: "bell.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 16, height: 16)
+                        .foregroundColor(.lightGray)
+                        .padding(4)
+                        .background(Color(.systemBackground))
+                        .clipShape(.circle)
+                        .padding(.trailing, -8)
+                        .padding(.top, -8)
+                }
             }
             
             VStack(alignment: .leading, spacing: 4) {
@@ -166,6 +169,17 @@ struct CoinListView: View {
                 Image(systemName: "heart.slash.fill")
             }
             .tint(.wmPink)
+            
+            Button {
+                guard viewModel.userID != nil else {
+                    showAuthAlert.toggle()
+                    return
+                }
+                swipedCoin = coin
+            } label: {
+                Image(systemName: "bell.fill")
+            }
+            .tint(.blue)
         }
     }
     

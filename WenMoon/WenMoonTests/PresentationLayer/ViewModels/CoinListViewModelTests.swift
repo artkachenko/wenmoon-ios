@@ -13,6 +13,7 @@ class CoinListViewModelTests: XCTestCase {
     var viewModel: CoinListViewModel!
     var coinScannerService: CoinScannerServiceMock!
     var priceAlertService: PriceAlertServiceMock!
+    var firebaseAuthService: FirebaseAuthServiceMock!
     var userDefaultsManager: UserDefaultsManagerMock!
     var swiftDataManager: SwiftDataManagerMock!
     var deviceToken: String!
@@ -22,11 +23,13 @@ class CoinListViewModelTests: XCTestCase {
         super.setUp()
         coinScannerService = CoinScannerServiceMock()
         priceAlertService = PriceAlertServiceMock()
+        firebaseAuthService = FirebaseAuthServiceMock()
         userDefaultsManager = UserDefaultsManagerMock()
         swiftDataManager = SwiftDataManagerMock()
         viewModel = CoinListViewModel(
             coinScannerService: coinScannerService,
             priceAlertService: priceAlertService,
+            firebaseAuthService: firebaseAuthService,
             userDefaultsManager: userDefaultsManager,
             swiftDataManager: swiftDataManager
         )
@@ -304,8 +307,8 @@ class CoinListViewModelTests: XCTestCase {
         await viewModel.fetchPriceAlerts()
         
         // Assertions
-        let priceAlert = priceAlerts.first(where: { $0.coinId == coin.id })!
-        assertCoinHasAlert(viewModel.coins.first!, priceAlert.targetPrice)
+        let priceAlert = priceAlerts.first(where: { $0.id == coin.id })!
+        assertCoinHasAlert(viewModel.coins.first!, priceAlert)
         XCTAssertNil(viewModel.errorMessage)
         
         // Test after alerts are cleared
@@ -332,65 +335,21 @@ class CoinListViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
-    func testSetPriceAlert_success() async throws {
-        // Setup
-        userDefaultsManager.getObjectReturnValue = ["deviceToken": deviceToken!]
-        let coin = CoinFactoryMock.makeCoinData()
-        let targetPrice: Double = 70000
-        viewModel.coins.append(coin)
-        let priceAlert = PriceAlertFactoryMock.makePriceAlert()
-        priceAlertService.setPriceAlertResult = .success(priceAlert)
-        
-        // Action - Set the price alert
-        await viewModel.setPriceAlert(for: coin, targetPrice: targetPrice)
-        
-        // Assertions after setting the price alert
-        assertCoinHasAlert(viewModel.coins.first!, targetPrice)
-        XCTAssertNil(viewModel.errorMessage)
-        
-        // Action - Delete Price Alert
-        priceAlertService.deletePriceAlertResult = .success(priceAlert)
-        await viewModel.setPriceAlert(for: coin, targetPrice: nil)
-        
-        // Assertions after deleting the price alert
-        assertCoinHasNoAlert(viewModel.coins.first!)
-        XCTAssertNil(viewModel.errorMessage)
-    }
-    
-    func testSetPriceAlert_encodingError() async throws {
-        // Setup
-        userDefaultsManager.getObjectReturnValue = ["deviceToken": deviceToken!]
-        let coin = CoinFactoryMock.makeCoinData()
-        viewModel.coins.append(coin)
-        let error = ErrorFactoryMock.makeFailedToEncodeBodyError()
-        priceAlertService.setPriceAlertResult = .failure(error)
-        
-        // Action
-        await viewModel.setPriceAlert(for: coin, targetPrice: 70000)
-        
-        // Assertions
-        assertCoinHasNoAlert(coin)
-        XCTAssertNotNil(viewModel.errorMessage)
-        XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
-    }
-    
     func testToggleOffPriceAlert() async throws {
         // Setup
         let coin = CoinFactoryMock.makeCoinData()
-        let targetPrice: Double = 70000
-        coin.targetPrice = targetPrice
-        coin.isActive = true
+        let priceAlert = PriceAlertFactoryMock.makePriceAlert()
+        coin.priceAlerts.append(priceAlert)
         viewModel.coins.append(coin)
         
         // Assertions after setting the price alert
-        assertCoinHasAlert(coin, targetPrice)
+        assertCoinHasAlert(coin, priceAlert)
         
         // Action
         viewModel.toggleOffPriceAlert(for: coin.id)
         
         // Assertions after deleting the price alert
         assertCoinHasNoAlert(coin)
-        XCTAssert(swiftDataManager.saveMethodCalled)
     }
     
     // MARK: - Helpers

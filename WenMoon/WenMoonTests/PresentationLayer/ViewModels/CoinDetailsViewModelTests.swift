@@ -11,18 +11,22 @@ import XCTest
 class CoinDetailsViewModelTests: XCTestCase {
     // MARK: - Properties
     var viewModel: CoinDetailsViewModel!
-    var service: CoinScannerServiceMock!
+    var coinScannerService: CoinScannerServiceMock!
     
     // MARK: - Setup
     override func setUp() {
         super.setUp()
-        service = CoinScannerServiceMock()
-        viewModel = CoinDetailsViewModel(coin: CoinData(), chartData: [:], service: service)
+        coinScannerService = CoinScannerServiceMock()
+        viewModel = CoinDetailsViewModel(
+            coin: CoinData(),
+            chartData: [:],
+            coinScannerService: coinScannerService
+        )
     }
     
     override func tearDown() {
         viewModel = nil
-        service = nil
+        coinScannerService = nil
         super.tearDown()
     }
     
@@ -30,7 +34,7 @@ class CoinDetailsViewModelTests: XCTestCase {
     func testFetchChartData_success() async throws {
         // Setup
         let chartData = ChartDataFactoryMock.makeChartDataForTimeframes()
-        service.getChartDataResult = .success(chartData)
+        coinScannerService.getChartDataResult = .success(chartData)
         
         // Action
         await viewModel.fetchChartData()
@@ -55,7 +59,7 @@ class CoinDetailsViewModelTests: XCTestCase {
     func testFetchChartData_invalidParameterError() async throws {
         // Setup
         let error = ErrorFactoryMock.makeInvalidParameterError()
-        service.getChartDataResult = .failure(error)
+        coinScannerService.getChartDataResult = .failure(error)
         
         // Action
         await viewModel.fetchChartData()

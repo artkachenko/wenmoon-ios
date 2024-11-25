@@ -17,7 +17,9 @@ struct CoinDetailsView: View {
     @State private var selectedDate = ""
     @State private var selectedXPosition: CGFloat?
     @State private var selectedTimeframe: Timeframe = .oneHour
-    @State private var showErrorAlert = false
+    
+    @State private var showPriceAlertsView = false
+    @State private var showAuthAlert = false
     
     // MARK: - Initializers
     init(coin: CoinData, chartData: [String: [ChartData]]) {
@@ -27,121 +29,139 @@ struct CoinDetailsView: View {
     
     // MARK: - Body
     var body: some View {
-        VStack {
-            let coin = viewModel.coin
-            HStack(spacing: 12) {
-                if let imageData = coin.imageData,
-                   let uiImage = UIImage(data: imageData) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 36, height: 36)
-                        .cornerRadius(8)
-                } else {
+        let coin = viewModel.coin
+        BaseView(errorMessage: $viewModel.errorMessage) {
+            VStack(spacing: 16) {
+                HStack(spacing: 12) {
                     ZStack {
                         Circle()
-                            .fill(Color.gray)
+                            .fill(Color.white)
                             .frame(width: 36, height: 36)
                         
-                        Text(coin.name.prefix(1))
-                            .font(.title2)
-                            .foregroundColor(.white)
+                        if let data = coin.imageData,
+                           let uiImage = UIImage(data: data) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 18, height: 18)
+                                .clipShape(.circle)
+                        } else {
+                            Text(coin.name.prefix(1))
+                                .font(.callout)
+                                .foregroundColor(.wmBlack)
+                        }
                     }
                     .brightness(-0.1)
-                }
-                
-                VStack(alignment: .leading) {
-                    HStack {
-                        Text(coin.symbol.uppercased())
-                            .font(.headline)
-                            .bold()
+                    
+                    VStack(alignment: .leading) {
+                        HStack {
+                            Text(coin.symbol.uppercased())
+                                .font(.headline)
+                                .bold()
+                            
+                            Text("#\(coin.marketCapRank.formattedOrNone())")
+                                .font(.caption)
+                                .bold()
+                        }
                         
-                        Text("#\(coin.marketCapRank.formattedOrNone())")
-                            .font(.caption)
-                            .bold()
+                        HStack {
+                            Text(selectedPrice)
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                            
+                            Text(selectedDate)
+                                .font(.caption)
+                                .foregroundColor(.white)
+                        }
                     }
                     
-                    HStack {
-                        Text(selectedPrice)
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
+                    Spacer()
+                    
+                    HStack(spacing: 24) {
+                        Button(action: {
+                            guard viewModel.userID != nil else {
+                                showAuthAlert.toggle()
+                                return
+                            }
+                            showPriceAlertsView.toggle()
+                        }) {
+                            Image(systemName: "bell.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 16, height: 16)
+                                .foregroundColor(coin.priceAlerts.isEmpty ? .gray : .white)
+                        }
                         
-                        Text(selectedDate)
-                            .font(.caption)
-                            .foregroundColor(.white)
+                        Button(action: {
+                            dismiss()
+                        }) {
+                            Image(systemName: "xmark")
+                                .resizable()
+                                .frame(width: 12, height: 12)
+                                .foregroundColor(.white)
+                        }
                     }
                 }
                 
-                Spacer()
+                ZStack {
+                    if !viewModel.chartData.isEmpty {
+                        makeChartView(viewModel.chartData)
+                            .animation(.easeInOut(duration: 0.5), value: viewModel.chartData)
+                    }
+                    
+                    if viewModel.isLoading {
+                        ProgressView()
+                    }
+                }
+                .frame(height: 200)
                 
-                Button(action: {
-                    dismiss()
-                }) {
-                    Image(systemName: "xmark")
-                        .resizable()
-                        .frame(width: 12, height: 12)
-                        .foregroundColor(.white)
+                Picker("Select Timeframe", selection: $selectedTimeframe) {
+                    ForEach(Timeframe.allCases, id: \.self) { timeframe in
+                        Text(timeframe.rawValue.uppercased()).tag(timeframe)
+                    }
                 }
-            }
-            
-            Spacer()
-            
-            ZStack {
-                if !viewModel.chartData.isEmpty {
-                    makeChartView(viewModel.chartData)
-                        .animation(.easeInOut(duration: 0.5), value: viewModel.chartData)
-                }
+                .pickerStyle(.segmented)
+                .scaleEffect(0.85)
                 
-                if viewModel.isLoading {
-                    ProgressView()
+                HStack {
+                    VStack(alignment: .leading, spacing: 8) {
+                        makeDetailRow(label: "Market Cap", value: coin.marketCap.formattedWithAbbreviation(suffix: "$"))
+                        makeDetailRow(label: "24h Volume", value: coin.totalVolume.formattedWithAbbreviation(suffix: "$"))
+                        makeDetailRow(label: "Max Supply", value: coin.maxSupply.formattedWithAbbreviation(placeholder: "∞"))
+                        makeDetailRow(label: "All-Time High", value: coin.ath.formattedAsCurrency())
+                    }
+                    
+                    Spacer()
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        makeDetailRow(label: "Fully Diluted Market Cap", value: coin.fullyDilutedValuation.formattedWithAbbreviation(suffix: "$"))
+                        makeDetailRow(label: "Circulating Supply", value: coin.circulatingSupply.formattedWithAbbreviation())
+                        makeDetailRow(label: "Total Supply", value: coin.totalSupply.formattedWithAbbreviation())
+                        makeDetailRow(label: "All-Time Low", value: coin.atl.formattedAsCurrency())
+                    }
                 }
-            }
-            .frame(height: 100)
-            
-            Picker("Select Timeframe", selection: $selectedTimeframe) {
-                ForEach(Timeframe.allCases, id: \.self) { timeframe in
-                    Text(timeframe.rawValue.uppercased()).tag(timeframe)
-                }
-            }
-            .pickerStyle(.segmented)
-            .scaleEffect(0.85)
-            .padding(.vertical, 8)
-            
-            HStack {
-                VStack(alignment: .leading, spacing: 8) {
-                    makeDetailRow(label: "Market Cap", value: coin.marketCap.formattedWithAbbreviation(suffix: "$"))
-                    makeDetailRow(label: "24h Volume", value: coin.totalVolume.formattedWithAbbreviation(suffix: "$"))
-                    makeDetailRow(label: "Max Supply", value: coin.maxSupply.formattedWithAbbreviation(placeholder: "∞"))
-                    makeDetailRow(label: "All-Time High", value: coin.ath.formattedAsCurrency())
-                }
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(12)
                 
                 Spacer()
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    makeDetailRow(label: "Fully Diluted Market Cap", value: coin.fullyDilutedValuation.formattedWithAbbreviation(suffix: "$"))
-                    makeDetailRow(label: "Circulating Supply", value: coin.circulatingSupply.formattedWithAbbreviation())
-                    makeDetailRow(label: "Total Supply", value: coin.totalSupply.formattedWithAbbreviation())
-                    makeDetailRow(label: "All-Time Low", value: coin.atl.formattedAsCurrency())
-                }
             }
-            .padding()
-            .background(Color(.secondarySystemBackground))
-            .cornerRadius(12)
+            .padding(.horizontal, 24)
         }
-        .padding(.top, 12)
-        .padding(.horizontal, 24)
         .onChange(of: selectedTimeframe) { _, timeframe in
             Task {
                 await viewModel.fetchChartData(on: timeframe)
             }
         }
-        .onChange(of: viewModel.errorMessage) { _, errorMessage in
-            showErrorAlert = errorMessage != nil
+        .sheet(isPresented: $showPriceAlertsView) {
+            PriceAlertsView(coin: coin)
+                .presentationDetents([.medium, .large])
+                .presentationCornerRadius(36)
         }
-        .alert(isPresented: $showErrorAlert) {
+        .alert(isPresented: $showAuthAlert) {
             Alert(
-                title: Text("Error"),
-                message: Text(viewModel.errorMessage!),
+                title: Text("Need to Sign In, Buddy!"),
+                message: Text("You gotta slide over to the Account tab and log in to check out your price alerts"),
                 dismissButton: .default(Text("OK"))
             )
         }

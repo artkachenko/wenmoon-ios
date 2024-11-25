@@ -18,25 +18,24 @@ struct SelectionView: View {
     // MARK: - Body
     var body: some View {
         VStack {
-            HStack {
-                Spacer()
-                
+            ZStack {
                 Text(title)
                     .font(.headline)
-                    .bold()
                 
-                Spacer()
-                
-                Button(action: {
-                    dismiss()
-                }) {
-                    Image(systemName: "xmark")
-                        .resizable()
-                        .frame(width: 12, height: 12)
-                        .foregroundColor(.white)
+                HStack {
+                    Spacer()
+                    
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        Image(systemName: "xmark")
+                            .resizable()
+                            .frame(width: 12, height: 12)
+                            .foregroundColor(.white)
+                    }
                 }
+                .padding(24)
             }
-            .padding(24)
             
             Spacer()
             

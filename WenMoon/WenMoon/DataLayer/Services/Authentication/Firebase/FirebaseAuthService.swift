@@ -9,7 +9,7 @@ import FirebaseAuth
 
 protocol FirebaseAuthService {
     var clientID: String? { get }
-    var currentUser: User? { get }
+    var userID: String? { get }
     
     func signIn(with credential: AuthCredential, completion: @escaping (AuthDataResult?, Error?) -> Void)
     func signOut() throws
@@ -33,8 +33,9 @@ final class FirebaseAuthServiceImpl: FirebaseAuthService {
         auth.app?.options.clientID
     }
     
-    var currentUser: User? {
-        auth.currentUser
+    var userID: String? {
+        guard let currentUser = auth.currentUser else { return nil }
+        return currentUser.email ?? currentUser.phoneNumber ?? currentUser.uid
     }
     
     func signIn(with credential: AuthCredential, completion: @escaping (AuthDataResult?, Error?) -> Void) {

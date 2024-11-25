@@ -10,14 +10,14 @@ import Foundation
 
 struct PriceAlertFactoryMock {
     static func makePriceAlert(
-        coinId: String = "coin-1",
-        coinName: String = "Coin 1",
+        id: String = "coin-1",
+        symbol: String = "SYM-1",
         targetPrice: Double = .random(in: 0.01...100_000),
         targetDirection: PriceAlert.TargetDirection = Bool.random() ? .above : .below
     ) -> PriceAlert {
         .init(
-            coinId: coinId,
-            coinName: coinName,
+            id: id,
+            symbol: symbol,
             targetPrice: targetPrice,
             targetDirection: targetDirection
         )
@@ -26,8 +26,8 @@ struct PriceAlertFactoryMock {
     static func makePriceAlerts(count: Int = 10) -> [PriceAlert] {
         (1...count).map { index in
             makePriceAlert(
-                coinId: "coin-\(index)",
-                coinName: "Coin \(index)"
+                id: "coin-\(index)",
+                symbol: "SYM-\(index)"
             )
         }
     }

@@ -8,16 +8,16 @@
 import Foundation
 
 protocol PriceAlertService {
-    func getPriceAlerts(deviceToken: String) async throws -> [PriceAlert]
-    func setPriceAlert(_ targetPrice: Double, for coin: CoinData, deviceToken: String) async throws -> PriceAlert
-    func deletePriceAlert(for id: String, deviceToken: String) async throws -> PriceAlert
+    func getPriceAlerts(userID: String, deviceToken: String) async throws -> [PriceAlert]
+    func createPriceAlert(_ priceAlert: PriceAlert, userID: String, deviceToken: String) async throws -> PriceAlert
+    func deletePriceAlert(_ priceAlert: PriceAlert, userID: String, deviceToken: String) async throws -> PriceAlert
 }
 
 final class PriceAlertServiceImpl: BaseBackendService, PriceAlertService {
     // MARK: - PriceAlertService
-    func getPriceAlerts(deviceToken: String) async throws -> [PriceAlert] {
+    func getPriceAlerts(userID: String, deviceToken: String) async throws -> [PriceAlert] {
         do {
-            let data = try await httpClient.get(path: "price-alerts", headers: ["X-Device-ID": deviceToken])
+            let data = try await httpClient.get(path: "users/\(userID)/price-alerts", headers: ["X-Device-ID": deviceToken])
             let priceAlerts = try decoder.decode([PriceAlert].self, from: data)
             print("Price Alerts: \(priceAlerts)")
             return priceAlerts
@@ -26,29 +26,23 @@ final class PriceAlertServiceImpl: BaseBackendService, PriceAlertService {
         }
     }
     
-    func setPriceAlert(_ targetPrice: Double, for coin: CoinData, deviceToken: String) async throws -> PriceAlert {
-        let request = PriceAlert(
-            coinId: coin.id,
-            coinName: coin.name,
-            targetPrice: targetPrice,
-            targetDirection: (coin.currentPrice ?? .zero) < targetPrice ? .above : .below
-        )
+    func createPriceAlert(_ priceAlert: PriceAlert, userID: String, deviceToken: String) async throws -> PriceAlert {
         do {
-            let body = try encoder.encode(request)
-            let data = try await httpClient.post(path: "price-alert", headers: ["X-Device-ID": deviceToken], body: body)
+            let body = try encoder.encode(priceAlert)
+            let data = try await httpClient.post(path: "users/\(userID)/price-alert", headers: ["X-Device-ID": deviceToken], body: body)
             let priceAlert = try decoder.decode(PriceAlert.self, from: data)
-            print("Successfully set price alert for \(priceAlert.coinName) with target price \(priceAlert.targetPrice)")
+            print("Successfully created price alert for \(priceAlert.symbol.uppercased()) with target price \(priceAlert.targetPrice)")
             return priceAlert
         } catch {
             throw mapToAPIError(error)
         }
     }
     
-    func deletePriceAlert(for id: String, deviceToken: String) async throws -> PriceAlert {
+    func deletePriceAlert(_ priceAlert: PriceAlert, userID: String, deviceToken: String) async throws -> PriceAlert {
         do {
-            let data = try await httpClient.delete(path: "price-alert/\(id)", headers: ["X-Device-ID": deviceToken])
+            let data = try await httpClient.delete(path: "users/\(userID)/price-alert/\(priceAlert.id)", headers: ["X-Device-ID": deviceToken])
             let priceAlert = try decoder.decode(PriceAlert.self, from: data)
-            print("Successfully deleted price alert for \(priceAlert.coinName)")
+            print("Successfully deleted price alert for \(priceAlert.symbol.uppercased())")
             return priceAlert
         } catch {
             throw mapToAPIError(error)

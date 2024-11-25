@@ -11,11 +11,11 @@ import XCTest
 class PriceAlertServiceMock: PriceAlertService {
     // MARK: - Properties
     var getPriceAlertsResult: Result<[PriceAlert], APIError>!
-    var setPriceAlertResult: Result<PriceAlert, APIError>!
+    var createPriceAlertResult: Result<PriceAlert, APIError>!
     var deletePriceAlertResult: Result<PriceAlert, APIError>!
     
     // MARK: - PriceAlertService
-    func getPriceAlerts(deviceToken: String) async throws -> [PriceAlert] {
+    func getPriceAlerts(userID: String, deviceToken: String) async throws -> [PriceAlert] {
         switch getPriceAlertsResult {
         case .success(let priceAlerts):
             return priceAlerts
@@ -27,19 +27,19 @@ class PriceAlertServiceMock: PriceAlertService {
         }
     }
     
-    func setPriceAlert(_ targetPrice: Double, for coin: CoinData, deviceToken: String) async throws -> PriceAlert {
-        switch setPriceAlertResult {
+    func createPriceAlert(_ priceAlert: PriceAlert, userID: String, deviceToken: String) async throws -> PriceAlert {
+        switch createPriceAlertResult {
         case .success(let priceAlert):
             return priceAlert
         case .failure(let error):
             throw error
         case .none:
-            XCTFail("setPriceAlertResult not set")
+            XCTFail("createPriceAlertResult not set")
             throw APIError.unknown(response: URLResponse())
         }
     }
     
-    func deletePriceAlert(for id: String, deviceToken: String) async throws -> PriceAlert {
+    func deletePriceAlert(_ priceAlert: PriceAlert, userID: String, deviceToken: String) async throws -> PriceAlert {
         switch deletePriceAlertResult {
         case .success(let priceAlert):
             return priceAlert

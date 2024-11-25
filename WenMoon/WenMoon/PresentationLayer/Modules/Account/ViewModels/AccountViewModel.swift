@@ -10,36 +10,31 @@ import UIKit.UIApplication
 
 final class AccountViewModel: BaseViewModel {
     // MARK: - Properties
-    @Published private(set) var isSignedIn: Bool = false
-    @Published private(set) var userName: String? = nil
     @Published private(set) var settings: [Setting] = []
-    @Published private(set) var isGoogleAuthInProgress: Bool = false
-    @Published private(set) var isTwitterAuthInProgress: Bool = false
+    @Published private(set) var userName: String? = nil
     
-    private let firebaseAuthService: FirebaseAuthService
+    @Published private(set) var isSignedIn = false
+    @Published private(set) var isGoogleAuthInProgress = false
+    @Published private(set) var isTwitterAuthInProgress = false
+    
     private let googleSignInService: GoogleSignInService
     private let twitterSignInService: TwitterSignInService
     
     // MARK: - Initializers
     convenience init() {
         self.init(
-            userDefaultsManager: UserDefaultsManagerImpl(),
-            firebaseAuthService: FirebaseAuthServiceImpl(),
             googleSignInService: GoogleSignInServiceImpl(),
             twitterSignInService: TwitterSignInServiceImpl()
         )
     }
     
     init(
-        userDefaultsManager: UserDefaultsManager,
-        firebaseAuthService: FirebaseAuthService,
         googleSignInService: GoogleSignInService,
         twitterSignInService: TwitterSignInService
     ) {
-        self.firebaseAuthService = firebaseAuthService
         self.googleSignInService = googleSignInService
         self.twitterSignInService = twitterSignInService
-        super.init(userDefaultsManager: userDefaultsManager)
+        super.init()
     }
     
     // MARK: - Authentication
@@ -116,9 +111,9 @@ final class AccountViewModel: BaseViewModel {
     }
     
     func fetchAuthState() {
-        if let user = firebaseAuthService.currentUser {
+        if let userID = firebaseAuthService.userID {
             isSignedIn = true
-            userName = user.displayName ?? user.email
+            userName = userID
         } else {
             isSignedIn = false
         }
@@ -151,7 +146,7 @@ final class AccountViewModel: BaseViewModel {
     // MARK: - Private Methods
     private func getSavedSetting(of type: Setting.SettingType) -> String? {
         do {
-            return try userDefaultsManager?.getObject(forKey: type.rawValue, objectType: String.self)
+            return try userDefaultsManager.getObject(forKey: type.rawValue, objectType: String.self)
         } catch {
             setErrorMessage(error)
             return nil
@@ -160,7 +155,7 @@ final class AccountViewModel: BaseViewModel {
     
     private func setSetting(_ setting: String, of type: Setting.SettingType) {
         do {
-            try userDefaultsManager?.setObject(setting, forKey: type.rawValue)
+            try userDefaultsManager.setObject(setting, forKey: type.rawValue)
         } catch {
             setErrorMessage(error)
         }
@@ -176,19 +171,27 @@ struct Setting: Identifiable, Hashable {
         
         var title: String {
             switch self {
-            case .language: return "Language"
-            case .currency: return "Currency"
-            case .privacyPolicy: return "Privacy Policy"
-            case .signOut: return "Sign Out"
+            case .language:
+                return "Language"
+            case .currency:
+                return "Currency"
+            case .privacyPolicy:
+                return "Privacy Policy"
+            case .signOut:
+                return "Sign Out"
             }
         }
         
         var icon: String {
             switch self {
-            case .language: return "globe"
-            case .currency: return "dollarsign.circle"
-            case .privacyPolicy: return "doc.text"
-            case .signOut: return "rectangle.portrait.and.arrow.right"
+            case .language:
+                return "globe"
+            case .currency:
+                return "dollarsign.circle"
+            case .privacyPolicy:
+                return "doc.text"
+            case .signOut:
+                return "rectangle.portrait.and.arrow.right"
             }
         }
         
