@@ -44,7 +44,7 @@ struct AccountView: View {
             .presentationDetents([.fraction(0.45)])
             .presentationCornerRadius(36)
         }
-        .onChange(of: viewModel.isSignedIn) {
+        .onChange(of: viewModel.loginState) {
             viewModel.fetchSettings()
         }
         .onAppear {
@@ -56,14 +56,16 @@ struct AccountView: View {
     // MARK: - Private Methods
     @ViewBuilder
     private func makeAuthView() -> some View {
-        if viewModel.isSignedIn {
+        if case .signedIn = viewModel.loginState {
             VStack(spacing: 16) {
                 Image(systemName: "person.crop.circle")
                     .resizable()
                     .frame(width: 60, height: 60)
                 
-                Text(viewModel.userName ?? "User")
-                    .font(.headline)
+                if case .signedIn(let userID) = viewModel.loginState {
+                    Text(userID ?? "User")
+                        .font(.headline)
+                }
             }
             .padding(.top, 48)
             .padding(.bottom, 24)
@@ -163,7 +165,7 @@ struct AccountView: View {
     private func setupSettingsBinding(_ setting: Setting) -> Binding<String> {
         Binding(
             get: {
-                viewModel.setting(of: setting.type)?.selectedOption ?? ""
+                viewModel.getSetting(of: setting.type)?.selectedOption ?? ""
             },
             set: { newValue in
                 viewModel.updateSetting(of: setting.type, with: newValue)

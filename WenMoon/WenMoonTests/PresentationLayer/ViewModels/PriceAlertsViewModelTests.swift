@@ -28,7 +28,7 @@ class PriceAlertsViewModelTests: XCTestCase {
             firebaseAuthService: firebaseAuthService,
             userDefaultsManager: userDefaultsManager
         )
-        deviceToken = "someDeviceToken"
+        deviceToken = "expectedDeviceToken"
     }
     
     override func tearDown() {

@@ -20,8 +20,8 @@ class PriceAlertServiceTests: XCTestCase {
         super.setUp()
         httpClient = HTTPClientMock()
         service = PriceAlertServiceImpl(httpClient: httpClient)
-        userID = "someUserID"
-        deviceToken = "someDeviceToken"
+        userID = "expectedUserID"
+        deviceToken = "expectedDeviceToken"
     }
     
     override func tearDown() {

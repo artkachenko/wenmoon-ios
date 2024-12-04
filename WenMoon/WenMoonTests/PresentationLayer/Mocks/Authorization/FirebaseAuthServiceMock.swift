@@ -11,8 +11,8 @@ import FirebaseAuth
 
 class FirebaseAuthServiceMock: FirebaseAuthService {
     // MARK: - Properties
-    var clientID: String? { "someClientID" }
-    var userID: String? { "example.email@gmail.com" }
+    var clientID: String? { "expectedClientID" }
+    var userID: String? { "expectedUserID" }
     
     var signInResult: Result<AuthDataResult, Error>!
     var signOutResult: Result<Void, Error>!

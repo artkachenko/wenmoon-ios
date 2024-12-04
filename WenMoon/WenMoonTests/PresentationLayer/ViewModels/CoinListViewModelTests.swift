@@ -33,7 +33,7 @@ class CoinListViewModelTests: XCTestCase {
             userDefaultsManager: userDefaultsManager,
             swiftDataManager: swiftDataManager
         )
-        deviceToken = "someDeviceToken"
+        deviceToken = "expectedDeviceToken"
     }
     
     override func tearDown() {

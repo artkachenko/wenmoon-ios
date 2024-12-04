@@ -7,13 +7,19 @@
 
 import Foundation
 import UIKit.UIApplication
+import FirebaseAuth
 
 final class AccountViewModel: BaseViewModel {
-    // MARK: - Properties
-    @Published private(set) var settings: [Setting] = []
-    @Published private(set) var userName: String? = nil
+    // MARK: - Nested Types
+    enum LoginState: Equatable {
+        case signedIn(_ userID: String? = nil)
+        case signedOut
+    }
     
-    @Published private(set) var isSignedIn = false
+    // MARK: - Properties
+    @Published var settings: [Setting] = []
+    @Published var loginState: LoginState = .signedOut
+    
     @Published private(set) var isGoogleAuthInProgress = false
     @Published private(set) var isTwitterAuthInProgress = false
     
@@ -24,21 +30,28 @@ final class AccountViewModel: BaseViewModel {
     convenience init() {
         self.init(
             googleSignInService: GoogleSignInServiceImpl(),
-            twitterSignInService: TwitterSignInServiceImpl()
+            twitterSignInService: TwitterSignInServiceImpl(),
+            firebaseAuthService: FirebaseAuthServiceImpl(),
+            userDefaultsManager: UserDefaultsManagerImpl()
         )
     }
     
     init(
         googleSignInService: GoogleSignInService,
-        twitterSignInService: TwitterSignInService
+        twitterSignInService: TwitterSignInService,
+        firebaseAuthService: FirebaseAuthService,
+        userDefaultsManager: UserDefaultsManager
     ) {
         self.googleSignInService = googleSignInService
         self.twitterSignInService = twitterSignInService
-        super.init()
+        super.init(firebaseAuthService: firebaseAuthService, userDefaultsManager: userDefaultsManager)
     }
     
     // MARK: - Authentication
     func signInWithGoogle() {
+        isGoogleAuthInProgress = true
+        defer { isGoogleAuthInProgress = false }
+        
         guard
             let clientID = firebaseAuthService.clientID,
             let rootViewController = UIApplication.rootViewController
@@ -47,9 +60,6 @@ final class AccountViewModel: BaseViewModel {
         }
         
         googleSignInService.configure(clientID: clientID)
-        
-        isGoogleAuthInProgress = true
-        
         googleSignInService.signIn(withPresenting: rootViewController) { [weak self] result, error in
             guard
                 let self,
@@ -62,21 +72,13 @@ final class AccountViewModel: BaseViewModel {
             }
             
             let credential = googleSignInService.credential(withIDToken: idToken, accessToken: user.accessToken.tokenString)
-            
-            firebaseAuthService.signIn(with: credential) { authResult, error in
-                if let error {
-                    self.setErrorMessage(error)
-                } else {
-                    self.isSignedIn = true
-                    self.userName = user.profile?.name
-                }
-                self.isGoogleAuthInProgress = false
-            }
+            signIn(with: credential)
         }
     }
     
     func signInWithTwitter() {
         isTwitterAuthInProgress = true
+        defer { isTwitterAuthInProgress = false }
         
         twitterSignInService.signIn { [weak self] credential, error in
             guard
@@ -88,23 +90,14 @@ final class AccountViewModel: BaseViewModel {
                 return
             }
             
-            firebaseAuthService.signIn(with: credential) { authResult, error in
-                if let error {
-                    self.setErrorMessage(error)
-                } else {
-                    self.isSignedIn = true
-                    self.userName = authResult?.user.displayName
-                }
-                self.isTwitterAuthInProgress = false
-            }
+            signIn(with: credential)
         }
     }
     
     func signOut() {
         do {
             try firebaseAuthService.signOut()
-            isSignedIn = false
-            userName = nil
+            loginState = .signedOut
         } catch {
             setErrorMessage(error)
         }
@@ -112,10 +105,9 @@ final class AccountViewModel: BaseViewModel {
     
     func fetchAuthState() {
         if let userID = firebaseAuthService.userID {
-            isSignedIn = true
-            userName = userID
+            loginState = .signedIn(userID)
         } else {
-            isSignedIn = false
+            loginState = .signedOut
         }
     }
     
@@ -127,13 +119,9 @@ final class AccountViewModel: BaseViewModel {
             Setting(type: .privacyPolicy)
         ]
         
-        if isSignedIn {
+        if case .signedIn = loginState {
             settings.append(Setting(type: .signOut))
         }
-    }
-    
-    func setting(of type: Setting.SettingType) -> Setting? {
-        settings.first(where: { $0.type == type })
     }
     
     func updateSetting(of type: Setting.SettingType, with value: String) {
@@ -143,7 +131,21 @@ final class AccountViewModel: BaseViewModel {
         }
     }
     
+    func getSetting(of type: Setting.SettingType) -> Setting? {
+        settings.first(where: { $0.type == type })
+    }
+    
     // MARK: - Private Methods
+    private func signIn(with credential: AuthCredential) {
+        firebaseAuthService.signIn(with: credential) { [weak self] authResult, error in
+            if let error {
+                self?.setErrorMessage(error)
+            } else {
+                self?.loginState = .signedIn(authResult?.user.displayName)
+            }
+        }
+    }
+    
     private func getSavedSetting(of type: Setting.SettingType) -> String? {
         do {
             return try userDefaultsManager.getObject(forKey: type.rawValue, objectType: String.self)

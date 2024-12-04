@@ -42,6 +42,9 @@
 		D2D795742CFA292600950125 /* UnderlinedTextFieldStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D795732CFA292600950125 /* UnderlinedTextFieldStyle.swift */; };
 		D2D795772CFDC6AE00950125 /* FirebaseAuthServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D795762CFDC6AE00950125 /* FirebaseAuthServiceMock.swift */; };
 		D2D795792CFDD0D500950125 /* PriceAlertsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D795782CFDD0D500950125 /* PriceAlertsViewModelTests.swift */; };
+		D2D7957B2CFDF8C100950125 /* AccountViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D7957A2CFDF8C100950125 /* AccountViewModelTests.swift */; };
+		D2D7957D2CFDF91100950125 /* GoogleSignInServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D7957C2CFDF91100950125 /* GoogleSignInServiceMock.swift */; };
+		D2D7957F2CFDF91B00950125 /* TwitterSignInServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D7957E2CFDF91B00950125 /* TwitterSignInServiceMock.swift */; };
 		D2EFF9032CDA2EDE004AA5A5 /* ChartShape.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2EFF9022CDA2EDE004AA5A5 /* ChartShape.swift */; };
 		D2EFF9052CDA2F32004AA5A5 /* Comparable+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2EFF9042CDA2F32004AA5A5 /* Comparable+Extensions.swift */; };
 		D2EFF9072CDCF6EF004AA5A5 /* Optional+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2EFF9062CDCF6EE004AA5A5 /* Optional+Extensions.swift */; };
@@ -131,6 +134,9 @@
 		D2D795732CFA292600950125 /* UnderlinedTextFieldStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnderlinedTextFieldStyle.swift; sourceTree = "<group>"; };
 		D2D795762CFDC6AE00950125 /* FirebaseAuthServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseAuthServiceMock.swift; sourceTree = "<group>"; };
 		D2D795782CFDD0D500950125 /* PriceAlertsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertsViewModelTests.swift; sourceTree = "<group>"; };
+		D2D7957A2CFDF8C100950125 /* AccountViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewModelTests.swift; sourceTree = "<group>"; };
+		D2D7957C2CFDF91100950125 /* GoogleSignInServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInServiceMock.swift; sourceTree = "<group>"; };
+		D2D7957E2CFDF91B00950125 /* TwitterSignInServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwitterSignInServiceMock.swift; sourceTree = "<group>"; };
 		D2EFF9022CDA2EDE004AA5A5 /* ChartShape.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartShape.swift; sourceTree = "<group>"; };
 		D2EFF9042CDA2F32004AA5A5 /* Comparable+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Comparable+Extensions.swift"; sourceTree = "<group>"; };
 		D2EFF9062CDCF6EE004AA5A5 /* Optional+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Optional+Extensions.swift"; sourceTree = "<group>"; };
@@ -250,9 +256,10 @@
 		D220D74E2CED050E004C8EAB /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				D220D71E2CEC8BD4004C8EAB /* ContentView.swift */,
 				FA61B3EF2A41B714008A9FB9 /* Base */,
 				D2D795722CFA291D00950125 /* Styles */,
-				D220D71E2CEC8BD4004C8EAB /* ContentView.swift */,
+				D2EFF9012CDA2ED3004AA5A5 /* Views */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -273,14 +280,14 @@
 			path = ViewModels;
 			sourceTree = "<group>";
 		};
-		D220D7562CF4DC06004C8EAB /* Authentication */ = {
+		D220D7562CF4DC06004C8EAB /* Authorization */ = {
 			isa = PBXGroup;
 			children = (
 				D220D7572CF4DC0E004C8EAB /* Firebase */,
 				D220D7582CF4DC14004C8EAB /* Google */,
 				D220D7592CF4DC19004C8EAB /* Twitter */,
 			);
-			path = Authentication;
+			path = Authorization;
 			sourceTree = "<group>";
 		};
 		D220D7572CF4DC0E004C8EAB /* Firebase */ = {
@@ -413,6 +420,8 @@
 		D2D795752CFDC69100950125 /* Authorization */ = {
 			isa = PBXGroup;
 			children = (
+				D2D7957C2CFDF91100950125 /* GoogleSignInServiceMock.swift */,
+				D2D7957E2CFDF91B00950125 /* TwitterSignInServiceMock.swift */,
 				D2D795762CFDC6AE00950125 /* FirebaseAuthServiceMock.swift */,
 			);
 			path = Authorization;
@@ -630,7 +639,6 @@
 			isa = PBXGroup;
 			children = (
 				FAB3622C29F4487200A88050 /* Modules */,
-				D2EFF9012CDA2ED3004AA5A5 /* Views */,
 			);
 			path = PresentationLayer;
 			sourceTree = "<group>";
@@ -695,7 +703,7 @@
 		FAB3624129F453A400A88050 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				D220D7562CF4DC06004C8EAB /* Authentication */,
+				D220D7562CF4DC06004C8EAB /* Authorization */,
 				FA8A08952A1D15480083B8DB /* CoinScannerService */,
 				FA8A08932A1D15260083B8DB /* PriceAlertService */,
 			);
@@ -788,6 +796,7 @@
 				FAB3626129F4598F00A88050 /* AddCoinViewModelTests.swift */,
 				D2EFF91E2CE24301004AA5A5 /* CoinDetailsViewModelTests.swift */,
 				D2D795782CFDD0D500950125 /* PriceAlertsViewModelTests.swift */,
+				D2D7957A2CFDF8C100950125 /* AccountViewModelTests.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -969,6 +978,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D2D7957D2CFDF91100950125 /* GoogleSignInServiceMock.swift in Sources */,
 				D2F6DD6C2CC682C3009EF857 /* PriceAlertServiceMock.swift in Sources */,
 				FA8F60CA2A4DA40A0050C983 /* MarketDataFactoryMock.swift in Sources */,
 				D21A57BE2CCA65AB00AC2D13 /* MarketData+Assertions.swift in Sources */,
@@ -982,12 +992,14 @@
 				D2F6DD682CC6514E009EF857 /* PriceAlertFactoryMock.swift in Sources */,
 				FAB3626229F4598F00A88050 /* AddCoinViewModelTests.swift in Sources */,
 				D2EFF91B2CE23A8F004AA5A5 /* ChartDataFactoryMock.swift in Sources */,
+				D2D7957B2CFDF8C100950125 /* AccountViewModelTests.swift in Sources */,
 				D2EFF91F2CE24301004AA5A5 /* CoinDetailsViewModelTests.swift in Sources */,
 				FAB3625029F4547100A88050 /* HTTPClientMock.swift in Sources */,
 				D2D795792CFDD0D500950125 /* PriceAlertsViewModelTests.swift in Sources */,
 				D2F6DD642CC650D4009EF857 /* PriceAlertServiceTests.swift in Sources */,
 				D2D0F9EC2CC2DF3F00712717 /* CoinFactoryMock.swift in Sources */,
 				FAA83CC82A3B6E37001DEE1E /* UserDefaultsManagerMock.swift in Sources */,
+				D2D7957F2CFDF91B00950125 /* TwitterSignInServiceMock.swift in Sources */,
 				D21A57C12CCAA8BC00AC2D13 /* ErrorFactoryMock.swift in Sources */,
 				D2D0F9EE2CC2E0C300712717 /* Coin+Assertions.swift in Sources */,
 				FACB39AE29FABBC800AA613E /* SwiftDataManagerMock.swift in Sources */,
