@@ -13,7 +13,7 @@ struct SelectionView: View {
     @Binding var selectedOption: String
     
     let title: String
-    let options: [(name: String, isEnabled: Bool)]
+    let options: [Setting.SettingType.Option]
     
     // MARK: - Body
     var body: some View {

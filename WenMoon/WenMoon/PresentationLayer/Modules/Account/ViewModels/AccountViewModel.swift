@@ -148,7 +148,7 @@ final class AccountViewModel: BaseViewModel {
     
     private func getSavedSetting(of type: Setting.SettingType) -> String? {
         do {
-            return try userDefaultsManager.getObject(forKey: type.rawValue, objectType: String.self)
+            return try userDefaultsManager.getObject(forKey: type.rawValue, objectType: String.self) ?? type.defaultOption?.name
         } catch {
             setErrorMessage(error)
             return nil
@@ -166,6 +166,25 @@ final class AccountViewModel: BaseViewModel {
 
 struct Setting: Identifiable, Hashable {
     enum SettingType: String, CaseIterable {
+        struct Option {
+            let name: String
+            let isEnabled: Bool
+        }
+        
+        enum Language: String, CaseIterable {
+            case english = "English"
+            case spanish = "Spanish"
+            case german = "German"
+            case french = "French"
+        }
+
+        enum Currency: String, CaseIterable {
+            case usd = "USD"
+            case eur = "EUR"
+            case gbp = "GBP"
+            case jpy = "JPY"
+        }
+        
         case language
         case currency
         case privacyPolicy
@@ -197,24 +216,25 @@ struct Setting: Identifiable, Hashable {
             }
         }
         
-        var options: [(name: String, isEnabled: Bool)] {
+        var options: [Option] {
             switch self {
             case .language:
-                return [
-                    ("English", true),
-                    ("Spanish", false),
-                    ("German", false),
-                    ("French", false)
-                ]
+                return Language.allCases.map { Option(name: $0.rawValue, isEnabled: $0 == .english) }
             case .currency:
-                return [
-                    ("USD", true),
-                    ("EUR", false),
-                    ("GBP", false),
-                    ("JPY", false)
-                ]
-            case .privacyPolicy, .signOut:
+                return Currency.allCases.map { Option(name: $0.rawValue, isEnabled: $0 == .usd) }
+            default:
                 return []
+            }
+        }
+        
+        var defaultOption: Option? {
+            switch self {
+            case .language:
+                return Option(name: Language.english.rawValue, isEnabled: true)
+            case .currency:
+                return Option(name: Currency.usd.rawValue, isEnabled: true)
+            default:
+                return nil
             }
         }
     }
