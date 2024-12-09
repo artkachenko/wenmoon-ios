@@ -1,5 +1,5 @@
 //
-//  AddCoinViewModelTests.swift
+//  CoinSelectionViewModelTests.swift
 //  WenMoonTests
 //
 //  Created by Artur Tkachenko on 22.04.23.
@@ -8,9 +8,9 @@
 import XCTest
 @testable import WenMoon
 
-class AddCoinViewModelTests: XCTestCase {
+class CoinSelectionViewModelTests: XCTestCase {
     // MARK: - Properties
-    var viewModel: AddCoinViewModel!
+    var viewModel: CoinSelectionViewModel!
     var service: CoinScannerServiceMock!
     var swiftDataManager: SwiftDataManagerMock!
     
@@ -19,7 +19,7 @@ class AddCoinViewModelTests: XCTestCase {
         super.setUp()
         service = CoinScannerServiceMock()
         swiftDataManager = SwiftDataManagerMock()
-        viewModel = AddCoinViewModel(coinScannerService: service, swiftDataManager: swiftDataManager)
+        viewModel = CoinSelectionViewModel(coinScannerService: service, swiftDataManager: swiftDataManager)
     }
     
     override func tearDown() {

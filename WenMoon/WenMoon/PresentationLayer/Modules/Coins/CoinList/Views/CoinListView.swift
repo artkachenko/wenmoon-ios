@@ -16,7 +16,7 @@ struct CoinListView: View {
     @State private var isEditMode: EditMode = .inactive
     @State private var chartDrawProgress: CGFloat = .zero
     
-    @State private var showAddCoinView = false
+    @State private var showCoinSelectionView = false
     @State private var showAuthAlert = false
     
     // MARK: - Body
@@ -30,7 +30,7 @@ struct CoinListView: View {
                     .onMove(perform: moveCoin)
                     
                     Button(action: {
-                        showAddCoinView.toggle()
+                        showCoinSelectionView.toggle()
                     }) {
                         HStack {
                             Image(systemName: "slider.horizontal.3")
@@ -53,8 +53,8 @@ struct CoinListView: View {
                 .navigationTitle("Coins")
             }
         }
-        .fullScreenCover(isPresented: $showAddCoinView) {
-            AddCoinView(didToggleCoin: handleCoinSelection)
+        .fullScreenCover(isPresented: $showCoinSelectionView) {
+            CoinSelectionView(didToggleCoin: handleCoinSelection)
         }
         .fullScreenCover(item: $selectedCoin, onDismiss: {
             selectedCoin = nil

@@ -1,5 +1,5 @@
 //
-//  AddCoinViewModel.swift
+//  CoinSelectionViewModel.swift
 //  WenMoon
 //
 //  Created by Artur Tkachenko on 22.04.23.
@@ -9,7 +9,7 @@ import Foundation
 import Combine
 import SwiftData
 
-final class AddCoinViewModel: BaseViewModel {
+final class CoinSelectionViewModel: BaseViewModel {
     // MARK: - Properties
     @Published private(set) var coins: [Coin] = []
     

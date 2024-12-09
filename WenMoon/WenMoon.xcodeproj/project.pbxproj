@@ -87,10 +87,10 @@
 		FAB3624A29F453FC00A88050 /* CoinScannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3624929F453FC00A88050 /* CoinScannerService.swift */; };
 		FAB3625029F4547100A88050 /* HTTPClientMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3624F29F4547100A88050 /* HTTPClientMock.swift */; };
 		FAB3625329F4549800A88050 /* CoinScannerServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3625229F4549800A88050 /* CoinScannerServiceTests.swift */; };
-		FAB3625729F457DC00A88050 /* AddCoinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3625629F457DC00A88050 /* AddCoinView.swift */; };
-		FAB3625A29F4580C00A88050 /* AddCoinViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3625929F4580C00A88050 /* AddCoinViewModel.swift */; };
+		FAB3625729F457DC00A88050 /* CoinSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3625629F457DC00A88050 /* CoinSelectionView.swift */; };
+		FAB3625A29F4580C00A88050 /* CoinSelectionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3625929F4580C00A88050 /* CoinSelectionViewModel.swift */; };
 		FAB3625F29F4595D00A88050 /* CoinScannerServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3625E29F4595D00A88050 /* CoinScannerServiceMock.swift */; };
-		FAB3626229F4598F00A88050 /* AddCoinViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3626129F4598F00A88050 /* AddCoinViewModelTests.swift */; };
+		FAB3626229F4598F00A88050 /* CoinSelectionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3626129F4598F00A88050 /* CoinSelectionViewModelTests.swift */; };
 		FAB3626A29F4651F00A88050 /* CoinListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3626929F4651F00A88050 /* CoinListViewModel.swift */; };
 		FAB3627529F469E700A88050 /* CoinListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAB3627429F469E700A88050 /* CoinListViewModelTests.swift */; };
 		FACB39AE29FABBC800AA613E /* SwiftDataManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = FACB39AD29FABBC800AA613E /* SwiftDataManagerMock.swift */; };
@@ -188,10 +188,10 @@
 		FAB3624929F453FC00A88050 /* CoinScannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinScannerService.swift; sourceTree = "<group>"; };
 		FAB3624F29F4547100A88050 /* HTTPClientMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPClientMock.swift; sourceTree = "<group>"; };
 		FAB3625229F4549800A88050 /* CoinScannerServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinScannerServiceTests.swift; sourceTree = "<group>"; };
-		FAB3625629F457DC00A88050 /* AddCoinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCoinView.swift; sourceTree = "<group>"; };
-		FAB3625929F4580C00A88050 /* AddCoinViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCoinViewModel.swift; sourceTree = "<group>"; };
+		FAB3625629F457DC00A88050 /* CoinSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinSelectionView.swift; sourceTree = "<group>"; };
+		FAB3625929F4580C00A88050 /* CoinSelectionViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinSelectionViewModel.swift; sourceTree = "<group>"; };
 		FAB3625E29F4595D00A88050 /* CoinScannerServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinScannerServiceMock.swift; sourceTree = "<group>"; };
-		FAB3626129F4598F00A88050 /* AddCoinViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCoinViewModelTests.swift; sourceTree = "<group>"; };
+		FAB3626129F4598F00A88050 /* CoinSelectionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinSelectionViewModelTests.swift; sourceTree = "<group>"; };
 		FAB3626929F4651F00A88050 /* CoinListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinListViewModel.swift; sourceTree = "<group>"; };
 		FAB3627429F469E700A88050 /* CoinListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinListViewModelTests.swift; sourceTree = "<group>"; };
 		FACB39AD29FABBC800AA613E /* SwiftDataManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataManagerMock.swift; sourceTree = "<group>"; };
@@ -855,7 +855,7 @@
 		FAB3625529F457CD00A88050 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				FAB3625629F457DC00A88050 /* AddCoinView.swift */,
+				FAB3625629F457DC00A88050 /* CoinSelectionView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -863,7 +863,7 @@
 		FAB3625829F457F300A88050 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
-				FAB3625929F4580C00A88050 /* AddCoinViewModel.swift */,
+				FAB3625929F4580C00A88050 /* CoinSelectionViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -891,7 +891,7 @@
 			isa = PBXGroup;
 			children = (
 				FAB3627429F469E700A88050 /* CoinListViewModelTests.swift */,
-				FAB3626129F4598F00A88050 /* AddCoinViewModelTests.swift */,
+				FAB3626129F4598F00A88050 /* CoinSelectionViewModelTests.swift */,
 				D2EFF91E2CE24301004AA5A5 /* CoinDetailsViewModelTests.swift */,
 				D2D795782CFDD0D500950125 /* PriceAlertsViewModelTests.swift */,
 				D2D7957A2CFDF8C100950125 /* AccountViewModelTests.swift */,
@@ -1056,7 +1056,7 @@
 				D2D795742CFA292600950125 /* UnderlinedTextFieldStyle.swift in Sources */,
 				D2EFF90C2CDD111C004AA5A5 /* CoinDetailsViewModel.swift in Sources */,
 				D2EFF9162CDE4C88004AA5A5 /* Date+Extensions.swift in Sources */,
-				FAB3625729F457DC00A88050 /* AddCoinView.swift in Sources */,
+				FAB3625729F457DC00A88050 /* CoinSelectionView.swift in Sources */,
 				D2D7958C2D02071E00950125 /* PortfolioView.swift in Sources */,
 				D2ADB8F52CE5FCF2004DA208 /* Currency.swift in Sources */,
 				FAB3624A29F453FC00A88050 /* CoinScannerService.swift in Sources */,
@@ -1067,7 +1067,7 @@
 				D2A52FDD2CEBC415003C1275 /* AppConfig.swift in Sources */,
 				D220D7352CEC99D2004C8EAB /* AccountView.swift in Sources */,
 				D2D795872D01F46800950125 /* CryptoCompareViewModel.swift in Sources */,
-				FAB3625A29F4580C00A88050 /* AddCoinViewModel.swift in Sources */,
+				FAB3625A29F4580C00A88050 /* CoinSelectionViewModel.swift in Sources */,
 				FAB3626A29F4651F00A88050 /* CoinListViewModel.swift in Sources */,
 				D220D75D2CF4DC65004C8EAB /* GoogleSignInService.swift in Sources */,
 				D2ADB8F22CE5FCD0004DA208 /* ChartTimeframe.swift in Sources */,
@@ -1094,7 +1094,7 @@
 				D21A57C32CCAAB9400AC2D13 /* Error+Assertions.swift in Sources */,
 				D2D795772CFDC6AE00950125 /* FirebaseAuthServiceMock.swift in Sources */,
 				D2F6DD682CC6514E009EF857 /* PriceAlertFactoryMock.swift in Sources */,
-				FAB3626229F4598F00A88050 /* AddCoinViewModelTests.swift in Sources */,
+				FAB3626229F4598F00A88050 /* CoinSelectionViewModelTests.swift in Sources */,
 				D2EFF91B2CE23A8F004AA5A5 /* ChartDataFactoryMock.swift in Sources */,
 				D2D7957B2CFDF8C100950125 /* AccountViewModelTests.swift in Sources */,
 				D2EFF91F2CE24301004AA5A5 /* CoinDetailsViewModelTests.swift in Sources */,

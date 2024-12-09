@@ -60,3 +60,9 @@ extension Double {
         return formattedValue
     }
 }
+
+extension Double {
+    func formattedAsMultiplier() -> String {
+        "(\(String(format: "%.2f", self))x)"
+    }
+}
