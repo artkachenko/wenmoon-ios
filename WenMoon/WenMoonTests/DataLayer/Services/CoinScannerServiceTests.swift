@@ -173,4 +173,69 @@ class CoinScannerServiceTests: XCTestCase {
             expectedError: error
         )
     }
+    
+    // Get Global Crypto Market Data
+    func testGetGlobalCryptoMarketData_success() async throws {
+        // Setup
+        let response = GlobalCryptoMarketData(
+            marketCapPercentage: ["btc": 56.5, "eth": 12.8, "others": 30.7]
+        )
+        httpClient.getResponse = .success(try! JSONEncoder().encode(response))
+        
+        // Action
+        let data = try await service.getGlobalCryptoMarketData()
+        
+        // Assertions
+        XCTAssertEqual(data.marketCapPercentage, response.marketCapPercentage)
+    }
+
+    func testGetGlobalCryptoMarketData_networkError() async throws {
+        // Setup
+        let error = ErrorFactoryMock.makeNoNetworkConnectionError()
+        httpClient.getResponse = .failure(error)
+        
+        // Action & Assertions
+        await assertFailure(
+            for: { [weak self] in
+                try await self!.service.getGlobalCryptoMarketData()
+            },
+            expectedError: error
+        )
+    }
+
+    // Get Global Market Data
+    func testGetGlobalMarketData_success() async throws {
+        // Setup
+        let dateFormatter = ISO8601DateFormatter()
+        let response = GlobalMarketData(
+            cpiPercentage: 2.7,
+            nextCPIDate: dateFormatter.date(from: "2025-01-01T00:00:00Z")!,
+            interestRatePercentage: 4.5,
+            nextFOMCMeetingDate: dateFormatter.date(from: "2025-02-01T00:00:00Z")!
+        )
+        httpClient.getResponse = .success(try! JSONEncoder().encode(response))
+        
+        // Action
+        let data = try await service.getGlobalMarketData()
+        
+        // Assertions
+        XCTAssertEqual(data.cpiPercentage, response.cpiPercentage)
+        XCTAssertEqual(data.nextCPIDate, response.nextCPIDate)
+        XCTAssertEqual(data.interestRatePercentage, response.interestRatePercentage)
+        XCTAssertEqual(data.nextFOMCMeetingDate, response.nextFOMCMeetingDate)
+    }
+
+    func testGetGlobalMarketData_decodingError() async throws {
+        // Setup
+        let error = ErrorFactoryMock.makeFailedToDecodeResponseError()
+        httpClient.getResponse = .failure(error)
+        
+        // Action & Assertions
+        await assertFailure(
+            for: { [weak self] in
+                try await self!.service.getGlobalMarketData()
+            },
+            expectedError: error
+        )
+    }
 }

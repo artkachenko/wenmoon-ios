@@ -19,38 +19,51 @@ struct CoinListView: View {
     @State private var showCoinSelectionView = false
     @State private var showAuthAlert = false
     
+    @State private var scrollText = false
+    
     // MARK: - Body
     var body: some View {
         BaseView(errorMessage: $viewModel.errorMessage) {
-            NavigationView {
-                List {
-                    ForEach(viewModel.coins, id: \.self) { coin in
-                        makeCoinView(coin)
+            VStack {
+                HStack(spacing: 8) {
+                    ForEach(viewModel.globalMarketItems, id: \.self) { item in
+                        makeGlobalMarketItemView(item)
                     }
-                    .onMove(perform: moveCoin)
-                    
-                    Button(action: {
-                        showCoinSelectionView.toggle()
-                    }) {
-                        HStack {
-                            Image(systemName: "slider.horizontal.3")
-                            Text("Add Coins")
+                }
+                .frame(width: 940, height: 20)
+                .offset(x: scrollText ? -680 : 680)
+                .animation(.linear(duration: 20).repeatForever(autoreverses: false), value: scrollText)
+                
+                NavigationView {
+                    List {
+                        ForEach(viewModel.coins, id: \.self) { coin in
+                            makeCoinView(coin)
                         }
-                        .frame(maxWidth: .infinity)
+                        .onMove(perform: moveCoin)
+                        
+                        Button(action: {
+                            showCoinSelectionView.toggle()
+                        }) {
+                            HStack {
+                                Image(systemName: "slider.horizontal.3")
+                                Text("Add Coins")
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                        .listRowSeparator(.hidden)
+                        .buttonStyle(.borderless)
                     }
-                    .listRowSeparator(.hidden)
-                    .buttonStyle(.borderless)
-                }
-                .listStyle(.plain)
-                .environment(\.editMode, $isEditMode)
-                .animation(.default, value: viewModel.coins)
-                .refreshable {
-                    Task {
-                        await viewModel.fetchMarketData()
-                        await viewModel.fetchPriceAlerts()
+                    .listStyle(.plain)
+                    .environment(\.editMode, $isEditMode)
+                    .animation(.default, value: viewModel.coins)
+                    .refreshable {
+                        Task {
+                            await viewModel.fetchMarketData()
+                            await viewModel.fetchPriceAlerts()
+                        }
                     }
+                    .navigationTitle("Coins")
                 }
-                .navigationTitle("Coins")
             }
         }
         .fullScreenCover(isPresented: $showCoinSelectionView) {
@@ -84,6 +97,14 @@ struct CoinListView: View {
         .task {
             await viewModel.fetchCoins()
             await viewModel.fetchPriceAlerts()
+            await viewModel.fetchGlobalCryptoMarketData()
+            await viewModel.fetchGlobalMarketData()
+        }
+        .onAppear {
+            Task { @MainActor in
+                try await Task.sleep(for: .seconds(1))
+                scrollText = true
+            }
         }
     }
     
@@ -180,6 +201,19 @@ struct CoinListView: View {
                 Image(systemName: "bell.fill")
             }
             .tint(.blue)
+        }
+    }
+    
+    @ViewBuilder
+    private func makeGlobalMarketItemView(_ item: GlobalMarketItem) -> some View {
+        HStack(spacing: 4) {
+            Text(item.type.title)
+                .font(.footnote)
+                .foregroundColor(.lightGray)
+            
+            Text(item.value)
+                .font(.footnote)
+                .bold()
         }
     }
     

@@ -13,6 +13,8 @@ protocol CoinScannerService {
     func searchCoins(by query: String) async throws -> [Coin]
     func getMarketData(for coinIDs: [String]) async throws -> [String: MarketData]
     func getChartData(for symbol: String, currency: Currency) async throws -> [String: [ChartData]]
+    func getGlobalCryptoMarketData() async throws -> GlobalCryptoMarketData
+    func getGlobalMarketData() async throws -> GlobalMarketData
 }
 
 final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
@@ -67,6 +69,24 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
         do {
             let data = try await httpClient.get(path: "ohlc", parameters: parameters)
             return try decoder.decode([String: [ChartData]].self, from: data)
+        } catch {
+            throw mapToAPIError(error)
+        }
+    }
+    
+    func getGlobalCryptoMarketData() async throws -> GlobalCryptoMarketData {
+        do {
+            let data = try await httpClient.get(path: "global-crypto-market-data")
+            return try decoder.decode(GlobalCryptoMarketData.self, from: data)
+        } catch {
+            throw mapToAPIError(error)
+        }
+    }
+    
+    func getGlobalMarketData() async throws -> GlobalMarketData {
+        do {
+            let data = try await httpClient.get(path: "global-market-data")
+            return try decoder.decode(GlobalMarketData.self, from: data)
         } catch {
             throw mapToAPIError(error)
         }

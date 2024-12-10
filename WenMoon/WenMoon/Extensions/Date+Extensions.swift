@@ -14,7 +14,7 @@ extension Date {
         case dateAndTime
     }
     
-    func formatted(as formatType: FormatType = .dateOnly) -> String {
+    func formatted(as formatType: FormatType) -> String {
         let dateFormatter = DateFormatter()
         switch formatType {
         case .dateOnly:

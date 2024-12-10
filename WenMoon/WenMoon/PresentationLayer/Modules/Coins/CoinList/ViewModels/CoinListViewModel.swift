@@ -13,6 +13,7 @@ final class CoinListViewModel: BaseViewModel {
     @Published var coins: [CoinData] = []
     @Published var marketData: [String: MarketData] = [:]
     @Published var chartData: [String: [String: [ChartData]]] = [:]
+    @Published var globalMarketItems: [GlobalMarketItem] = []
     
     private let coinScannerService: CoinScannerService
     private let priceAlertService: PriceAlertService
@@ -184,13 +185,61 @@ final class CoinListViewModel: BaseViewModel {
         }
     }
     
-    func fetchChartData() async {
-        await withTaskGroup(of: Void.self) { group in
-            for coin in coins {
-                group.addTask { [weak self] in
-                    await self?.fetchChartData(for: coin.symbol)
-                }
-            }
+    @MainActor
+    func fetchGlobalCryptoMarketData() async {
+        do {
+            let globalCryptoMarketData = try await coinScannerService.getGlobalCryptoMarketData()
+            let btcDominance = globalCryptoMarketData.marketCapPercentage["btc"] ?? .zero
+            let ethDominance = globalCryptoMarketData.marketCapPercentage["eth"] ?? .zero
+            let othersDominance = 100 - (btcDominance + ethDominance)
+            
+            let items = [
+                GlobalMarketItem(
+                    type: .btcDominance,
+                    value: btcDominance.formattedAsPercentage(includePlusSign: false)
+                ),
+                GlobalMarketItem(
+                    type: .ethDominance,
+                    value: ethDominance.formattedAsPercentage(includePlusSign: false)
+                ),
+                GlobalMarketItem(
+                    type: .othersDominance,
+                    value: othersDominance.formattedAsPercentage(includePlusSign: false)
+                )
+            ]
+            let newItems = items.filter { !globalMarketItems.contains($0) }
+            globalMarketItems.append(contentsOf: newItems)
+        } catch {
+            setErrorMessage(error)
+        }
+    }
+    
+    @MainActor
+    func fetchGlobalMarketData() async {
+        do {
+            let globalMarketData = try await coinScannerService.getGlobalMarketData()
+            let items = [
+                GlobalMarketItem(
+                    type: .cpi,
+                    value: globalMarketData.cpiPercentage.formattedAsPercentage(includePlusSign: false)
+                ),
+                GlobalMarketItem(
+                    type: .nextCPI,
+                    value: globalMarketData.nextCPIDate.formatted(as: .dateOnly)
+                ),
+                GlobalMarketItem(
+                    type: .interestRate,
+                    value: globalMarketData.interestRatePercentage.formattedAsPercentage(includePlusSign: false)
+                ),
+                GlobalMarketItem(
+                    type: .nextFOMCMeeting,
+                    value: globalMarketData.nextFOMCMeetingDate.formatted(as: .dateOnly)
+                )
+            ]
+            let newItems = items.filter { !globalMarketItems.contains($0) }
+            globalMarketItems.append(contentsOf: newItems)
+        } catch {
+            setErrorMessage(error)
         }
     }
     
@@ -213,4 +262,33 @@ final class CoinListViewModel: BaseViewModel {
             self?.clearCacheIfNeeded()
         }
     }
+}
+
+struct GlobalMarketItem: Hashable {
+    // MARK: - Nested Types
+    enum ItemType: CaseIterable {
+        case btcDominance
+        case ethDominance
+        case othersDominance
+        case cpi
+        case nextCPI
+        case interestRate
+        case nextFOMCMeeting
+        
+        var title: String {
+            switch self {
+            case .btcDominance: return "BTC.D:"
+            case .ethDominance: return "ETH.D:"
+            case .othersDominance: return "OTHERS.D:"
+            case .cpi: return "CPI:"
+            case .nextCPI: return "Next CPI:"
+            case .interestRate: return "Interest Rate:"
+            case .nextFOMCMeeting: return "Next FOMC:"
+            }
+        }
+    }
+    
+    // MARK: - Properties
+    let type: ItemType
+    let value: String
 }

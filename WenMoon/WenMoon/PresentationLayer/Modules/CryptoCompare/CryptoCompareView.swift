@@ -63,13 +63,13 @@ struct CryptoCompareView: View {
                         VStack(spacing: 8) {
                             HStack(spacing: .zero) {
                                 Text(coinToBeCompared.symbol.uppercased())
-                                    .foregroundColor(.wmPink)
+                                    .foregroundColor(.white)
                                     .bold()
                                 
                                 Text(" WITH THE MARKET CAP OF ")
                                 
                                 Text(coinToCompareWith.symbol.uppercased())
-                                    .foregroundColor(.wmPink)
+                                    .foregroundColor(.white)
                                     .bold()
                                 
                                 Text(" \(selectedPriceOption.rawValue)")

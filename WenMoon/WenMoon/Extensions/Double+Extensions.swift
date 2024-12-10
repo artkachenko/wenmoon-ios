@@ -53,6 +53,8 @@ extension Double {
         let formatter = NumberFormatter()
         formatter.numberStyle = .percent
         formatter.maximumFractionDigits = 2
+        formatter.positiveSuffix = " %"
+        formatter.negativeSuffix = " %"
         let formattedValue = formatter.string(from: NSNumber(value: self / 100)) ?? "\(self)%"
         if includePlusSign && self > 0 {
             return "+\(formattedValue)"
