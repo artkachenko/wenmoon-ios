@@ -34,7 +34,7 @@ final class CryptoCompareViewModel: BaseViewModel {
         return hypotheticalPrice / currentPrice
     }
     
-    func isPositive(_ multiplier: Double) -> Bool {
+    func isPositiveMultiplier(_ multiplier: Double) -> Bool {
         multiplier >= 1
     }
 }

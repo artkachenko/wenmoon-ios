@@ -86,7 +86,7 @@ struct CryptoCompareView: View {
                                         .foregroundColor(.white)
                                     
                                     Text(multiplier.formattedAsMultiplier())
-                                        .foregroundColor(viewModel.isPositive(multiplier) ? .green : .red)
+                                        .foregroundColor(viewModel.isPositiveMultiplier(multiplier) ? .green : .red)
                                         .opacity(0.8)
                                         .font(.title2)
                                 }

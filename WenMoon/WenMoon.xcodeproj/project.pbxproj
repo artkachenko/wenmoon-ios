@@ -30,6 +30,7 @@
 		D22D339D2CB92ABC007997DD /* SwiftDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D339C2CB92ABC007997DD /* SwiftDataManager.swift */; };
 		D22D33A02CB9342A007997DD /* SwiftDataError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D339F2CB9342A007997DD /* SwiftDataError.swift */; };
 		D22D33A32CB958A5007997DD /* DescriptiveError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22D33A22CB958A5007997DD /* DescriptiveError.swift */; };
+		D284FF312D133A85007875B6 /* CryptoCompareViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D284FF302D133A85007875B6 /* CryptoCompareViewModelTests.swift */; };
 		D28558492CF8B43C0023A2D5 /* PriceAlertsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28558482CF8B43C0023A2D5 /* PriceAlertsView.swift */; };
 		D285584D2CF8B4540023A2D5 /* PriceAlertsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D285584C2CF8B4540023A2D5 /* PriceAlertsViewModel.swift */; };
 		D28C184E2D0B26F000291920 /* GlobalCryptoMarketData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28C184D2D0B26F000291920 /* GlobalCryptoMarketData.swift */; };
@@ -127,6 +128,7 @@
 		D22D339C2CB92ABC007997DD /* SwiftDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataManager.swift; sourceTree = "<group>"; };
 		D22D339F2CB9342A007997DD /* SwiftDataError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataError.swift; sourceTree = "<group>"; };
 		D22D33A22CB958A5007997DD /* DescriptiveError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DescriptiveError.swift; sourceTree = "<group>"; };
+		D284FF302D133A85007875B6 /* CryptoCompareViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoCompareViewModelTests.swift; sourceTree = "<group>"; };
 		D28558482CF8B43C0023A2D5 /* PriceAlertsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertsView.swift; sourceTree = "<group>"; };
 		D285584C2CF8B4540023A2D5 /* PriceAlertsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PriceAlertsViewModel.swift; sourceTree = "<group>"; };
 		D28C184D2D0B26F000291920 /* GlobalCryptoMarketData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalCryptoMarketData.swift; sourceTree = "<group>"; };
@@ -901,6 +903,7 @@
 				D2EFF91E2CE24301004AA5A5 /* CoinDetailsViewModelTests.swift */,
 				D2D795782CFDD0D500950125 /* PriceAlertsViewModelTests.swift */,
 				D2D7957A2CFDF8C100950125 /* AccountViewModelTests.swift */,
+				D284FF302D133A85007875B6 /* CryptoCompareViewModelTests.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -1107,6 +1110,7 @@
 				D2D7957B2CFDF8C100950125 /* AccountViewModelTests.swift in Sources */,
 				D2EFF91F2CE24301004AA5A5 /* CoinDetailsViewModelTests.swift in Sources */,
 				FAB3625029F4547100A88050 /* HTTPClientMock.swift in Sources */,
+				D284FF312D133A85007875B6 /* CryptoCompareViewModelTests.swift in Sources */,
 				D2D795792CFDD0D500950125 /* PriceAlertsViewModelTests.swift in Sources */,
 				D2F6DD642CC650D4009EF857 /* PriceAlertServiceTests.swift in Sources */,
 				D2D0F9EC2CC2DF3F00712717 /* CoinFactoryMock.swift in Sources */,
