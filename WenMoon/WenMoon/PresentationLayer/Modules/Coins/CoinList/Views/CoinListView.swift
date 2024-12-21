@@ -13,7 +13,6 @@ struct CoinListView: View {
     
     @State private var selectedCoin: CoinData!
     @State private var swipedCoin: CoinData!
-    @State private var isEditMode: EditMode = .inactive
     @State private var chartDrawProgress: CGFloat = .zero
     
     @State private var showCoinSelectionView = false
@@ -39,6 +38,7 @@ struct CoinListView: View {
                         ForEach(viewModel.coins, id: \.self) { coin in
                             makeCoinView(coin)
                         }
+                        .onDelete(perform: deleteCoin)
                         .onMove(perform: moveCoin)
                         
                         Button(action: {
@@ -54,7 +54,6 @@ struct CoinListView: View {
                         .buttonStyle(.borderless)
                     }
                     .listStyle(.plain)
-                    .environment(\.editMode, $isEditMode)
                     .animation(.default, value: viewModel.coins)
                     .refreshable {
                         Task {
@@ -63,6 +62,9 @@ struct CoinListView: View {
                         }
                     }
                     .navigationTitle("Coins")
+                    .toolbar {
+                        EditButton()
+                    }
                 }
             }
         }
@@ -72,7 +74,7 @@ struct CoinListView: View {
         .fullScreenCover(item: $selectedCoin, onDismiss: {
             selectedCoin = nil
         }) { coin in
-            CoinDetailsView(coin: coin, chartData: viewModel.chartData[coin.symbol] ?? [:])
+            CoinDetailsView(coin: coin)
                 .presentationCornerRadius(36)
         }
         .sheet(item: $swipedCoin, onDismiss: {
@@ -108,30 +110,16 @@ struct CoinListView: View {
         }
     }
     
-    // MARK: - Private Methods
+    // MARK: - Subviews
     @ViewBuilder
     private func makeCoinView(_ coin: CoinData) -> some View {
         HStack(spacing: .zero) {
             ZStack(alignment: .topTrailing) {
-                ZStack {
-                    Circle()
-                        .fill(Color.white)
-                        .frame(width: 48, height: 48)
-                    
-                    if let data = coin.imageData,
-                       let uiImage = UIImage(data: data) {
-                        Image(uiImage: uiImage)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24, height: 24)
-                            .clipShape(.circle)
-                    } else {
-                        Text(coin.name.prefix(1))
-                            .font(.body)
-                            .foregroundColor(.wmBlack)
-                    }
-                }
-                .brightness(-0.1)
+                CoinImageView(
+                    imageData: coin.imageData,
+                    placeholder: coin.symbol,
+                    size: 48
+                )
                 
                 if !coin.priceAlerts.isEmpty {
                     Image(systemName: "bell.fill")
@@ -178,9 +166,6 @@ struct CoinListView: View {
         .onTapGesture {
             selectedCoin = coin
         }
-        .onLongPressGesture {
-            isEditMode = .active
-        }
         .swipeActions {
             Button(role: .destructive) {
                 Task {
@@ -217,20 +202,29 @@ struct CoinListView: View {
         }
     }
     
+    // MARK: - Helper Methods
+    private func deleteCoin(at offsets: IndexSet) {
+        for index in offsets {
+            let coinID = viewModel.coins[index].id
+            Task {
+                await viewModel.deleteCoin(coinID)
+            }
+        }
+    }
+    
     private func moveCoin(from source: IndexSet, to destination: Int) {
         viewModel.coins.move(fromOffsets: source, toOffset: destination)
-        viewModel.saveCoinOrder()
+        viewModel.saveCoinsOrder()
     }
     
     private func handleCoinSelection(coin: Coin, shouldAdd: Bool) {
         Task {
             if shouldAdd {
                 await viewModel.saveCoin(coin)
-                await viewModel.fetchChartData(for: coin.symbol)
             } else {
                 await viewModel.deleteCoin(coin.id)
             }
-            viewModel.saveCoinOrder()
+            viewModel.saveCoinsOrder()
         }
     }
 }

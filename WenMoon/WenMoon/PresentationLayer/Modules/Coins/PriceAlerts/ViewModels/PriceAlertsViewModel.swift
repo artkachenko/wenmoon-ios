@@ -18,18 +18,13 @@ final class PriceAlertsViewModel: BaseViewModel {
     
     // MARK: - Initializers
     convenience init(coin: CoinData) {
-        self.init(
-            coin: coin,
-            priceAlertService: PriceAlertServiceImpl(),
-            firebaseAuthService: FirebaseAuthServiceImpl(),
-            userDefaultsManager: UserDefaultsManagerImpl()
-        )
+        self.init(coin: coin, priceAlertService: PriceAlertServiceImpl())
     }
     
     init(
         coin: CoinData,
         priceAlertService: PriceAlertService,
-        firebaseAuthService: FirebaseAuthService,
+        firebaseAuthService: FirebaseAuthService? = nil,
         userDefaultsManager: UserDefaultsManager? = nil
     ) {
         self.coin = coin

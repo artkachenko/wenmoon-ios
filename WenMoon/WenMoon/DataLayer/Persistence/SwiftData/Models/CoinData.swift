@@ -37,8 +37,15 @@ final class CoinData {
     var atlDate: String?
     var imageData: Data?
     var priceAlerts: [PriceAlert]
+    @Relationship(deleteRule: .noAction, inverse: \Transaction.coin)
+    var transactions: [Transaction]
+    var isArchived: Bool
     
-    convenience init(from coin: Coin, imageData: Data? = nil, priceAlerts: [PriceAlert] = []) {
+    convenience init(
+        from coin: Coin,
+        imageData: Data? = nil,
+        priceAlerts: [PriceAlert] = []
+    ) {
         self.init(
             id: coin.id,
             symbol: coin.symbol,
@@ -65,7 +72,9 @@ final class CoinData {
             atlChangePercentage: coin.atlChangePercentage,
             atlDate: coin.atlDate,
             imageData: imageData,
-            priceAlerts: priceAlerts
+            priceAlerts: priceAlerts,
+            transactions: [],
+            isArchived: false
         )
     }
     
@@ -95,7 +104,9 @@ final class CoinData {
         atlChangePercentage: Double? = nil,
         atlDate: String? = nil,
         imageData: Data? = nil,
-        priceAlerts: [PriceAlert] = []
+        priceAlerts: [PriceAlert] = [],
+        transactions: [Transaction] = [],
+        isArchived: Bool = false
     ) {
         self.id = id
         self.symbol = symbol
@@ -123,6 +134,30 @@ final class CoinData {
         self.atlDate = atlDate
         self.imageData = imageData
         self.priceAlerts = priceAlerts
+        self.transactions = transactions
+        self.isArchived = isArchived
+    }
+    
+    func updateMarketData(from marketData: MarketData) {
+        currentPrice = marketData.currentPrice
+        marketCap = marketData.marketCap
+        marketCapRank = marketData.marketCapRank
+        fullyDilutedValuation = marketData.fullyDilutedValuation
+        totalVolume = marketData.totalVolume
+        high24H = marketData.high24H
+        low24H = marketData.low24H
+        priceChange24H = marketData.priceChange24H
+        priceChangePercentage24H = marketData.priceChangePercentage24H
+        marketCapChange24H = marketData.marketCapChange24H
+        marketCapChangePercentage24H = marketData.marketCapChangePercentage24H
+        circulatingSupply = marketData.circulatingSupply
+        totalSupply = marketData.totalSupply
+        ath = marketData.ath
+        athChangePercentage = marketData.athChangePercentage
+        athDate = marketData.athDate
+        atl = marketData.atl
+        atlChangePercentage = marketData.atlChangePercentage
+        atlDate = marketData.atlDate
     }
 }
 

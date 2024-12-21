@@ -14,8 +14,8 @@ class BaseViewModel: ObservableObject {
     @Published var isLoading = false
     
     private(set) var firebaseAuthService: FirebaseAuthService
-    private(set) var swiftDataManager: SwiftDataManager
     private(set) var userDefaultsManager: UserDefaultsManager
+    private(set) var swiftDataManager: SwiftDataManager?
     
     var userID: String? {
         firebaseAuthService.userID
@@ -27,41 +27,36 @@ class BaseViewModel: ObservableObject {
     }
     
     var isFirstLaunch: Bool {
-        do {
-            let isFirstLaunch = try userDefaultsManager.getObject(forKey: "isFirstLaunch", objectType: Bool.self) ?? true
-            if isFirstLaunch {
-                try userDefaultsManager.setObject(false, forKey: "isFirstLaunch")
-            }
-            return isFirstLaunch
-        } catch {
-            errorMessage = error.localizedDescription
+        let isFirstLaunch = (try? userDefaultsManager.getObject(forKey: "isFirstLaunch", objectType: Bool.self)) ?? true
+        if isFirstLaunch {
+            try? userDefaultsManager.setObject(false, forKey: "isFirstLaunch")
         }
-        return false
+        return isFirstLaunch
     }
     
     // MARK: - Initializers
     init(
-        firebaseAuthService: FirebaseAuthService = FirebaseAuthServiceImpl(),
+        firebaseAuthService: FirebaseAuthService? = nil,
         userDefaultsManager: UserDefaultsManager? = nil,
         swiftDataManager: SwiftDataManager? = nil
     ) {
-        self.firebaseAuthService = firebaseAuthService
+        self.firebaseAuthService = firebaseAuthService ?? FirebaseAuthServiceImpl()
         self.userDefaultsManager = userDefaultsManager ?? UserDefaultsManagerImpl()
         
         if let swiftDataManager {
             self.swiftDataManager = swiftDataManager
         } else {
-            let modelContainer = try! ModelContainer(for: CoinData.self)
-            let swiftDataManager = SwiftDataManagerImpl(modelContainer: modelContainer)
-            self.swiftDataManager = swiftDataManager
+            if let modelContainer = try? ModelContainer(for: CoinData.self, Portfolio.self, Transaction.self) {
+                let swiftDataManager = SwiftDataManagerImpl(modelContainer: modelContainer)
+                self.swiftDataManager = swiftDataManager
+            }
         }
     }
     
     // MARK: - Methods
     func fetch<T: PersistentModel>(_ descriptor: FetchDescriptor<T>) -> [T] {
         do {
-            let models = try swiftDataManager.fetch(descriptor)
-            return models
+            return try swiftDataManager?.fetch(descriptor) ?? []
         } catch {
             setErrorMessage(error)
             return []
@@ -70,7 +65,7 @@ class BaseViewModel: ObservableObject {
     
     func insert<T: PersistentModel>(_ model: T) {
         do {
-            try swiftDataManager.insert(model)
+            try swiftDataManager?.insert(model)
         } catch {
             setErrorMessage(error)
         }
@@ -78,7 +73,7 @@ class BaseViewModel: ObservableObject {
     
     func delete<T: PersistentModel>(_ model: T) {
         do {
-            try swiftDataManager.delete(model)
+            try swiftDataManager?.delete(model)
         } catch {
             setErrorMessage(error)
         }
@@ -86,7 +81,7 @@ class BaseViewModel: ObservableObject {
     
     func save() {
         do {
-            try swiftDataManager.save()
+            try swiftDataManager?.save()
         } catch {
             setErrorMessage(error)
         }

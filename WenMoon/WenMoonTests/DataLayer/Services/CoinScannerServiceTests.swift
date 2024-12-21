@@ -154,7 +154,7 @@ class CoinScannerServiceTests: XCTestCase {
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
         
         // Action
-        let chartData = try await service.getChartData(for: "", currency: .usd)
+        let chartData = try await service.getChartData(for: "coin-1", timeframe: "1h", currency: "usd")
         
         // Assertions
         assertChartDataForTimeframesEqual(chartData, response)
@@ -168,7 +168,7 @@ class CoinScannerServiceTests: XCTestCase {
         // Action & Assertions
         await assertFailure(
             for: { [weak self] in
-                try await self!.service.getChartData(for: "", currency: .usd)
+                try await self!.service.getChartData(for: "coin-1", timeframe: "1h", currency: "usd")
             },
             expectedError: error
         )

@@ -12,7 +12,7 @@ protocol CoinScannerService {
     func getCoins(by ids: [String]) async throws -> [Coin]
     func searchCoins(by query: String) async throws -> [Coin]
     func getMarketData(for coinIDs: [String]) async throws -> [String: MarketData]
-    func getChartData(for symbol: String, currency: Currency) async throws -> [String: [ChartData]]
+    func getChartData(for symbol: String, timeframe: String, currency: String) async throws -> [String: [ChartData]]
     func getGlobalCryptoMarketData() async throws -> GlobalCryptoMarketData
     func getGlobalMarketData() async throws -> GlobalMarketData
 }
@@ -64,8 +64,8 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
         }
     }
     
-    func getChartData(for symbol: String, currency: Currency) async throws -> [String: [ChartData]] {
-        let parameters = ["symbol": symbol, "currency": currency.rawValue]
+    func getChartData(for symbol: String, timeframe: String, currency: String) async throws -> [String: [ChartData]] {
+        let parameters = ["symbol": symbol, "timeframe": timeframe, "currency": currency]
         do {
             let data = try await httpClient.get(path: "ohlc", parameters: parameters)
             return try decoder.decode([String: [ChartData]].self, from: data)

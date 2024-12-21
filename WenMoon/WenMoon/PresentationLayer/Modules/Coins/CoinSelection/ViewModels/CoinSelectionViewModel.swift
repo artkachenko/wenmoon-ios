@@ -98,8 +98,9 @@ final class CoinSelectionViewModel: BaseViewModel {
     }
     
     func fetchSavedCoins() {
-        let descriptor = FetchDescriptor<CoinData>()
-        savedCoinIDs = Set(fetch(descriptor).compactMap(\.id))
+        let descriptor = FetchDescriptor<CoinData>(predicate: #Predicate { !$0.isArchived })
+        let fetchedCoinIDs = fetch(descriptor).compactMap(\.id)
+        savedCoinIDs = Set(fetchedCoinIDs)
     }
     
     func toggleSaveState(for coin: Coin) {

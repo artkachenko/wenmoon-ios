@@ -76,7 +76,7 @@ struct CoinFactoryMock {
     }
     
     // MARK: - CoinData
-    static func makeCoinData(from coin: Coin) -> CoinData {
+    static func makeCoinData(from coin: Coin, isArchived: Bool = false) -> CoinData {
         CoinData(
             id: coin.id,
             symbol: coin.symbol,
@@ -101,7 +101,8 @@ struct CoinFactoryMock {
             athDate: coin.athDate,
             atl: coin.atl,
             atlChangePercentage: coin.atlChangePercentage,
-            atlDate: coin.atlDate
+            atlDate: coin.atlDate,
+            isArchived: isArchived
         )
     }
     

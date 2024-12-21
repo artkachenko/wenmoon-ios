@@ -53,7 +53,7 @@ struct AccountView: View {
         }
     }
     
-    // MARK: - Private Methods
+    // MARK: - Subviews
     @ViewBuilder
     private func makeAuthView() -> some View {
         if case .signedIn = viewModel.loginState {
@@ -162,6 +162,7 @@ struct AccountView: View {
         .foregroundColor(setting.type == .signOut ? .red : .primary)
     }
     
+    // MARK: - Helper Methods
     private func setupSettingsBinding(_ setting: Setting) -> Binding<String> {
         Binding(
             get: {

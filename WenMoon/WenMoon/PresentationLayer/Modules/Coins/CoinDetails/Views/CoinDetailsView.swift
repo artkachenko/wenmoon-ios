@@ -22,8 +22,8 @@ struct CoinDetailsView: View {
     @State private var showAuthAlert = false
     
     // MARK: - Initializers
-    init(coin: CoinData, chartData: [String: [ChartData]]) {
-        _viewModel = StateObject(wrappedValue: CoinDetailsViewModel(coin: coin, chartData: chartData))
+    init(coin: CoinData) {
+        _viewModel = StateObject(wrappedValue: CoinDetailsViewModel(coin: coin))
         selectedPrice = coin.currentPrice.formattedAsCurrency()
     }
     
@@ -33,25 +33,11 @@ struct CoinDetailsView: View {
         BaseView(errorMessage: $viewModel.errorMessage) {
             VStack(spacing: 16) {
                 HStack(spacing: 12) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.white)
-                            .frame(width: 36, height: 36)
-                        
-                        if let data = coin.imageData,
-                           let uiImage = UIImage(data: data) {
-                            Image(uiImage: uiImage)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 18, height: 18)
-                                .clipShape(.circle)
-                        } else {
-                            Text(coin.name.prefix(1))
-                                .font(.callout)
-                                .foregroundColor(.wmBlack)
-                        }
-                    }
-                    .brightness(-0.1)
+                    CoinImageView(
+                        imageData: coin.imageData,
+                        placeholder: coin.symbol,
+                        size: 36
+                    )
                     
                     VStack(alignment: .leading) {
                         HStack {
@@ -170,7 +156,7 @@ struct CoinDetailsView: View {
         }
     }
     
-    // MARK: - Private Methods
+    // MARK: - Subviews
     @ViewBuilder
     private func makeChartView(_ data: [ChartData]) -> some View {
         let prices = data.map { $0.price }
@@ -245,6 +231,18 @@ struct CoinDetailsView: View {
         }
     }
     
+    @ViewBuilder
+    private func makeDetailRow(label: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(.caption)
+                .foregroundColor(.gray)
+            Text(value)
+                .font(.caption)
+        }
+    }
+    
+    // MARK: - Helper Methods
     private func updateSelectedData(
         location: CGPoint,
         proxy: ChartProxy,
@@ -276,20 +274,9 @@ struct CoinDetailsView: View {
             }
         }
     }
-    
-    @ViewBuilder
-    private func makeDetailRow(label: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(label)
-                .font(.caption)
-                .foregroundColor(.gray)
-            Text(value)
-                .font(.caption)
-        }
-    }
 }
 
 // MARK: - Preview
 #Preview {
-    CoinDetailsView(coin: CoinData(), chartData: [:])
+    CoinDetailsView(coin: CoinData())
 }

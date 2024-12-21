@@ -67,7 +67,7 @@ class CoinScannerServiceMock: CoinScannerService {
         }
     }
     
-    func getChartData(for symbol: String, currency: Currency) async throws -> [String: [ChartData]] {
+    func getChartData(for symbol: String, timeframe: String, currency: String) async throws -> [String: [ChartData]] {
         switch getChartDataResult {
         case .success(let chartData):
             return chartData

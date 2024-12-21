@@ -82,7 +82,7 @@ class CoinListViewModelTests: XCTestCase {
         let savedOrder = coins.map(\.id)
         userDefaultsManager.getObjectReturnValue = [
             "isFirstLaunch": false,
-            "coinOrder": savedOrder
+            "coinsOrder": savedOrder
         ]
         for coin in coins {
             let newCoin = CoinFactoryMock.makeCoinData(from: coin)
@@ -160,10 +160,6 @@ class CoinListViewModelTests: XCTestCase {
         assertCoinsEqual(viewModel.coins, [coin])
         assertInsertAndSaveMethodsCalled()
         XCTAssertNil(viewModel.errorMessage)
-        
-        // Save the same coin again
-        await viewModel.saveCoin(coin)
-        XCTAssertEqual(viewModel.coins.count, 1)
     }
     
     func testSaveCoin_saveError() async throws {
@@ -180,32 +176,35 @@ class CoinListViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
-    func testSaveCoinOrder_success() throws {
+    func testUnarchiveCoin() async throws {
+        // Setup
+        let coin = CoinFactoryMock.makeCoin()
+        let archivedCoin = CoinFactoryMock.makeCoinData(from: coin, isArchived: true)
+        swiftDataManager.fetchResult = [archivedCoin]
+        
+        // Action
+        await viewModel.saveCoin(coin)
+        
+        // Assertions
+        XCTAssertEqual(viewModel.coins.count, 1)
+        assertCoinsEqual(viewModel.coins, [coin])
+        XCTAssertFalse(archivedCoin.isArchived)
+        XCTAssert(swiftDataManager.saveMethodCalled)
+        XCTAssertNil(viewModel.errorMessage)
+    }
+    
+    func testSaveCoinsOrder_success() throws {
         // Setup
         let coins = CoinFactoryMock.makeCoinsData()
         viewModel.coins = coins
         
         // Action
-        viewModel.saveCoinOrder()
+        viewModel.saveCoinsOrder()
         
         // Assertions
         XCTAssert(userDefaultsManager.setObjectCalled)
-        XCTAssertEqual(userDefaultsManager.setObjectValue["coinOrder"] as! [String], coins.map(\.id))
+        XCTAssertEqual(userDefaultsManager.setObjectValue["coinsOrder"] as! [String], coins.map(\.id))
         XCTAssertNil(viewModel.errorMessage)
-    }
-    
-    func testSaveCoinOrder_encodingError() throws {
-        // Setup
-        viewModel.coins = CoinFactoryMock.makeCoinsData()
-        let error: UserDefaultsError = .failedToEncodeObject
-        userDefaultsManager.userDefaultsError = error
-        
-        // Action
-        viewModel.saveCoinOrder()
-        
-        // Assertions
-        XCTAssert(userDefaultsManager.setObjectCalled)
-        XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
     // Delete Coin
@@ -235,6 +234,27 @@ class CoinListViewModelTests: XCTestCase {
         // Assertions
         assertDeleteAndSaveMethodsCalled()
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
+    }
+    
+    func testArchiveCoin() async throws {
+        // Setup
+        let coin = CoinFactoryMock.makeCoin()
+        await viewModel.saveCoin(coin)
+        let unarchivedCoin = CoinFactoryMock.makeCoinData(from: coin)
+        let portfolio = PortfolioFactoryMock.makePortfolio(
+            transactions: [
+                PortfolioFactoryMock.makeTransaction(coin: unarchivedCoin)
+            ]
+        )
+        swiftDataManager.fetchResult = [portfolio]
+        
+        // Action
+        await viewModel.deleteCoin(coin.id)
+        
+        // Assertions
+        XCTAssertFalse(unarchivedCoin.isArchived)
+        XCTAssert(swiftDataManager.saveMethodCalled)
+        XCTAssertNil(viewModel.errorMessage)
     }
     
     // Market Data

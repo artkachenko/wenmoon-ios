@@ -17,6 +17,7 @@ final class CoinListViewModel: BaseViewModel {
     
     private let coinScannerService: CoinScannerService
     private let priceAlertService: PriceAlertService
+    
     private var cacheTimer: Timer?
     private var chartDataFetchTimer: Timer?
     
@@ -24,15 +25,14 @@ final class CoinListViewModel: BaseViewModel {
     convenience init() {
         self.init(
             coinScannerService: CoinScannerServiceImpl(),
-            priceAlertService: PriceAlertServiceImpl(),
-            firebaseAuthService: FirebaseAuthServiceImpl()
+            priceAlertService: PriceAlertServiceImpl()
         )
     }
     
     init(
         coinScannerService: CoinScannerService,
         priceAlertService: PriceAlertService,
-        firebaseAuthService: FirebaseAuthService,
+        firebaseAuthService: FirebaseAuthService? = nil,
         userDefaultsManager: UserDefaultsManager? = nil,
         swiftDataManager: SwiftDataManager? = nil
     ) {
@@ -57,9 +57,12 @@ final class CoinListViewModel: BaseViewModel {
         if isFirstLaunch {
             await fetchPredefinedCoins()
         } else {
-            let descriptor = FetchDescriptor<CoinData>(sortBy: [SortDescriptor(\.marketCapRank)])
+            let descriptor = FetchDescriptor<CoinData>(
+                predicate: #Predicate { !$0.isArchived },
+                sortBy: [SortDescriptor(\.marketCapRank)]
+            )
             var fetchedCoins = fetch(descriptor)
-            if let savedOrder = try? userDefaultsManager.getObject(forKey: "coinOrder", objectType: [String].self) {
+            if let savedOrder = try? userDefaultsManager.getObject(forKey: "coinsOrder", objectType: [String].self) {
                 fetchedCoins.sort { coin1, coin2 in
                     let index1 = savedOrder.firstIndex(of: coin1.id) ?? .max
                     let index2 = savedOrder.firstIndex(of: coin2.id) ?? .max
@@ -83,25 +86,7 @@ final class CoinListViewModel: BaseViewModel {
             for (index, coinID) in coinIDs.enumerated() {
                 if let coinMarketData = fetchedMarketData[coinID] {
                     marketData[coinID] = coinMarketData
-                    coins[index].currentPrice = coinMarketData.currentPrice ?? .zero
-                    coins[index].marketCap = coinMarketData.marketCap ?? .zero
-                    coins[index].marketCapRank = coinMarketData.marketCapRank ?? .zero
-                    coins[index].fullyDilutedValuation = coinMarketData.fullyDilutedValuation ?? .zero
-                    coins[index].totalVolume = coinMarketData.totalVolume ?? .zero
-                    coins[index].high24H = coinMarketData.high24H ?? .zero
-                    coins[index].low24H = coinMarketData.low24H ?? .zero
-                    coins[index].priceChange24H = coinMarketData.priceChange24H ?? .zero
-                    coins[index].priceChangePercentage24H = coinMarketData.priceChangePercentage24H ?? .zero
-                    coins[index].marketCapChange24H = coinMarketData.marketCapChange24H ?? .zero
-                    coins[index].marketCapChangePercentage24H = coinMarketData.marketCapChangePercentage24H ?? .zero
-                    coins[index].circulatingSupply = coinMarketData.circulatingSupply ?? .zero
-                    coins[index].totalSupply = coinMarketData.totalSupply ?? .zero
-                    coins[index].ath = coinMarketData.ath ?? .zero
-                    coins[index].athChangePercentage = coinMarketData.athChangePercentage ?? .zero
-                    coins[index].athDate = coinMarketData.athDate ?? ""
-                    coins[index].atl = coinMarketData.atl ?? .zero
-                    coins[index].atlChangePercentage = coinMarketData.atlChangePercentage ?? .zero
-                    coins[index].atlDate = coinMarketData.atlDate ?? ""
+                    coins[index].updateMarketData(from: coinMarketData)
                 }
             }
             save()
@@ -128,6 +113,7 @@ final class CoinListViewModel: BaseViewModel {
             }
             return
         }
+        
         do {
             let priceAlerts = try await priceAlertService.getPriceAlerts(userID: userID, deviceToken: deviceToken)
             for (index, coin) in coins.enumerated() {
@@ -141,29 +127,44 @@ final class CoinListViewModel: BaseViewModel {
     
     @MainActor
     func saveCoin(_ coin: Coin) async {
-        guard !coins.contains(where: { $0.id == coin.id }) else { return }
-        let imageData = coin.image != nil ? await loadImage(from: coin.image!) : nil
-        let newCoin = CoinData(from: coin, imageData: imageData)
-        coins.append(newCoin)
-        insert(newCoin)
+        let descriptor = FetchDescriptor<CoinData>(predicate: #Predicate { $0.id == coin.id })
+        let fetchedCoins = fetch(descriptor)
+        
+        if let existingCoin = fetchedCoins.first {
+            if existingCoin.isArchived {
+                unarchiveCoin(existingCoin)
+            }
+            return
+        }
+        
+        await insertCoin(coin)
     }
     
-    func saveCoinOrder() {
-        do {
-            let ids = coins.map { $0.id }
-            try userDefaultsManager.setObject(ids, forKey: "coinOrder")
-        } catch {
-            setErrorMessage(error)
-        }
+    func saveCoinsOrder() {
+        let ids = coins.map { $0.id }
+        try? userDefaultsManager.setObject(ids, forKey: "coinsOrder")
     }
     
     @MainActor
     func deleteCoin(_ coinID: String) async {
         guard let coin = coins.first(where: { $0.id == coinID }) else { return }
-        if let index = coins.firstIndex(of: coin) {
-            coins.remove(at: index)
+        
+        let descriptor = FetchDescriptor<Portfolio>()
+        let portfolios = fetch(descriptor)
+        
+        var isCoinReferenced = false
+        for portfolio in portfolios {
+            if portfolio.transactions.contains(where: { $0.coin?.id == coin.id }) {
+                isCoinReferenced = true
+                break
+            }
         }
-        delete(coin)
+        
+        if isCoinReferenced {
+            archiveCoin(coin)
+        } else {
+            deleteCoin(coin)
+        }
     }
     
     // When the target price has been reached
@@ -173,15 +174,6 @@ final class CoinListViewModel: BaseViewModel {
                 coins[index].priceAlerts.remove(at: alertIndex)
                 break
             }
-        }
-    }
-    
-    @MainActor
-    func fetchChartData(for symbol: String) async {
-        do {
-            chartData[symbol] = try await coinScannerService.getChartData(for: symbol, currency: .usd)
-        } catch {
-            print("Failed to fetch data for \(symbol): \(error)")
         }
     }
     
@@ -255,6 +247,39 @@ final class CoinListViewModel: BaseViewModel {
         } catch {
             setErrorMessage(error)
         }
+    }
+    
+    @MainActor
+    private func insertCoin(_ coin: Coin) async {
+        print("Inserting coin: \(coin.id)")
+        let imageData = coin.image != nil ? await loadImage(from: coin.image!) : nil
+        let newCoin = CoinData(from: coin, imageData: imageData)
+        coins.append(newCoin)
+        insert(newCoin)
+    }
+    
+    private func deleteCoin(_ coin: CoinData) {
+        print("Deleting coin: \(coin.id)")
+        if let index = coins.firstIndex(of: coin) {
+            coins.remove(at: index)
+        }
+        delete(coin)
+    }
+    
+    private func archiveCoin(_ coin: CoinData) {
+        print("Archiving coin: \(coin.id)")
+        coin.isArchived = true
+        if let index = coins.firstIndex(of: coin) {
+            coins.remove(at: index)
+        }
+        save()
+    }
+    
+    private func unarchiveCoin(_ coin: CoinData) {
+        print("Unarchiving coin: \(coin.id)")
+        coin.isArchived = false
+        coins.append(coin)
+        save()
     }
     
     private func startCacheTimer() {

@@ -86,9 +86,8 @@ struct CryptoCompareView: View {
                                         .foregroundColor(.white)
                                     
                                     Text(multiplier.formattedAsMultiplier())
-                                        .foregroundColor(viewModel.isPositiveMultiplier(multiplier) ? .green : .red)
-                                        .opacity(0.8)
                                         .font(.title2)
+                                        .foregroundColor(viewModel.isPositiveMultiplier(multiplier) ? .green : .red)
                                 }
                             }
                         }
@@ -114,7 +113,7 @@ struct CryptoCompareView: View {
         }
     }
     
-    // MARK: - Private Methods
+    // MARK: - Subviews
     @ViewBuilder
     private func makeCoinSelectionView(
         coin: Binding<Coin?>,
@@ -152,24 +151,11 @@ struct CryptoCompareView: View {
     @ViewBuilder
     private func makeCoinView(_ coin: Coin, _ cachedImage: Image?) -> some View {
         HStack(spacing: 12) {
-            ZStack {
-                Circle()
-                    .fill(Color.white)
-                    .frame(width: 36, height: 36)
-                
-                if let cachedImage {
-                    cachedImage
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 18, height: 18)
-                        .clipShape(.circle)
-                } else {
-                    Text(coin.name.prefix(1))
-                        .font(.callout)
-                        .foregroundColor(.wmBlack)
-                }
-            }
-            .brightness(-0.1)
+            CoinImageView(
+                image: cachedImage,
+                placeholder: coin.symbol,
+                size: 36
+            )
             
             Text(coin.symbol.uppercased())
                 .font(.headline)
@@ -206,6 +192,7 @@ struct CryptoCompareView: View {
         .cornerRadius(12)
     }
     
+    // MARK: - Helper Methods
     private func loadAndCacheCoinImage(for coin: Coin) {
         if let url = coin.image {
             Task {

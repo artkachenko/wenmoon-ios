@@ -30,17 +30,15 @@ final class AccountViewModel: BaseViewModel {
     convenience init() {
         self.init(
             googleSignInService: GoogleSignInServiceImpl(),
-            twitterSignInService: TwitterSignInServiceImpl(),
-            firebaseAuthService: FirebaseAuthServiceImpl(),
-            userDefaultsManager: UserDefaultsManagerImpl()
+            twitterSignInService: TwitterSignInServiceImpl()
         )
     }
     
     init(
         googleSignInService: GoogleSignInService,
         twitterSignInService: TwitterSignInService,
-        firebaseAuthService: FirebaseAuthService,
-        userDefaultsManager: UserDefaultsManager
+        firebaseAuthService: FirebaseAuthService? = nil,
+        userDefaultsManager: UserDefaultsManager? = nil
     ) {
         self.googleSignInService = googleSignInService
         self.twitterSignInService = twitterSignInService
@@ -147,20 +145,11 @@ final class AccountViewModel: BaseViewModel {
     }
     
     private func getSavedSetting(of type: Setting.SettingType) -> String? {
-        do {
-            return try userDefaultsManager.getObject(forKey: type.rawValue, objectType: String.self) ?? type.defaultOption?.name
-        } catch {
-            setErrorMessage(error)
-            return nil
-        }
+        try? userDefaultsManager.getObject(forKey: type.rawValue, objectType: String.self) ?? type.defaultOption?.name
     }
     
     private func setSetting(_ setting: String, of type: Setting.SettingType) {
-        do {
-            try userDefaultsManager.setObject(setting, forKey: type.rawValue)
-        } catch {
-            setErrorMessage(error)
-        }
+        try? userDefaultsManager.setObject(setting, forKey: type.rawValue)
     }
 }
 
@@ -239,7 +228,7 @@ struct Setting: Identifiable, Hashable {
         }
     }
     
-    var id = UUID()
+    var id = UUID().uuidString
     let type: SettingType
     var selectedOption: String? = nil
 }

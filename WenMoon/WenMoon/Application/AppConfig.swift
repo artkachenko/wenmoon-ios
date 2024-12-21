@@ -31,7 +31,7 @@ enum AppConfig {
 
 enum API {
     static var baseURL: URL {
-        try! URL(string: "http://" + AppConfig.value(for: "BASE_URL"))!
+        try! URL(string: "https://" + AppConfig.value(for: "BASE_URL"))!
     }
     
     static var key: String {

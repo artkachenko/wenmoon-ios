@@ -42,3 +42,12 @@ extension Optional where Wrapped == Double {
         return value.formattedAsPercentage(includePlusSign: includePlusSign)
     }
 }
+
+extension Optional where Wrapped == Double {
+    func formattedAsQuantity(includeMinusSign: Bool = false) -> String {
+        guard let value = self else {
+            return "-"
+        }
+        return value.formattedAsQuantity(includeMinusSign: includeMinusSign)
+    }
+}

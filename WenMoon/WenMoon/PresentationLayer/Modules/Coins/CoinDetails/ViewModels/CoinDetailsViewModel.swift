@@ -17,25 +17,13 @@ final class CoinDetailsViewModel: BaseViewModel {
     private let coinScannerService: CoinScannerService
     
     // MARK: - Initializers
-    convenience init(coin: CoinData, chartData: [String: [ChartData]]) {
-        self.init(
-            coin: coin,
-            chartData: chartData,
-            coinScannerService: CoinScannerServiceImpl()
-        )
+    convenience init(coin: CoinData) {
+        self.init(coin: coin, coinScannerService: CoinScannerServiceImpl())
     }
     
-    init(
-        coin: CoinData,
-        chartData: [String: [ChartData]],
-        coinScannerService: CoinScannerService
-    ) {
+    init(coin: CoinData, coinScannerService: CoinScannerService) {
         self.coin = coin
         self.coinScannerService = coinScannerService
-        if !chartData.isEmpty {
-            self.chartDataCache = chartData
-            self.chartData = chartData[Timeframe.oneHour.rawValue] ?? []
-        }
         super.init()
     }
     
@@ -51,12 +39,9 @@ final class CoinDetailsViewModel: BaseViewModel {
         }
         
         do {
-            let fetchedData = try await coinScannerService.getChartData(for: coin.symbol, currency: .usd)
-            for timeframe in Timeframe.allCases {
-                if let data = fetchedData[timeframe.rawValue] {
-                    chartDataCache[timeframe.rawValue] = data
-                }
-            }
+            let currency: Currency = .usd
+            let fetchedData = try await coinScannerService.getChartData(for: coin.symbol, timeframe: timeframe.rawValue, currency: currency.rawValue)
+            chartDataCache = fetchedData
             chartData = chartDataCache[timeframe.rawValue] ?? []
         } catch {
             setErrorMessage(error)

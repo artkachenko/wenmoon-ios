@@ -17,11 +17,7 @@ class CoinDetailsViewModelTests: XCTestCase {
     override func setUp() {
         super.setUp()
         coinScannerService = CoinScannerServiceMock()
-        viewModel = CoinDetailsViewModel(
-            coin: CoinData(),
-            chartData: [:],
-            coinScannerService: coinScannerService
-        )
+        viewModel = CoinDetailsViewModel(coin: CoinData(), coinScannerService: coinScannerService)
     }
     
     override func tearDown() {
