@@ -11,6 +11,7 @@
 		191DCD492D2805CC00892757 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 191DCD472D2805CC00892757 /* Release.xcconfig */; };
 		191DCD4B2D2805D900892757 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 191DCD4A2D2805D900892757 /* Debug.xcconfig */; };
 		191DCD4C2D2805D900892757 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 191DCD4A2D2805D900892757 /* Debug.xcconfig */; };
+		1961B51F2D34407600D0CEBC /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1961B51E2D34407600D0CEBC /* PlaceholderView.swift */; };
 		198655062D30394F00216097 /* CoinImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 198655052D30394F00216097 /* CoinImageView.swift */; };
 		198655092D32DD6200216097 /* PortfolioFactoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 198655082D32DD6200216097 /* PortfolioFactoryMock.swift */; };
 		198655102D32E08D00216097 /* AddTransactionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1986550F2D32E08D00216097 /* AddTransactionViewModelTests.swift */; };
@@ -125,6 +126,7 @@
 /* Begin PBXFileReference section */
 		191DCD472D2805CC00892757 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		191DCD4A2D2805D900892757 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		1961B51E2D34407600D0CEBC /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		198655052D30394F00216097 /* CoinImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinImageView.swift; sourceTree = "<group>"; };
 		198655082D32DD6200216097 /* PortfolioFactoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioFactoryMock.swift; sourceTree = "<group>"; };
 		1986550F2D32E08D00216097 /* AddTransactionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionViewModelTests.swift; sourceTree = "<group>"; };
@@ -620,6 +622,7 @@
 			children = (
 				D2EFF9022CDA2EDE004AA5A5 /* ChartShape.swift */,
 				198655052D30394F00216097 /* CoinImageView.swift */,
+				1961B51E2D34407600D0CEBC /* PlaceholderView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1156,6 +1159,7 @@
 				FAB361FE29F447DB00A88050 /* CoinListView.swift in Sources */,
 				FAB3623829F4514B00A88050 /* APIError.swift in Sources */,
 				FA07AC3029F93292008F6484 /* Double+Extensions.swift in Sources */,
+				1961B51F2D34407600D0CEBC /* PlaceholderView.swift in Sources */,
 				D2D795742CFA292600950125 /* UnderlinedTextFieldStyle.swift in Sources */,
 				D2EFF90C2CDD111C004AA5A5 /* CoinDetailsViewModel.swift in Sources */,
 				D2EFF9162CDE4C88004AA5A5 /* Date+Extensions.swift in Sources */,
@@ -1370,7 +1374,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;
@@ -1413,7 +1417,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 13.3;

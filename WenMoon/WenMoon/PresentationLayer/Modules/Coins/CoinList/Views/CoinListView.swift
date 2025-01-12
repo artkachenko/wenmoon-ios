@@ -24,6 +24,7 @@ struct CoinListView: View {
     var body: some View {
         BaseView(errorMessage: $viewModel.errorMessage) {
             VStack {
+                let coins = viewModel.coins
                 HStack(spacing: 8) {
                     ForEach(viewModel.globalMarketItems, id: \.self) { item in
                         makeGlobalMarketItemView(item)
@@ -34,36 +35,38 @@ struct CoinListView: View {
                 .animation(.linear(duration: 20).repeatForever(autoreverses: false), value: scrollText)
                 
                 NavigationView {
-                    List {
-                        ForEach(viewModel.coins, id: \.self) { coin in
-                            makeCoinView(coin)
-                        }
-                        .onDelete(perform: deleteCoin)
-                        .onMove(perform: moveCoin)
-                        
-                        Button(action: {
-                            showCoinSelectionView.toggle()
-                        }) {
-                            HStack {
-                                Image(systemName: "slider.horizontal.3")
-                                Text("Add Coins")
+                    VStack {
+                        if coins.isEmpty {
+                            makeAddCoinsButton()
+                            Spacer()
+                            PlaceholderView(text: "No coins added yet")
+                            Spacer()
+                        } else {
+                            List {
+                                ForEach(coins, id: \.self) { coin in
+                                    makeCoinView(coin)
+                                }
+                                .onDelete(perform: deleteCoin)
+                                .onMove(perform: moveCoin)
+                                
+                                makeAddCoinsButton()
                             }
-                            .frame(maxWidth: .infinity)
-                        }
-                        .listRowSeparator(.hidden)
-                        .buttonStyle(.borderless)
-                    }
-                    .listStyle(.plain)
-                    .animation(.default, value: viewModel.coins)
-                    .refreshable {
-                        Task {
-                            await viewModel.fetchMarketData()
-                            await viewModel.fetchPriceAlerts()
+                            .listStyle(.plain)
+                            .animation(.default, value: viewModel.coins)
+                            .refreshable {
+                                Task {
+                                    await viewModel.fetchMarketData()
+                                    await viewModel.fetchPriceAlerts()
+                                }
+                            }
                         }
                     }
+                    .animation(.easeInOut, value: coins)
                     .navigationTitle("Coins")
                     .toolbar {
-                        EditButton()
+                        if !coins.isEmpty {
+                            EditButton()
+                        }
                     }
                 }
             }
@@ -112,12 +115,28 @@ struct CoinListView: View {
     
     // MARK: - Subviews
     @ViewBuilder
+    private func makeAddCoinsButton() -> some View {
+        Button(action: {
+            showCoinSelectionView.toggle()
+        }) {
+            HStack {
+                Image(systemName: "slider.horizontal.3")
+                Text("Add Coins")
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .listRowSeparator(.hidden)
+        .buttonStyle(.borderless)
+        .padding(.vertical, 8)
+    }
+    
+    @ViewBuilder
     private func makeCoinView(_ coin: CoinData) -> some View {
         HStack(spacing: .zero) {
             ZStack(alignment: .topTrailing) {
                 CoinImageView(
                     imageData: coin.imageData,
-                    placeholder: coin.symbol,
+                    placeholderText: coin.symbol,
                     size: 48
                 )
                 

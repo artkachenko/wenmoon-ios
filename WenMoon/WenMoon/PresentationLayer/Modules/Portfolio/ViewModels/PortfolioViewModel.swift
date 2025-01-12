@@ -202,7 +202,7 @@ final class PortfolioViewModel: BaseViewModel {
     }
 }
 
-struct CoinTransactions {
+struct CoinTransactions: Equatable {
     let coin: CoinData
     let transactions: [Date: [Transaction]]
     

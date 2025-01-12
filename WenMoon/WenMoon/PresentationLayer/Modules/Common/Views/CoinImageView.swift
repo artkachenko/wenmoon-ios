@@ -11,20 +11,20 @@ struct CoinImageView: View {
     let image: Image?
     let imageURL: URL?
     let imageData: Data?
-    let placeholder: String
+    let placeholderText: String
     let size: CGFloat
     
     init(
         image: Image? = nil,
         imageURL: URL? = nil,
         imageData: Data? = nil,
-        placeholder: String,
+        placeholderText: String,
         size: CGFloat
     ) {
         self.image = image
         self.imageURL = imageURL
         self.imageData = imageData
-        self.placeholder = placeholder
+        self.placeholderText = placeholderText
         self.size = size
     }
     
@@ -47,7 +47,7 @@ struct CoinImageView: View {
                         .tint(.wmBlack)
                 })
             } else {
-                Text(placeholder.prefix(1))
+                Text(placeholderText.prefix(1))
                     .font(.body)
                     .foregroundColor(.wmBlack)
             }

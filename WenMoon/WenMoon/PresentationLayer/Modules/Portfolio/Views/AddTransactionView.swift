@@ -110,7 +110,7 @@ struct AddTransactionView: View {
                         HStack(spacing: 12) {
                             CoinImageView(
                                 imageData: coin.imageData,
-                                placeholder: coin.symbol,
+                                placeholderText: coin.symbol,
                                 size: 36
                             )
                             

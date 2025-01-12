@@ -153,7 +153,7 @@ struct CryptoCompareView: View {
         HStack(spacing: 12) {
             CoinImageView(
                 image: cachedImage,
-                placeholder: coin.symbol,
+                placeholderText: coin.symbol,
                 size: 36
             )
             

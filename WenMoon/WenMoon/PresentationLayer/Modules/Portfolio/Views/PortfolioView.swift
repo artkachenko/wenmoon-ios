@@ -76,36 +76,51 @@ struct PortfolioView: View {
     
     @ViewBuilder
     private func makePortfolioContentView() -> some View {
-        List {
-            ForEach(viewModel.groupedTransactions, id: \.coin.id) { group in
-                makeTransactionsSummaryView(for: group, isExpanded: expandedRows.contains(group.coin.id))
-                    .onTapGesture {
-                        withAnimation(.easeInOut) {
-                            toggleRowExpansion(for: group.coin.id)
+        let groupedTransactions = viewModel.groupedTransactions
+        VStack {
+            if groupedTransactions.isEmpty {
+                makeAddTransactionButton()
+                Spacer()
+                PlaceholderView(text: "No transactions yet")
+                Spacer()
+            } else {
+                List {
+                    ForEach(groupedTransactions, id: \.coin.id) { group in
+                        makeTransactionsSummaryView(for: group, isExpanded: expandedRows.contains(group.coin.id))
+                            .onTapGesture {
+                                withAnimation(.easeInOut) {
+                                    toggleRowExpansion(for: group.coin.id)
+                                }
+                            }
+                        if expandedRows.contains(group.coin.id) {
+                            makeExpandedTransactionsView(for: group)
                         }
                     }
-                
-                if expandedRows.contains(group.coin.id) {
-                    makeExpandedTransactionsView(for: group)
+                    makeAddTransactionButton()
+                }
+                .listStyle(.plain)
+                .refreshable {
+                    viewModel.fetchPortfolios()
                 }
             }
-            
-            Button {
-                showAddTransactionView.toggle()
-            } label: {
-                HStack {
-                    Image(systemName: "slider.horizontal.3")
-                    Text("Add Transaction")
-                }
-                .frame(maxWidth: .infinity)
+        }
+        .animation(.easeInOut, value: groupedTransactions)
+    }
+    
+    @ViewBuilder
+    private func makeAddTransactionButton() -> some View {
+        Button {
+            showAddTransactionView.toggle()
+        } label: {
+            HStack {
+                Image(systemName: "slider.horizontal.3")
+                Text("Add Transaction")
             }
-            .listRowSeparator(.hidden)
-            .buttonStyle(.borderless)
+            .frame(maxWidth: .infinity)
         }
-        .listStyle(.plain)
-        .refreshable {
-            viewModel.fetchPortfolios()
-        }
+        .listRowSeparator(.hidden)
+        .buttonStyle(.borderless)
+        .padding(.vertical, 8)
     }
     
     @ViewBuilder
@@ -113,7 +128,7 @@ struct PortfolioView: View {
         HStack(spacing: 16) {
             CoinImageView(
                 imageData: group.coin.imageData,
-                placeholder: group.coin.symbol,
+                placeholderText: group.coin.symbol,
                 size: 36
             )
             

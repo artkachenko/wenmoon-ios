@@ -95,28 +95,21 @@ struct PriceAlertsView: View {
                 
                 Spacer()
                 
-                if priceAlerts.isEmpty {
-                    VStack(spacing: 8) {
-                        Image("MoonIcon")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24, height: 24)
-                            .foregroundColor(.gray)
-                        
-                        Text("No price alerts yet")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                    }
-                    
-                    Spacer()
-                } else {
-                    List {
-                        ForEach(priceAlerts, id: \.self) { priceAlert in
-                            makePriceAlertCell(priceAlert)
+                VStack {
+                    if priceAlerts.isEmpty {
+                        Spacer()
+                        PlaceholderView(text: "No price alerts yet")
+                        Spacer()
+                    } else {
+                        List {
+                            ForEach(priceAlerts, id: \.self) { priceAlert in
+                                makePriceAlertCell(priceAlert)
+                            }
                         }
+                        .listStyle(.plain)
                     }
-                    .listStyle(.plain)
                 }
+                .animation(.easeInOut, value: priceAlerts)
             }
         }
         .contentShape(Rectangle())

@@ -91,7 +91,7 @@ struct CoinSelectionView: View {
                 HStack(spacing: 12) {
                     CoinImageView(
                         imageURL: coin.image,
-                        placeholder: coin.symbol,
+                        placeholderText: coin.symbol,
                         size: 36
                     )
                     
