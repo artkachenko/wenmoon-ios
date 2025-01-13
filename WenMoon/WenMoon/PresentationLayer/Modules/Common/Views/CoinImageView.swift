@@ -8,12 +8,14 @@
 import SwiftUI
 
 struct CoinImageView: View {
+    // MARK: - Properties
     let image: Image?
     let imageURL: URL?
     let imageData: Data?
     let placeholderText: String
     let size: CGFloat
     
+    // MARK: - Initializers
     init(
         image: Image? = nil,
         imageURL: URL? = nil,
@@ -28,6 +30,7 @@ struct CoinImageView: View {
         self.size = size
     }
     
+    // MARK: - Body
     var body: some View {
         ZStack {
             Circle()
@@ -44,17 +47,18 @@ struct CoinImageView: View {
                 }, placeholder: {
                     ProgressView()
                         .controlSize(.mini)
-                        .tint(.wmBlack)
+                        .tint(.black)
                 })
             } else {
                 Text(placeholderText.prefix(1))
                     .font(.body)
-                    .foregroundColor(.wmBlack)
+                    .foregroundColor(.black)
             }
         }
         .brightness(-0.1)
     }
     
+    // MARK: - Subviews
     @ViewBuilder
     private func makeImage(_ image: Image) -> some View {
         image

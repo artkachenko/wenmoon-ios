@@ -11,17 +11,18 @@ import SwiftData
 
 final class CoinSelectionViewModel: BaseViewModel {
     // MARK: - Properties
+    private let coinScannerService: CoinScannerService
+
     @Published private(set) var coins: [Coin] = []
-    
+    @Published private(set) var isLoadingMoreItems = false
+    @Published var isInSearchMode = false
+
     var coinsCache: [Int: [Coin]] = [:]
     var searchCoinsCache: [String: [Coin]] = [:]
-    var isInSearchMode = false
-    
+
     private(set) var currentPage = 1
     private(set) var savedCoinIDs: Set<String> = []
-    
-    private let coinScannerService: CoinScannerService
-    
+
     private var searchQuerySubject = PassthroughSubject<String, Never>()
     private var cancellables = Set<AnyCancellable>()
     
@@ -35,7 +36,7 @@ final class CoinSelectionViewModel: BaseViewModel {
         super.init(swiftDataManager: swiftDataManager)
         
         searchQuerySubject
-            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
             .sink { [weak self] query in
                 Task {
                     await self?.handleQueryChange(query)
@@ -47,14 +48,14 @@ final class CoinSelectionViewModel: BaseViewModel {
     // MARK: - Internal Methods
     @MainActor
     func fetchCoins(at page: Int = 1) async {
+        isLoading = true
+        defer { isLoading = false }
+        
         if !isInSearchMode, let cachedCoins = coinsCache[page] {
             coins = page > 1 ? coins + cachedCoins : cachedCoins
             currentPage = page
             return
         }
-        
-        isLoading = true
-        defer { isLoading = false }
         
         do {
             let fetchedCoins = try await coinScannerService.getCoins(at: page)
@@ -68,8 +69,11 @@ final class CoinSelectionViewModel: BaseViewModel {
         }
     }
     
+    @MainActor
     func fetchCoinsOnNextPageIfNeeded(_ coin: Coin) async {
         if coin.id == coins.last?.id && !isInSearchMode {
+            isLoadingMoreItems = true
+            defer { isLoadingMoreItems = false }
             await fetchCoins(at: currentPage + 1)
         }
     }

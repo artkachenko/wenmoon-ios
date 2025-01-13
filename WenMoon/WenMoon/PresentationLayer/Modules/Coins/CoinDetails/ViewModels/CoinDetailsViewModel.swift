@@ -9,12 +9,12 @@ import Foundation
 
 final class CoinDetailsViewModel: BaseViewModel {
     // MARK: - Properties
-    @Published var coin: CoinData
-    @Published private(set) var chartData: [ChartData] = []
-    
-    var chartDataCache: [String: [ChartData]] = [:]
-    
     private let coinScannerService: CoinScannerService
+
+    @Published private(set) var coin: CoinData
+    @Published private(set) var chartData: [ChartData] = []
+
+    var chartDataCache: [String: [ChartData]] = [:]
     
     // MARK: - Initializers
     convenience init(coin: CoinData) {

@@ -68,7 +68,7 @@ final class HTTPClientImpl: HTTPClient {
         return try await execute(httpRequest)
     }
     
-    // MARK: - Private
+    // MARK: - Private Methods
     private func execute(_ httpRequest: HTTPRequest) async throws -> Data {
         guard var urlComponents = URLComponents(url: absolutePath(httpRequest.path), resolvingAgainstBaseURL: false) else {
             throw APIError.invalidEndpoint(endpoint: httpRequest.path)

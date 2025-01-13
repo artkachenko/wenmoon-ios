@@ -53,7 +53,7 @@ class BaseViewModel: ObservableObject {
         }
     }
     
-    // MARK: - Methods
+    // MARK: - Internal Methods
     func fetch<T: PersistentModel>(_ descriptor: FetchDescriptor<T>) -> [T] {
         do {
             return try swiftDataManager?.fetch(descriptor) ?? []

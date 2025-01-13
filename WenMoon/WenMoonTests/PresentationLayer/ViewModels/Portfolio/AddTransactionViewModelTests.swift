@@ -11,11 +11,13 @@ import XCTest
 final class AddTransactionViewModelTests: XCTestCase {
     // MARK: - Properties
     var viewModel: AddTransactionViewModel!
+    var swiftDataManager: SwiftDataManagerMock!
     
     // MARK: - Setup
     override func setUp() {
         super.setUp()
-        viewModel = AddTransactionViewModel()
+        swiftDataManager = SwiftDataManagerMock()
+        viewModel = AddTransactionViewModel(swiftDataManager: swiftDataManager)
     }
     
     override func tearDown() {
@@ -24,56 +26,66 @@ final class AddTransactionViewModelTests: XCTestCase {
     }
     
     // MARK: - Tests
-    func testMakeCoinData_withImage() async {
+    func testCreateCoinData_withImage() async {
         // Setup
         let imageURL = URL(string: "https://example.com/image.png")!
         let coin = CoinFactoryMock.makeCoin(image: imageURL)
         
         // Action
-        let coinData = await viewModel.makeCoinData(from: coin)
+        let createdCoin = await viewModel.createCoinData(from: coin)
         
         // Assertions
-        assertCoinsEqual([coin], [coinData])
-        XCTAssertNotNil(coinData.imageData)
+        assertCoinsEqual([coin], [createdCoin])
+        XCTAssertNotNil(createdCoin.imageData)
     }
     
-    func testMakeCoinData_withoutImage() async {
+    func testCreateCoinData_withoutImage() async {
         // Setup
         let coin = CoinFactoryMock.makeCoin()
         
         // Action
-        let coinData = await viewModel.makeCoinData(from: coin)
+        let createdCoin = await viewModel.createCoinData(from: coin)
         
         // Assertions
-        assertCoinsEqual([coin], [coinData])
-        XCTAssertNil(coinData.imageData)
+        assertCoinsEqual([coin], [createdCoin])
+        XCTAssertNil(createdCoin.imageData)
     }
     
     func testShouldDisableAddTransactionsButton_buyAndSell() {
         // Setup
-        viewModel.transaction = PortfolioFactoryMock.makeTransaction(type: .buy)
+        let transaction = PortfolioFactoryMock.makeTransaction(type: .buy)
         
         // Action & Assertions
-        XCTAssertFalse(viewModel.shouldDisableAddTransactionsButton())
+        XCTAssertFalse(viewModel.shouldDisableAddTransactionsButton(for: transaction))
         
-        viewModel.transaction.pricePerCoin = nil
-        XCTAssert(viewModel.shouldDisableAddTransactionsButton())
+        transaction.pricePerCoin = nil
+        XCTAssert(viewModel.shouldDisableAddTransactionsButton(for: transaction))
         
-        viewModel.transaction.coin = nil
-        XCTAssert(viewModel.shouldDisableAddTransactionsButton())
+        transaction.coin = nil
+        XCTAssert(viewModel.shouldDisableAddTransactionsButton(for: transaction))
     }
     
     func testShouldDisableAddTransactionsButton_transferInAndOut() {
         // Setup
-        viewModel.transaction = PortfolioFactoryMock.makeTransaction(type: .transferIn)
+        let transaction = PortfolioFactoryMock.makeTransaction(type: .transferIn)
         
         // Action & Assertions
-        XCTAssertFalse(viewModel.shouldDisableAddTransactionsButton())
+        XCTAssertFalse(viewModel.shouldDisableAddTransactionsButton(for: transaction))
         
-        viewModel.transaction.quantity = nil
-        XCTAssert(viewModel.shouldDisableAddTransactionsButton())
+        transaction.quantity = nil
+        XCTAssert(viewModel.shouldDisableAddTransactionsButton(for: transaction))
         
-        viewModel.transaction.coin = nil
-        XCTAssert(viewModel.shouldDisableAddTransactionsButton())
+        transaction.coin = nil
+        XCTAssert(viewModel.shouldDisableAddTransactionsButton(for: transaction))
+    }
+
+    
+    func testIsPriceFieldRequired() {
+        // Action & Assertions
+        XCTAssertTrue(viewModel.isPriceFieldRequired(for: .buy))
+        XCTAssertTrue(viewModel.isPriceFieldRequired(for: .sell))
+
+        XCTAssertFalse(viewModel.isPriceFieldRequired(for: .transferIn))
+        XCTAssertFalse(viewModel.isPriceFieldRequired(for: .transferOut))
     }
 }

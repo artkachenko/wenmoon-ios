@@ -16,17 +16,17 @@ final class PortfolioViewModel: BaseViewModel {
     }
     
     // MARK: - Properties
-    @Published var groupedTransactions: [CoinTransactions] = []
-    @Published var totalValue: Double = .zero
-    @Published var portfolioChange24HValue: Double = .zero
-    @Published var portfolioChange24HPercentage: Double = .zero
-    @Published var portfolioChangeAllTimeValue: Double = .zero
-    @Published var portfolioChangeAllTimePercentage: Double = .zero
-    @Published var selectedTimeline: Timeline = .twentyFourHours
-    
+    @Published private(set) var groupedTransactions: [CoinTransactions] = []
+    @Published private(set) var totalValue: Double = .zero
+    @Published private(set) var portfolioChange24HValue: Double = .zero
+    @Published private(set) var portfolioChange24HPercentage: Double = .zero
+    @Published private(set) var portfolioChangeAllTimeValue: Double = .zero
+    @Published private(set) var portfolioChangeAllTimePercentage: Double = .zero
+    @Published private(set) var selectedTimeline: Timeline = .twentyFourHours
+
     var portfolios: [Portfolio] = []
     var selectedPortfolio: Portfolio!
-    
+
     var portfolioChangePercentage: Double {
         switch selectedTimeline {
         case .twentyFourHours:
@@ -35,7 +35,7 @@ final class PortfolioViewModel: BaseViewModel {
             return portfolioChangeAllTimePercentage
         }
     }
-    
+
     var portfolioChangeValue: Double {
         switch selectedTimeline {
         case .twentyFourHours:
@@ -68,30 +68,13 @@ final class PortfolioViewModel: BaseViewModel {
     }
     
     func addTransaction(_ transaction: Transaction) {
-        let existingQuantity = groupedTransactions.first { $0.coin.id == transaction.coin?.id }?.totalQuantity ?? .zero
-        let quantity = transaction.quantity ?? .zero
-        
-        if (transaction.type == .sell || transaction.type == .transferOut) && quantity > existingQuantity { return }
-        
         selectedPortfolio.transactions.append(transaction)
         updateAndSavePortfolio()
     }
     
     func editTransaction(_ transaction: Transaction) {
-        guard let index = selectedPortfolio.transactions.firstIndex(where: { $0.id == transaction.id }) else {
-            return
-        }
-        
-        let existingTransaction = selectedPortfolio.transactions[index]
-        let existingQuantity = groupedTransactions
-            .first { $0.coin.id == transaction.coin?.id }?.totalQuantity ?? 0
-        let newQuantity = transaction.quantity ?? .zero
-        let deltaQuantity = newQuantity - (existingTransaction.quantity ?? .zero)
-        
-        if (transaction.type == .sell || transaction.type == .transferOut) && deltaQuantity > existingQuantity { return }
-        
-        selectedPortfolio.transactions[index] = transaction
-        updateAndSavePortfolio()
+        deleteTransaction(by: transaction.id)
+        addTransaction(transaction)
     }
     
     func deleteTransactions(for coinID: String) {
@@ -104,11 +87,7 @@ final class PortfolioViewModel: BaseViewModel {
     }
 
     func deleteTransaction(_ transactionID: String) {
-        guard let transactionToDelete = selectedPortfolio.transactions.first(where: { $0.id == transactionID }) else {
-            return
-        }
-        delete(transactionToDelete)
-        selectedPortfolio.transactions.removeAll { $0.id == transactionID }
+        deleteTransaction(by: transactionID)
         updateAndSavePortfolio()
     }
     
@@ -128,6 +107,14 @@ final class PortfolioViewModel: BaseViewModel {
     }
     
     // MARK: - Private Methods
+    private func deleteTransaction(by id: String) {
+        guard let transactionToDelete = selectedPortfolio.transactions.first(where: { $0.id == id }) else {
+            return
+        }
+        delete(transactionToDelete)
+        selectedPortfolio.transactions.removeAll { $0.id == id }
+    }
+    
     private func updateAndSavePortfolio() {
         updatePortfolio()
         save()
@@ -166,8 +153,9 @@ final class PortfolioViewModel: BaseViewModel {
             previousTotalValue += previousCoinValue
         }
         
-        portfolioChange24HValue = total24HChange
-        portfolioChange24HPercentage = (previousTotalValue > .zero) ? (total24HChange / previousTotalValue) * 100 : .zero
+        let isPreviousTotalValuePositive = previousTotalValue > .zero
+        portfolioChange24HValue = isPreviousTotalValuePositive ? total24HChange : .zero
+        portfolioChange24HPercentage = isPreviousTotalValuePositive ? (total24HChange / previousTotalValue) * 100 : .zero
     }
     
     private func calculatePortfolioChanges() {
@@ -197,8 +185,9 @@ final class PortfolioViewModel: BaseViewModel {
             }
         }
         
-        portfolioChangeAllTimeValue = (totalValue + realizedValue) - initialInvestment
-        portfolioChangeAllTimePercentage = (initialInvestment > .zero) ? ((portfolioChangeAllTimeValue / initialInvestment) * 100) : .zero
+        let isInitialInvestmentPositive = initialInvestment > .zero
+        portfolioChangeAllTimeValue = isInitialInvestmentPositive ? ((totalValue + realizedValue) - initialInvestment) : .zero
+        portfolioChangeAllTimePercentage = isInitialInvestmentPositive ? ((portfolioChangeAllTimeValue / initialInvestment) * 100) : .zero
     }
 }
 

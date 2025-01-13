@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct PlaceholderView: View {
+    // MARK: - Properties
     let text: String
 
+    // MARK: - Body
     var body: some View {
         VStack(spacing: 8) {
-            Image("MoonIcon")
+            Image("moon")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 24, height: 24)

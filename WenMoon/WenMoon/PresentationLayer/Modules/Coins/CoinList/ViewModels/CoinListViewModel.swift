@@ -10,16 +10,14 @@ import SwiftData
 
 final class CoinListViewModel: BaseViewModel {
     // MARK: - Properties
-    @Published var coins: [CoinData] = []
-    @Published var marketData: [String: MarketData] = [:]
-    @Published var chartData: [String: [String: [ChartData]]] = [:]
-    @Published var globalMarketItems: [GlobalMarketItem] = []
-    
     private let coinScannerService: CoinScannerService
     private let priceAlertService: PriceAlertService
-    
+
+    @Published var coins: [CoinData] = []
+    @Published var marketData: [String: MarketData] = [:]
+    @Published var globalMarketItems: [GlobalMarketItem] = []
+
     private var cacheTimer: Timer?
-    private var chartDataFetchTimer: Timer?
     
     // MARK: - Initializers
     convenience init() {
@@ -48,7 +46,6 @@ final class CoinListViewModel: BaseViewModel {
     
     deinit {
         cacheTimer?.invalidate()
-        chartDataFetchTimer?.invalidate()
     }
     
     // MARK: - Internal Methods

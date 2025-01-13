@@ -8,27 +8,27 @@
 import Foundation
 
 final class AddTransactionViewModel: BaseViewModel {
-    // MARK: - Properties
-    @Published var transaction: Transaction
-    
     // MARK: - Initializers
-    init(transaction: Transaction? = nil) {
-        self.transaction = transaction ?? Transaction()
-        super.init()
+    init(swiftDataManager: SwiftDataManager? = nil) {
+        super.init(swiftDataManager: swiftDataManager)
     }
     
     // MARK: - Internal Methods
-    func makeCoinData(from coin: Coin) async -> CoinData {
+    func createCoinData(from coin: Coin) async -> CoinData {
         let imageData = (coin.image != nil) ? (await loadImage(from: coin.image!)) : nil
         return CoinData(from: coin, imageData: imageData)
     }
     
-    func shouldDisableAddTransactionsButton() -> Bool {
+    func shouldDisableAddTransactionsButton(for transaction: Transaction) -> Bool {
         switch transaction.type {
         case .buy, .sell:
-            return transaction.coin == nil || transaction.quantity == nil || transaction.pricePerCoin == nil
+            return (transaction.coin == nil) || (transaction.quantity == nil) || (transaction.pricePerCoin == nil)
         default:
-            return transaction.coin == nil || transaction.quantity == nil
+            return (transaction.coin == nil) || (transaction.quantity == nil)
         }
+    }
+    
+    func isPriceFieldRequired(for transactionType: Transaction.TransactionType) -> Bool {
+        (transactionType == .buy) || (transactionType == .sell)
     }
 }

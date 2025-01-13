@@ -10,11 +10,14 @@ import SwiftUI
 struct CryptoCompareView: View {
     // MARK: - Properties
     @StateObject private var viewModel = CryptoCompareViewModel()
+
     @State private var selectedPriceOption: PriceOption = .now
     @State private var coinToBeCompared: Coin?
     @State private var coinToCompareWith: Coin?
+
     @State private var cachedImage1: Image?
     @State private var cachedImage2: Image?
+
     @State private var isSelectingFirstCoin = true
     @State private var showCoinSelectionView = false
     
@@ -33,7 +36,7 @@ struct CryptoCompareView: View {
                     swap(&coinToBeCompared, &coinToCompareWith)
                     swap(&cachedImage1, &cachedImage2)
                 }) {
-                    Image("SwapIcon")
+                    Image("arrows.swap")
                         .resizable()
                         .frame(width: 24, height: 24)
                         .foregroundColor(.gray)

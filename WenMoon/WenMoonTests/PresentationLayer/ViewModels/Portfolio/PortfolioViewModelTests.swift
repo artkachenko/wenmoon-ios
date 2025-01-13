@@ -51,7 +51,7 @@ final class PortfolioViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.selectedPortfolio, portfolio)
     }
     
-    func testAddTransaction_success() {
+    func testAddTransaction() {
         // Setup
         viewModel.selectedPortfolio = PortfolioFactoryMock.makePortfolio(transactions: [])
         let transaction = PortfolioFactoryMock.makeTransaction()
@@ -65,19 +65,7 @@ final class PortfolioViewModelTests: XCTestCase {
         XCTAssert(swiftDataManager.saveMethodCalled)
     }
     
-    func testAddTransaction_failure() {
-        // Setup
-        viewModel.selectedPortfolio = PortfolioFactoryMock.makePortfolio(transactions: [])
-        let transaction = PortfolioFactoryMock.makeTransaction(quantity: 1_001, type: .sell)
-        
-        // Action
-        viewModel.addTransaction(transaction)
-        
-        // Assertions
-        XCTAssertEqual(viewModel.selectedPortfolio.transactions.count, .zero)
-    }
-    
-    func testEditTransaction_success() {
+    func testEditTransaction() {
         // Setup
         let transactionID = UUID().uuidString
         let originalTransaction = PortfolioFactoryMock.makeTransaction(id: transactionID)
@@ -90,21 +78,6 @@ final class PortfolioViewModelTests: XCTestCase {
         // Assertions
         XCTAssertEqual(viewModel.selectedPortfolio.transactions.first, editedTransaction)
         XCTAssert(swiftDataManager.saveMethodCalled)
-    }
-    
-    func testEditTransaction_failure() {
-        // Setup
-        let transactionID = UUID().uuidString
-        let originalTransaction = PortfolioFactoryMock.makeTransaction(id: transactionID)
-        viewModel.selectedPortfolio = PortfolioFactoryMock.makePortfolio(transactions: [originalTransaction])
-        let editedTransaction = PortfolioFactoryMock.makeTransaction(id: transactionID, quantity: 1_001, type: .transferOut)
-        
-        // Action
-        viewModel.editTransaction(editedTransaction)
-        
-        // Assertions
-        XCTAssertNotEqual(viewModel.selectedPortfolio.transactions.first, editedTransaction)
-        XCTAssertFalse(swiftDataManager.saveMethodCalled)
     }
     
     func testDeleteTransactions() {

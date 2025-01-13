@@ -11,6 +11,7 @@ import XCTest
 class CryptoCompareViewModelTests: XCTestCase {
     // MARK: - Properties
     var viewModel: CryptoCompareViewModel!
+    
     var coinToBeCompared: Coin!
     var coinToCompareWith: Coin!
     

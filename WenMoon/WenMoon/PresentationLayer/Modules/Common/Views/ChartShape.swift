@@ -8,11 +8,13 @@
 import SwiftUI
 
 struct ChartShape: Shape {
+    // MARK: - Properties
     var value: Double
     var baseAmplitude: CGFloat = 15
     var frequency: Int = 3
     var maxTilt: CGFloat = 15
     
+    // MARK: - Internal Methods
     func path(in rect: CGRect) -> Path {
         var path = Path()
         let width = rect.width

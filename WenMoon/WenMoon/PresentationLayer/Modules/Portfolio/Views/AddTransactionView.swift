@@ -16,29 +16,32 @@ struct AddTransactionView: View {
     
     // MARK: - Properties
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var viewModel: AddTransactionViewModel
+
+    @StateObject private var viewModel = AddTransactionViewModel()
+
     @FocusState private var isTextFieldFocused: Bool
+
+    @State private var transaction: Transaction
     @State private var showCoinSelectionView = false
-    
+
     private let mode: Mode
     private let didAddTransaction: ((Transaction) -> Void)?
     private let didEditTransaction: ((Transaction) -> Void)?
-    
+
     // MARK: - Initializers
     init(
         transaction: Transaction? = nil,
         didAddTransaction: ((Transaction) -> Void)? = nil,
         didEditTransaction: ((Transaction) -> Void)? = nil
     ) {
-        _viewModel = StateObject(wrappedValue: AddTransactionViewModel(transaction: transaction))
-        mode = transaction == nil ? .add : .edit
+        mode = (transaction == nil) ? .add : .edit
+        self.transaction = transaction ?? Transaction()
         self.didAddTransaction = didAddTransaction
         self.didEditTransaction = didEditTransaction
     }
     
     // MARK: - Body
     var body: some View {
-        let transaction = viewModel.transaction
         VStack {
             ZStack {
                 Text(mode == .add ? "Add Transaction" : "Edit Transaction")
@@ -59,9 +62,9 @@ struct AddTransactionView: View {
                 .padding(24)
             }
             
-            makeTransactionFormView(transaction)
+            makeTransactionFormView($transaction)
             
-            let isAddTransactionButtonDisabled = viewModel.shouldDisableAddTransactionsButton()
+            let isAddTransactionButtonDisabled = viewModel.shouldDisableAddTransactionsButton(for: transaction)
             Button(action: {
                 Task {
                     switch mode {
@@ -91,7 +94,7 @@ struct AddTransactionView: View {
         .sheet(isPresented: $showCoinSelectionView) {
             CoinSelectionView(mode: .selection, didSelectCoin: { selectedCoin in
                 Task {
-                    let coin = await viewModel.makeCoinData(from: selectedCoin)
+                    let coin = await viewModel.createCoinData(from: selectedCoin)
                     transaction.coin = coin
                 }
             })
@@ -100,13 +103,13 @@ struct AddTransactionView: View {
     
     // MARK: - Subviews
     @ViewBuilder
-    private func makeTransactionFormView(_ transaction: Transaction) -> some View {
+    private func makeTransactionFormView(_ transactionBinding: Binding<Transaction>) -> some View {
         VStack(spacing: 16) {
             Button(action: {
                 showCoinSelectionView.toggle()
             }) {
                 HStack {
-                    if let coin = transaction.coin {
+                    if let coin = transactionBinding.wrappedValue.coin {
                         HStack(spacing: 12) {
                             CoinImageView(
                                 imageData: coin.imageData,
@@ -134,7 +137,7 @@ struct AddTransactionView: View {
             .font(.headline)
             
             HStack(spacing: .zero) {
-                TextField("Quantity", value: $viewModel.transaction.quantity, format: .number)
+                TextField("Quantity", value: transactionBinding.quantity, format: .number)
                     .keyboardType(.decimalPad)
                     .focused($isTextFieldFocused)
                     .textFieldStyle(UnderlinedTextFieldStyle())
@@ -145,9 +148,9 @@ struct AddTransactionView: View {
                     .foregroundColor(.gray)
             }
             
-            if viewModel.transaction.type == .buy || viewModel.transaction.type == .sell {
+            if viewModel.isPriceFieldRequired(for: transactionBinding.wrappedValue.type) {
                 HStack(spacing: .zero) {
-                    TextField("Price per Coin", value: $viewModel.transaction.pricePerCoin, format: .number)
+                    TextField("Price per Coin", value: transactionBinding.pricePerCoin, format: .number)
                         .keyboardType(.decimalPad)
                         .focused($isTextFieldFocused)
                         .textFieldStyle(UnderlinedTextFieldStyle())
@@ -159,7 +162,7 @@ struct AddTransactionView: View {
                 }
             }
             
-            DatePicker("Date", selection: $viewModel.transaction.date, displayedComponents: .date)
+            DatePicker("Date", selection: transactionBinding.date, displayedComponents: .date)
                 .font(.headline)
             
             HStack {
@@ -168,7 +171,7 @@ struct AddTransactionView: View {
                 
                 Spacer()
                 
-                Picker("", selection: $viewModel.transaction.type) {
+                Picker("", selection: transactionBinding.type) {
                     ForEach(Transaction.TransactionType.allCases, id: \.self) { type in
                         Text(type.rawValue).tag(type)
                     }
@@ -177,6 +180,11 @@ struct AddTransactionView: View {
             }
         }
         .padding()
+        .onChange(of: transactionBinding.wrappedValue.type) { _, type in
+            if !viewModel.isPriceFieldRequired(for: type) {
+                transactionBinding.pricePerCoin.wrappedValue = nil
+            }
+        }
     }
 }
 

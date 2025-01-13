@@ -10,7 +10,9 @@ import SwiftUI
 struct PortfolioView: View {
     // MARK: - Properties
     @StateObject private var viewModel = PortfolioViewModel()
+
     @State private var showAddTransactionView = false
+
     @State private var expandedRows: Set<String> = []
     @State private var swipedTransaction: Transaction?
     
@@ -67,6 +69,7 @@ struct PortfolioView: View {
                     .font(.caption)
                     .foregroundColor(.gray)
             }
+            .animation(.easeInOut, value: viewModel.selectedTimeline)
             .onTapGesture {
                 viewModel.toggleSelectedTimeline()
             }
@@ -158,7 +161,7 @@ struct PortfolioView: View {
             Button(role: .destructive) {
                 viewModel.deleteTransactions(for: group.coin.id)
             } label: {
-                Image("TrashIcon")
+                Image("trash")
             }
         }
         .padding()
@@ -176,13 +179,13 @@ struct PortfolioView: View {
                             Button(role: .destructive) {
                                 viewModel.deleteTransaction(transaction.id)
                             } label: {
-                                Image("TrashIcon")
+                                Image("trash")
                             }
                             
                             Button {
-                                swipedTransaction = transaction
+                                swipedTransaction = transaction.copy()
                             } label: {
-                                Image("EditIcon")
+                                Image("pencil")
                             }
                             .tint(.blue)
                         }

@@ -63,3 +63,16 @@ final class Transaction: Identifiable {
         return quantity * currentPrice
     }
 }
+
+extension Transaction {
+    func copy() -> Transaction {
+        Transaction(
+            id: id,
+            coin: coin,
+            quantity: quantity,
+            pricePerCoin: pricePerCoin,
+            date: date,
+            type: type
+        )
+    }
+}

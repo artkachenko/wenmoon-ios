@@ -15,9 +15,9 @@ struct PriceAlert: Codable, Hashable {
         var iconName: String {
             switch self {
             case .above:
-                return "ArrowIncreaseIcon"
+                return "arrow.increase"
             case .below:
-                return "ArrowDecreaseIcon"
+                return "arrow.decrease"
             }
         }
     }

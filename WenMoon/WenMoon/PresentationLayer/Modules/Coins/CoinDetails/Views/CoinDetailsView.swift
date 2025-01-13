@@ -11,16 +11,17 @@ import Charts
 struct CoinDetailsView: View {
     // MARK: - Properties
     @Environment(\.dismiss) private var dismiss
+
     @StateObject private var viewModel: CoinDetailsViewModel
-    
+
     @State private var selectedPrice: String
     @State private var selectedDate = ""
     @State private var selectedXPosition: CGFloat?
     @State private var selectedTimeframe: Timeframe = .oneHour
-    
+
     @State private var showPriceAlertsView = false
     @State private var showAuthAlert = false
-    
+
     // MARK: - Initializers
     init(coin: CoinData) {
         _viewModel = StateObject(wrappedValue: CoinDetailsViewModel(coin: coin))

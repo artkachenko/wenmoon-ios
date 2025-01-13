@@ -16,13 +16,17 @@ struct CoinSelectionView: View {
     
     // MARK: - Properties
     @Environment(\.dismiss) private var dismiss
+
     @StateObject private var viewModel = CoinSelectionViewModel()
+
+    @FocusState private var isTextFieldFocused: Bool
+
     @State private var searchText = ""
-    
+
     private let mode: Mode
     private let didToggleCoin: ((Coin, Bool) -> Void)?
     private let didSelectCoin: ((Coin) -> Void)?
-    
+
     // MARK: - Initializers
     init(
         mode: Mode = .toggle,
@@ -39,15 +43,21 @@ struct CoinSelectionView: View {
         BaseView(errorMessage: $viewModel.errorMessage) {
             NavigationView {
                 ZStack {
-                    List {
-                        ForEach(viewModel.coins, id: \.self) { coin in
-                            makeCoinView(coin)
-                                .task {
-                                    await viewModel.fetchCoinsOnNextPageIfNeeded(coin)
-                                }
+                    ScrollView {
+                        LazyVStack {
+                            ForEach(viewModel.coins, id: \.self) { coin in
+                                Divider()
+                                makeCoinView(coin)
+                                    .task {
+                                        await viewModel.fetchCoinsOnNextPageIfNeeded(coin)
+                                    }
+                            }
+                            
+                            if viewModel.isLoadingMoreItems {
+                                ProgressView()
+                            }
                         }
                     }
-                    .listStyle(.plain)
                     .navigationTitle(mode == .toggle ? "Select Coins" : "Select Coin")
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
@@ -58,11 +68,19 @@ struct CoinSelectionView: View {
                         }
                     }
                     .searchable(text: $searchText, placement: .toolbar, prompt: "e.g. Bitcoin")
+                    .searchFocused($isTextFieldFocused)
                     .scrollDismissesKeyboard(.immediately)
                     
-                    if viewModel.isLoading {
+                    if viewModel.isLoading && !viewModel.isLoadingMoreItems {
                         ProgressView()
                     }
+                    
+                    if viewModel.isInSearchMode && viewModel.coins.isEmpty {
+                        PlaceholderView(text: "No coins found")
+                    }
+                }
+                .onTapGesture {
+                    isTextFieldFocused = false
                 }
             }
         }
@@ -111,8 +129,8 @@ struct CoinSelectionView: View {
                         }
                     ))
                     .tint(.wmPink)
-                    .scaleEffect(0.85)
-                    .padding(.trailing, -28)
+                    .scaleEffect(0.90)
+                    .padding(.trailing, -24)
                 } else if mode == .selection {
                     Image(systemName: "chevron.right")
                         .resizable()
@@ -123,8 +141,11 @@ struct CoinSelectionView: View {
             .padding([.top, .bottom], 4)
             .padding(.leading, 36)
         }
+        .padding(.vertical, 6)
+        .padding(.horizontal, 16)
         .contentShape(Rectangle())
         .onTapGesture {
+            isTextFieldFocused = false
             if mode == .selection {
                 didSelectCoin?(coin)
                 dismiss()

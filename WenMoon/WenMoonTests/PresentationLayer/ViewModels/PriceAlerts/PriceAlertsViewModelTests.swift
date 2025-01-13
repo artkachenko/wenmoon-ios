@@ -11,9 +11,11 @@ import XCTest
 class PriceAlertsViewModelTests: XCTestCase {
     // MARK: - Properties
     var viewModel: PriceAlertsViewModel!
+    
     var priceAlertService: PriceAlertServiceMock!
     var firebaseAuthService: FirebaseAuthServiceMock!
     var userDefaultsManager: UserDefaultsManagerMock!
+    
     var deviceToken: String!
     
     // MARK: - Setup
@@ -22,12 +24,14 @@ class PriceAlertsViewModelTests: XCTestCase {
         priceAlertService = PriceAlertServiceMock()
         firebaseAuthService = FirebaseAuthServiceMock()
         userDefaultsManager = UserDefaultsManagerMock()
+        
         viewModel = PriceAlertsViewModel(
             coin: CoinData(),
             priceAlertService: priceAlertService,
             firebaseAuthService: firebaseAuthService,
             userDefaultsManager: userDefaultsManager
         )
+        
         deviceToken = "expectedDeviceToken"
     }
     

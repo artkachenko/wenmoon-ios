@@ -13,27 +13,27 @@ struct ContentView: View {
         TabView {
             CoinListView()
                 .tabItem {
-                    Image("CoinsIcon")
+                    Image("coins")
                 }
             
             PortfolioView()
                 .tabItem {
-                    Image("PortfolioIcon")
+                    Image("bag")
                 }
             
             CryptoCompareView()
                 .tabItem {
-                    Image("SwapIcon")
+                    Image("arrows.swap")
                 }
             
             EducationView()
                 .tabItem {
-                    Image("BooksIcon")
+                    Image("books")
                 }
             
             AccountView()
                 .tabItem {
-                    Image("PersonIcon")
+                    Image("person")
                 }
         }
     }

@@ -12,6 +12,7 @@ import FirebaseAuth
 class AccountViewModelTests: XCTestCase {
     // MARK: - Properties
     var viewModel: AccountViewModel!
+    
     var googleSignInService: GoogleSignInServiceMock!
     var twitterSignInService: TwitterSignInServiceMock!
     var firebaseAuthService: FirebaseAuthServiceMock!
@@ -24,6 +25,7 @@ class AccountViewModelTests: XCTestCase {
         twitterSignInService = TwitterSignInServiceMock()
         firebaseAuthService = FirebaseAuthServiceMock()
         userDefaultsManager = UserDefaultsManagerMock()
+        
         viewModel = AccountViewModel(
             googleSignInService: googleSignInService,
             twitterSignInService: twitterSignInService,

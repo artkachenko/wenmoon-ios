@@ -10,10 +10,13 @@ import SwiftUI
 struct PriceAlertsView: View {
     // MARK: - Properties
     @Environment(\.dismiss) var dismiss
+
     @StateObject private var viewModel: PriceAlertsViewModel
+
     @FocusState private var isTextFieldFocused: Bool
+
     @State private var targetPrice: Double?
-    
+
     // MARK: - Initializers
     init(coin: CoinData) {
         _viewModel = StateObject(wrappedValue: PriceAlertsViewModel(coin: coin))
@@ -151,7 +154,7 @@ struct PriceAlertsView: View {
                         await viewModel.deletePriceAlert(priceAlert)
                     }
                 }) {
-                    Image("TrashIcon")
+                    Image("trash")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 20, height: 20)

@@ -10,6 +10,7 @@ import SwiftUI
 struct SelectionView: View {
     // MARK: - Properties
     @Environment(\.dismiss) var dismiss
+    
     @Binding var selectedOption: String
     
     let title: String

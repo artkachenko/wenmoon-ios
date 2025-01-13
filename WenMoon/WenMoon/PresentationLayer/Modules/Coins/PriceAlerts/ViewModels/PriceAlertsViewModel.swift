@@ -9,12 +9,11 @@ import Foundation
 
 final class PriceAlertsViewModel: BaseViewModel {
     // MARK: - Properties
+    private let priceAlertService: PriceAlertService
+
     @Published var coin: CoinData
-    
     @Published private(set) var isCreatingPriceAlert = false
     @Published private(set) var deletingPriceAlertIDs: [String] = []
-    
-    private let priceAlertService: PriceAlertService
     
     // MARK: - Initializers
     convenience init(coin: CoinData) {

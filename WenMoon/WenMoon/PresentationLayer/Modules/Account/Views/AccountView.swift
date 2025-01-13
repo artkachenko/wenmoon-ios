@@ -10,6 +10,7 @@ import SwiftUI
 struct AccountView: View {
     // MARK: - Properties
     @StateObject private var viewModel = AccountViewModel()
+    
     @State private var selectedSetting: Setting!
     
     // MARK: - Body
@@ -71,7 +72,7 @@ struct AccountView: View {
             .padding(.bottom, 24)
         } else {
             VStack(spacing: 16) {
-                Image("MoonIcon")
+                Image("moon")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 48, height: 48)
@@ -93,7 +94,7 @@ struct AccountView: View {
                             if viewModel.isGoogleAuthInProgress {
                                 ProgressView()
                             } else {
-                                Image("GoogleLogo")
+                                Image("google.logo")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 24, height: 24)
@@ -110,7 +111,7 @@ struct AccountView: View {
                             if viewModel.isTwitterAuthInProgress {
                                 ProgressView()
                             } else {
-                                Image("TwitterLogo")
+                                Image("twitter.logo")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 24, height: 24)

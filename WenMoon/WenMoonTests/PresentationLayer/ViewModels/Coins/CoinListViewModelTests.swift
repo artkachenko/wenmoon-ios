@@ -11,11 +11,13 @@ import XCTest
 class CoinListViewModelTests: XCTestCase {
     // MARK: - Properties
     var viewModel: CoinListViewModel!
+
     var coinScannerService: CoinScannerServiceMock!
     var priceAlertService: PriceAlertServiceMock!
     var firebaseAuthService: FirebaseAuthServiceMock!
     var userDefaultsManager: UserDefaultsManagerMock!
     var swiftDataManager: SwiftDataManagerMock!
+
     var deviceToken: String!
     
     // MARK: - Setup
@@ -26,6 +28,7 @@ class CoinListViewModelTests: XCTestCase {
         firebaseAuthService = FirebaseAuthServiceMock()
         userDefaultsManager = UserDefaultsManagerMock()
         swiftDataManager = SwiftDataManagerMock()
+        
         viewModel = CoinListViewModel(
             coinScannerService: coinScannerService,
             priceAlertService: priceAlertService,
@@ -33,6 +36,7 @@ class CoinListViewModelTests: XCTestCase {
             userDefaultsManager: userDefaultsManager,
             swiftDataManager: swiftDataManager
         )
+        
         deviceToken = "expectedDeviceToken"
     }
     

@@ -10,6 +10,7 @@ import SwiftUI
 struct BaseView<Content: View>: View {
     // MARK: - Properties
     @Binding var errorMessage: String?
+    
     @State private var showErrorAlert = false
     
     let content: Content

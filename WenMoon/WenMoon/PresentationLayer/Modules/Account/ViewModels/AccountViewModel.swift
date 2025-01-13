@@ -17,14 +17,14 @@ final class AccountViewModel: BaseViewModel {
     }
     
     // MARK: - Properties
-    @Published var settings: [Setting] = []
-    @Published var loginState: LoginState = .signedOut
-    
-    @Published private(set) var isGoogleAuthInProgress = false
-    @Published private(set) var isTwitterAuthInProgress = false
-    
     private let googleSignInService: GoogleSignInService
     private let twitterSignInService: TwitterSignInService
+
+    @Published var settings: [Setting] = []
+    @Published var loginState: LoginState = .signedOut
+
+    @Published private(set) var isGoogleAuthInProgress = false
+    @Published private(set) var isTwitterAuthInProgress = false
     
     // MARK: - Initializers
     convenience init() {

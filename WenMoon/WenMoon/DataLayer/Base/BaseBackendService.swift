@@ -30,7 +30,7 @@ class BaseBackendService {
         self.httpClient = httpClient
     }
 
-    // MARK: - Methods
+    // MARK: - Internal Methods
     func mapToAPIError(_ error: Error) -> APIError {
         if let apiError = error as? APIError {
             return apiError

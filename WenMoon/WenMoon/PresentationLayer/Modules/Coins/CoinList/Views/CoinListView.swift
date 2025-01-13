@@ -10,14 +10,14 @@ import SwiftUI
 struct CoinListView: View {
     // MARK: - Properties
     @StateObject private var viewModel = CoinListViewModel()
-    
+
     @State private var selectedCoin: CoinData!
     @State private var swipedCoin: CoinData!
+
     @State private var chartDrawProgress: CGFloat = .zero
-    
+
     @State private var showCoinSelectionView = false
     @State private var showAuthAlert = false
-    
     @State private var scrollText = false
     
     // MARK: - Body

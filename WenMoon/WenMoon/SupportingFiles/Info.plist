@@ -32,9 +32,9 @@
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
-		<string>wmBlack</string>
+		<string>black</string>
 		<key>UIImageName</key>
-		<string>WenMoonLogo</string>
+		<string>wenmoon.logo</string>
 	</dict>
 </dict>
 </plist>
