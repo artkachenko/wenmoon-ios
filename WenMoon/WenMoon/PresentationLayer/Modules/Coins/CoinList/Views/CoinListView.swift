@@ -10,63 +10,51 @@ import SwiftUI
 struct CoinListView: View {
     // MARK: - Properties
     @StateObject private var viewModel = CoinListViewModel()
-
+    
     @State private var selectedCoin: CoinData!
     @State private var swipedCoin: CoinData!
-
+    
     @State private var chartDrawProgress: CGFloat = .zero
-
+    
     @State private var showCoinSelectionView = false
     @State private var showAuthAlert = false
-    @State private var scrollText = false
     
     // MARK: - Body
     var body: some View {
         BaseView(errorMessage: $viewModel.errorMessage) {
-            VStack {
+            NavigationView {
                 let coins = viewModel.coins
-                HStack(spacing: 8) {
-                    ForEach(viewModel.globalMarketItems, id: \.self) { item in
-                        makeGlobalMarketItemView(item)
+                VStack {
+                    if coins.isEmpty {
+                        makeAddCoinsButton()
+                        Spacer()
+                        PlaceholderView(text: "No coins added yet")
+                        Spacer()
+                    } else {
+                        List {
+                            ForEach(coins, id: \.self) { coin in
+                                makeCoinView(coin)
+                            }
+                            .onDelete(perform: deleteCoin)
+                            .onMove(perform: moveCoin)
+                            
+                            makeAddCoinsButton()
+                        }
+                        .listStyle(.plain)
+                        .animation(.default, value: viewModel.coins)
+                        .refreshable {
+                            Task {
+                                await viewModel.fetchMarketData()
+                                await viewModel.fetchPriceAlerts()
+                            }
+                        }
                     }
                 }
-                .frame(width: 940, height: 20)
-                .offset(x: scrollText ? -680 : 680)
-                .animation(.linear(duration: 20).repeatForever(autoreverses: false), value: scrollText)
-                
-                NavigationView {
-                    VStack {
-                        if coins.isEmpty {
-                            makeAddCoinsButton()
-                            Spacer()
-                            PlaceholderView(text: "No coins added yet")
-                            Spacer()
-                        } else {
-                            List {
-                                ForEach(coins, id: \.self) { coin in
-                                    makeCoinView(coin)
-                                }
-                                .onDelete(perform: deleteCoin)
-                                .onMove(perform: moveCoin)
-                                
-                                makeAddCoinsButton()
-                            }
-                            .listStyle(.plain)
-                            .animation(.default, value: viewModel.coins)
-                            .refreshable {
-                                Task {
-                                    await viewModel.fetchMarketData()
-                                    await viewModel.fetchPriceAlerts()
-                                }
-                            }
-                        }
-                    }
-                    .animation(.easeInOut, value: coins)
-                    .navigationTitle("Coins")
-                    .toolbar {
-                        if !coins.isEmpty {
-                            EditButton()
-                        }
+                .animation(.easeInOut, value: coins)
+                .navigationTitle("Coins")
+                .toolbar {
+                    if !coins.isEmpty {
+                        EditButton()
                     }
                 }
             }
@@ -102,14 +90,6 @@ struct CoinListView: View {
         .task {
             await viewModel.fetchCoins()
             await viewModel.fetchPriceAlerts()
-            await viewModel.fetchGlobalCryptoMarketData()
-            await viewModel.fetchGlobalMarketData()
-        }
-        .onAppear {
-            Task { @MainActor in
-                try await Task.sleep(for: .seconds(1))
-                scrollText = true
-            }
         }
     }
     
@@ -205,19 +185,6 @@ struct CoinListView: View {
                 Image(systemName: "bell.fill")
             }
             .tint(.blue)
-        }
-    }
-    
-    @ViewBuilder
-    private func makeGlobalMarketItemView(_ item: GlobalMarketItem) -> some View {
-        HStack(spacing: 4) {
-            Text(item.type.title)
-                .font(.footnote)
-                .foregroundColor(.lightGray)
-            
-            Text(item.value)
-                .font(.footnote)
-                .bold()
         }
     }
     
