@@ -97,8 +97,8 @@ class AccountViewModelTests: XCTestCase {
         let selectedLanguageOption = "English"
         let selectedCurrencyOption = "USD"
         userDefaultsManager.getObjectReturnValue = [
-            Setting.SettingType.language.rawValue: selectedLanguageOption,
-            Setting.SettingType.currency.rawValue: selectedCurrencyOption
+            .setting(ofType: .language): selectedLanguageOption,
+            .setting(ofType: .currency): selectedCurrencyOption
         ]
         let expectedSettings: [Setting] = [
             Setting(type: .language, selectedOption: selectedLanguageOption),
@@ -130,7 +130,7 @@ class AccountViewModelTests: XCTestCase {
         let updatedSetting = viewModel.getSetting(of: .language)!
         XCTAssertEqual(updatedSetting.selectedOption, newLanguageSettingValue)
         XCTAssertTrue(userDefaultsManager.setObjectCalled)
-        XCTAssertEqual(userDefaultsManager.setObjectValue[languageSetting.type.rawValue] as? String, newLanguageSettingValue)
+        XCTAssertEqual(userDefaultsManager.setObjectValue[.setting(ofType: languageSetting.type)] as? String, newLanguageSettingValue)
     }
     
     func testGetSetting() {

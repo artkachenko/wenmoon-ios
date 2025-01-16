@@ -53,8 +53,8 @@ class CoinListViewModelTests: XCTestCase {
     // Fetch Coins
     func testFetchCoins_isFirstLaunch() async throws {
         // Setup
-        userDefaultsManager.getObjectReturnValue = ["isFirstLaunch": true]
-        let coins = CoinFactoryMock.makeCoins()
+        userDefaultsManager.getObjectReturnValue = [.isFirstLaunch: true]
+        let coins = CoinFactoryMock.makeCoins().sorted { $0.marketCap! > $1.marketCap! }
         coinScannerService.getCoinsByIDsResult = .success(coins)
         
         // Action
@@ -68,7 +68,7 @@ class CoinListViewModelTests: XCTestCase {
     
     func testFetchCoins_isFirstLaunch_networkError() async throws {
         // Setup
-        userDefaultsManager.getObjectReturnValue = ["isFirstLaunch": true]
+        userDefaultsManager.getObjectReturnValue = [.isFirstLaunch: true]
         let error = ErrorFactoryMock.makeNoNetworkConnectionError()
         coinScannerService.getCoinsByIDsResult = .failure(error)
         
@@ -85,8 +85,8 @@ class CoinListViewModelTests: XCTestCase {
         let coins = CoinFactoryMock.makeCoins().shuffled()
         let savedOrder = coins.map(\.id)
         userDefaultsManager.getObjectReturnValue = [
-            "isFirstLaunch": false,
-            "coinsOrder": savedOrder
+            .isFirstLaunch: false,
+            .coinsOrder(forOption: .custom): savedOrder
         ]
         for coin in coins {
             let newCoin = CoinFactoryMock.makeCoinData(from: coin)
@@ -107,7 +107,7 @@ class CoinListViewModelTests: XCTestCase {
     
     func testFetchCoins_isNotFirstLaunch_success() async throws {
         // Setup
-        userDefaultsManager.getObjectReturnValue = ["isFirstLaunch": false]
+        userDefaultsManager.getObjectReturnValue = [.isFirstLaunch: false]
         let coins = CoinFactoryMock.makeCoins()
         for coin in coins {
             let newCoin = CoinFactoryMock.makeCoinData(from: coin)
@@ -127,7 +127,7 @@ class CoinListViewModelTests: XCTestCase {
     
     func testFetchCoins_isNotFirstLaunch_fetchError() async throws {
         // Setup
-        userDefaultsManager.getObjectReturnValue = ["isFirstLaunch": false]
+        userDefaultsManager.getObjectReturnValue = [.isFirstLaunch: false]
         let error: SwiftDataError = .failedToFetchModels
         swiftDataManager.swiftDataError = error
         
@@ -141,7 +141,7 @@ class CoinListViewModelTests: XCTestCase {
     
     func testFetchCoins_emptyResult() async throws {
         // Setup
-        userDefaultsManager.getObjectReturnValue = ["isFirstLaunch": false]
+        userDefaultsManager.getObjectReturnValue = [.isFirstLaunch: false]
         
         // Action
         await viewModel.fetchCoins()
@@ -203,11 +203,11 @@ class CoinListViewModelTests: XCTestCase {
         viewModel.coins = coins
         
         // Action
-        viewModel.saveCoinsOrder()
+        viewModel.saveCoinsOrder(for: .custom)
         
         // Assertions
         XCTAssert(userDefaultsManager.setObjectCalled)
-        XCTAssertEqual(userDefaultsManager.setObjectValue["coinsOrder"] as! [String], coins.map(\.id))
+        XCTAssertEqual(userDefaultsManager.setObjectValue[.coinsOrder(forOption: .custom)] as! [String], coins.map(\.id))
         XCTAssertNil(viewModel.errorMessage)
     }
     
@@ -321,7 +321,7 @@ class CoinListViewModelTests: XCTestCase {
     // Price Alerts
     func testFetchPriceAlerts_success() async throws {
         // Setup
-        userDefaultsManager.getObjectReturnValue = ["deviceToken": deviceToken!]
+        userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
         let coin = CoinFactoryMock.makeCoinData()
         viewModel.coins.append(coin)
         let priceAlerts = PriceAlertFactoryMock.makePriceAlerts()
@@ -345,7 +345,7 @@ class CoinListViewModelTests: XCTestCase {
     
     func testFetchPriceAlerts_invalidEndpoint() async throws {
         // Setup
-        userDefaultsManager.getObjectReturnValue = ["deviceToken": deviceToken!]
+        userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
         let coin = CoinFactoryMock.makeCoinData()
         viewModel.coins.append(coin)
         let error = ErrorFactoryMock.makeInvalidEndpointError()
@@ -374,6 +374,108 @@ class CoinListViewModelTests: XCTestCase {
         
         // Assertions after deleting the price alert
         assertCoinHasNoAlert(coin)
+    }
+    
+    func testSortCoinsBySymbol() {
+        // Setup
+        let coins = [
+            CoinFactoryMock.makeCoinData(symbol: "eth"),
+            CoinFactoryMock.makeCoinData(symbol: "doge"),
+            CoinFactoryMock.makeCoinData(symbol: "btc")
+        ]
+        viewModel.coins = coins
+
+        // Action
+        viewModel.sortCoins(by: .symbol)
+
+        // Assertions
+        XCTAssertEqual(viewModel.coins.map(\.symbol), ["btc", "doge", "eth"])
+    }
+
+    func testSortCoinsByRank() {
+        // Setup
+        let coins = [
+            CoinFactoryMock.makeCoinData(marketCapRank: 2),
+            CoinFactoryMock.makeCoinData(marketCapRank: 10),
+            CoinFactoryMock.makeCoinData(marketCapRank: 1)
+        ]
+        viewModel.coins = coins
+
+        // Action
+        viewModel.sortCoins(by: .rank)
+
+        // Assertions
+        XCTAssertEqual(viewModel.coins.map(\.marketCapRank), [1, 2, 10])
+    }
+
+    func testSortCoinsByMarketCap() {
+        // Setup
+        let coins = [
+            CoinFactoryMock.makeCoinData(marketCap: 5000),
+            CoinFactoryMock.makeCoinData(marketCap: 300),
+            CoinFactoryMock.makeCoinData(marketCap: 10000)
+        ]
+        viewModel.coins = coins
+
+        // Action
+        viewModel.sortCoins(by: .marketCap)
+
+        // Assertions
+        XCTAssertEqual(viewModel.coins.map(\.marketCap), [10000, 5000, 300])
+    }
+
+    func testSortCoinsByPriceChange() {
+        // Setup
+        let coins = [
+            CoinFactoryMock.makeCoinData(priceChange24H: 1.2),
+            CoinFactoryMock.makeCoinData(priceChange24H: 0.5),
+            CoinFactoryMock.makeCoinData(priceChange24H: -0.8)
+        ]
+        viewModel.coins = coins
+
+        // Action
+        viewModel.sortCoins(by: .priceChange24H)
+
+        // Assertions
+        XCTAssertEqual(viewModel.coins.map(\.priceChange24H), [1.2, 0.5, -0.8])
+    }
+    
+    func testGetSavedSortOption() {
+        // Setup
+        userDefaultsManager.getObjectReturnValue = [.sortOption: "marketCap"]
+
+        // Action
+        viewModel.getSavedSortOption()
+
+        // Assertions
+        XCTAssertEqual(viewModel.selectedSortOption, .marketCap)
+    }
+    
+    func testSaveSortOption() {
+        // Action
+        viewModel.saveSortOption(.rank)
+
+        // Assertions
+        XCTAssertTrue(userDefaultsManager.setObjectCalled)
+        XCTAssertEqual(userDefaultsManager.setObjectValue[.sortOption] as? String, "rank")
+        XCTAssertEqual(viewModel.selectedSortOption, .rank)
+    }
+    
+    func testSaveCoinsOrder() {
+        // Setup
+        let coins = [
+            CoinFactoryMock.makeCoinData(id: "bitcoin", marketCapRank: 1),
+            CoinFactoryMock.makeCoinData(id: "ethereum", marketCapRank: 2),
+            CoinFactoryMock.makeCoinData(id: "dogecoin", marketCapRank: 10)
+        ]
+        viewModel.coins = coins
+
+        // Action
+        viewModel.saveCoinsOrder(for: .rank)
+
+        // Assertions
+        XCTAssertTrue(userDefaultsManager.setObjectCalled)
+        XCTAssertEqual(userDefaultsManager.setObjectValue[.coinsOrder(forOption: .rank)] as! [String], ["bitcoin", "ethereum", "dogecoin"])
     }
     
     // MARK: - Helpers

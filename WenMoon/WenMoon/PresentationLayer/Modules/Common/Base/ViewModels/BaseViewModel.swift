@@ -22,14 +22,14 @@ class BaseViewModel: ObservableObject {
     }
     
     var deviceToken: String? {
-        let deviceToken = try? userDefaultsManager.getObject(forKey: "deviceToken", objectType: String.self)
+        let deviceToken = try? userDefaultsManager.getObject(forKey: .deviceToken, objectType: String.self)
         return deviceToken
     }
     
     var isFirstLaunch: Bool {
-        let isFirstLaunch = (try? userDefaultsManager.getObject(forKey: "isFirstLaunch", objectType: Bool.self)) ?? true
+        let isFirstLaunch = (try? userDefaultsManager.getObject(forKey: .isFirstLaunch, objectType: Bool.self)) ?? true
         if isFirstLaunch {
-            try? userDefaultsManager.setObject(false, forKey: "isFirstLaunch")
+            try? userDefaultsManager.setObject(false, forKey: .isFirstLaunch)
         }
         return isFirstLaunch
     }

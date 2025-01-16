@@ -54,7 +54,12 @@ struct CoinListView: View {
                 .navigationTitle("Coins")
                 .toolbar {
                     if !coins.isEmpty {
-                        EditButton()
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            EditButton()
+                        }
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            makeSortByButton()
+                        }
                     }
                 }
             }
@@ -90,6 +95,9 @@ struct CoinListView: View {
         .task {
             await viewModel.fetchCoins()
             await viewModel.fetchPriceAlerts()
+        }
+        .onAppear {
+            viewModel.getSavedSortOption()
         }
     }
     
@@ -188,6 +196,26 @@ struct CoinListView: View {
         }
     }
     
+    @ViewBuilder
+    private func makeSortByButton() -> some View {
+        Menu("Sort By") {
+            ForEach(SortOption.allCases, id: \.self) { sortOption in
+                Button {
+                    viewModel.sortCoins(by: sortOption)
+                } label: {
+                    HStack {
+                        Text(sortOption.title)
+                        if viewModel.selectedSortOption == sortOption {
+                            Spacer()
+                            Image(systemName: "checkmark")
+                                .foregroundStyle(.blue, .primary)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     // MARK: - Helper Methods
     private func deleteCoin(at offsets: IndexSet) {
         for index in offsets {
@@ -200,7 +228,8 @@ struct CoinListView: View {
     
     private func moveCoin(from source: IndexSet, to destination: Int) {
         viewModel.coins.move(fromOffsets: source, toOffset: destination)
-        viewModel.saveCoinsOrder()
+        viewModel.saveSortOption(.custom)
+        viewModel.saveCoinsOrder(for: .custom)
     }
     
     private func handleCoinSelection(coin: Coin, shouldAdd: Bool) {
@@ -210,7 +239,6 @@ struct CoinListView: View {
             } else {
                 await viewModel.deleteCoin(coin.id)
             }
-            viewModel.saveCoinsOrder()
         }
     }
 }

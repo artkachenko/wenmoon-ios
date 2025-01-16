@@ -145,11 +145,11 @@ final class AccountViewModel: BaseViewModel {
     }
     
     private func getSavedSetting(of type: Setting.SettingType) -> String? {
-        try? userDefaultsManager.getObject(forKey: type.rawValue, objectType: String.self) ?? type.defaultOption?.name
+        try? userDefaultsManager.getObject(forKey: .setting(ofType: type), objectType: String.self) ?? type.defaultOption?.name
     }
     
     private func setSetting(_ setting: String, of type: Setting.SettingType) {
-        try? userDefaultsManager.setObject(setting, forKey: type.rawValue)
+        try? userDefaultsManager.setObject(setting, forKey: .setting(ofType: type))
     }
 }
 

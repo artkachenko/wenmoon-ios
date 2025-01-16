@@ -47,7 +47,7 @@ class PriceAlertsViewModelTests: XCTestCase {
     // MARK: - Tests
     func testCreatePriceAlert_success() async throws {
         // Setup
-        userDefaultsManager.getObjectReturnValue = ["deviceToken": deviceToken!]
+        userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
         let coin = CoinFactoryMock.makeCoinData()
         viewModel.coin = coin
         let priceAlert = PriceAlertFactoryMock.makePriceAlert()
@@ -63,7 +63,7 @@ class PriceAlertsViewModelTests: XCTestCase {
     
     func testCreatePriceAlert_encodingError() async throws {
         // Setup
-        userDefaultsManager.getObjectReturnValue = ["deviceToken": deviceToken!]
+        userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
         let coin = CoinFactoryMock.makeCoinData()
         viewModel.coin = coin
         let error = ErrorFactoryMock.makeFailedToEncodeBodyError()
@@ -80,7 +80,7 @@ class PriceAlertsViewModelTests: XCTestCase {
     
     func testDeletePriceAlert_success() async throws {
         // Setup
-        userDefaultsManager.getObjectReturnValue = ["deviceToken": deviceToken!]
+        userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
         let coin = CoinFactoryMock.makeCoinData()
         viewModel.coin = coin
         let priceAlert = PriceAlertFactoryMock.makePriceAlert()
@@ -97,7 +97,7 @@ class PriceAlertsViewModelTests: XCTestCase {
     
     func testDeletePriceAlert_apiError() async throws {
         // Setup
-        userDefaultsManager.getObjectReturnValue = ["deviceToken": deviceToken!]
+        userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
         let coin = CoinFactoryMock.makeCoinData()
         viewModel.coin = coin
         let priceAlert = PriceAlertFactoryMock.makePriceAlert()

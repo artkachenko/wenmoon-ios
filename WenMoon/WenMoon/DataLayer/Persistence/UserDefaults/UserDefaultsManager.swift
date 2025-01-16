@@ -8,8 +8,8 @@
 import Foundation
 
 protocol UserDefaultsManager {
-    func setObject<T: Encodable>(_ object: T, forKey key: String) throws
-    func getObject<T: Decodable>(forKey key: String, objectType: T.Type) throws -> T?
+    func setObject<T: Encodable>(_ object: T, forKey key: UserDefaultsKey) throws
+    func getObject<T: Decodable>(forKey key: UserDefaultsKey, objectType: T.Type) throws -> T?
     func removeObject(forKey key: String)
 }
 
@@ -18,17 +18,17 @@ final class UserDefaultsManagerImpl: UserDefaultsManager {
     private let userDefaults = UserDefaults.standard
     
     // MARK: - UserDefaultsManager
-    func setObject<T: Encodable>(_ object: T, forKey key: String) throws {
+    func setObject<T: Encodable>(_ object: T, forKey key: UserDefaultsKey) throws {
         do {
             let data = try JSONEncoder().encode(object)
-            userDefaults.set(data, forKey: key)
+            userDefaults.set(data, forKey: key.value)
         } catch {
             throw UserDefaultsError.failedToEncodeObject
         }
     }
     
-    func getObject<T: Decodable>(forKey key: String, objectType: T.Type) throws -> T? {
-        guard let data = userDefaults.data(forKey: key) else {
+    func getObject<T: Decodable>(forKey key: UserDefaultsKey, objectType: T.Type) throws -> T? {
+        guard let data = userDefaults.data(forKey: key.value) else {
             return nil
         }
         do {
@@ -41,5 +41,28 @@ final class UserDefaultsManagerImpl: UserDefaultsManager {
     
     func removeObject(forKey key: String) {
         userDefaults.removeObject(forKey: key)
+    }
+}
+
+enum UserDefaultsKey: Hashable {
+    case isFirstLaunch
+    case deviceToken
+    case sortOption
+    case coinsOrder(forOption: SortOption)
+    case setting(ofType: Setting.SettingType)
+    
+    var value: String {
+        switch self {
+        case .isFirstLaunch:
+            return "isFirstLaunch"
+        case .deviceToken:
+            return "deviceToken"
+        case .sortOption:
+            return "sortOption"
+        case .coinsOrder(let sortOption):
+            return "coinsOrder_\(sortOption)"
+        case .setting(let type):
+            return "setting_\(type)"
+        }
     }
 }
