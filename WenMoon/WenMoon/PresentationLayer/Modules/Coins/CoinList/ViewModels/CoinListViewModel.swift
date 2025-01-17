@@ -142,7 +142,7 @@ final class CoinListViewModel: BaseViewModel {
         
         var isCoinReferenced = false
         for portfolio in portfolios {
-            if portfolio.transactions.contains(where: { $0.coin?.id == coin.id }) {
+            if portfolio.transactions.contains(where: { $0.coinID == coin.id }) {
                 isCoinReferenced = true
                 break
             }

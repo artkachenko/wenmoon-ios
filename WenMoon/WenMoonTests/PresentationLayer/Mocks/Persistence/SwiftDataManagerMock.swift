@@ -27,7 +27,7 @@ final class SwiftDataManagerMock: SwiftDataManager {
         if let error = swiftDataError {
             throw error
         }
-        return fetchResult as! [T]
+        return fetchResult.compactMap { $0 as? T }
     }
     
     func insert<T: PersistentModel>(_ model: T) throws {

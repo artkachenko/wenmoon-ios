@@ -63,7 +63,7 @@ class ContentViewModelTests: XCTestCase {
         await viewModel.fetchGlobalCryptoMarketData()
         
         // Assertions
-        XCTAssert(viewModel.globalMarketItems.isEmpty)
+        XCTAssertTrue(viewModel.globalMarketItems.isEmpty)
         XCTAssertNotNil(viewModel.errorMessage)
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
@@ -109,7 +109,7 @@ class ContentViewModelTests: XCTestCase {
         await viewModel.fetchGlobalMarketData()
         
         // Assertions
-        XCTAssert(viewModel.globalMarketItems.isEmpty)
+        XCTAssertTrue(viewModel.globalMarketItems.isEmpty)
         XCTAssertNotNil(viewModel.errorMessage)
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }

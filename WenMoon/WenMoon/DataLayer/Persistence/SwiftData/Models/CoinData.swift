@@ -37,8 +37,6 @@ final class CoinData {
     var atlDate: String?
     var imageData: Data?
     var priceAlerts: [PriceAlert]
-    @Relationship(deleteRule: .noAction, inverse: \Transaction.coin)
-    var transactions: [Transaction]
     var isArchived: Bool
     
     convenience init(
@@ -73,7 +71,6 @@ final class CoinData {
             atlDate: coin.atlDate,
             imageData: imageData,
             priceAlerts: priceAlerts,
-            transactions: [],
             isArchived: false
         )
     }
@@ -105,7 +102,6 @@ final class CoinData {
         atlDate: String? = nil,
         imageData: Data? = nil,
         priceAlerts: [PriceAlert] = [],
-        transactions: [Transaction] = [],
         isArchived: Bool = false
     ) {
         self.id = id
@@ -134,7 +130,6 @@ final class CoinData {
         self.atlDate = atlDate
         self.imageData = imageData
         self.priceAlerts = priceAlerts
-        self.transactions = transactions
         self.isArchived = isArchived
     }
     

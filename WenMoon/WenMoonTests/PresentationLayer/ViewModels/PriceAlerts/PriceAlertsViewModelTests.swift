@@ -122,9 +122,9 @@ class PriceAlertsViewModelTests: XCTestCase {
         viewModel.coin = coin
         
         // Assertions
-        XCTAssert(viewModel.shouldDisableCreateButton(targetPrice: nil))
-        XCTAssert(viewModel.shouldDisableCreateButton(targetPrice: .zero))
-        XCTAssert(viewModel.shouldDisableCreateButton(targetPrice: priceAlerts.first!.targetPrice))
+        XCTAssertTrue(viewModel.shouldDisableCreateButton(targetPrice: nil))
+        XCTAssertTrue(viewModel.shouldDisableCreateButton(targetPrice: .zero))
+        XCTAssertTrue(viewModel.shouldDisableCreateButton(targetPrice: priceAlerts.first!.targetPrice))
         XCTAssertFalse(viewModel.shouldDisableCreateButton(targetPrice: 150_000))
     }
     

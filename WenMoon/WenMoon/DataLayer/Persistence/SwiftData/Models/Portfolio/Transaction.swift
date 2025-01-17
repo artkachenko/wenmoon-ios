@@ -19,8 +19,7 @@ final class Transaction: Identifiable {
     
     @Attribute(.unique)
     var id: String
-    @Relationship(deleteRule: .noAction)
-    var coin: CoinData?
+    var coinID: String?
     var quantity: Double?
     var pricePerCoin: Double?
     var date: Date
@@ -28,14 +27,14 @@ final class Transaction: Identifiable {
     
     init(
         id: String = UUID().uuidString,
-        coin: CoinData? = nil,
+        coinID: String? = nil,
         quantity: Double? = nil,
         pricePerCoin: Double? = nil,
         date: Date = .now,
         type: TransactionType = .buy
     ) {
         self.id = id
-        self.coin = coin
+        self.coinID = coinID
         self.quantity = quantity
         self.pricePerCoin = pricePerCoin
         self.date = date
@@ -53,14 +52,11 @@ final class Transaction: Identifiable {
         return quantity * pricePerCoin
     }
     
-    var currentValue: Double {
-        guard
-            let quantity,
-            let currentPrice = coin?.currentPrice
-        else {
-            return .zero
-        }
-        return quantity * currentPrice
+    func update(from transaction: Transaction) {
+        quantity = transaction.quantity
+        pricePerCoin = transaction.pricePerCoin
+        date = transaction.date
+        type = transaction.type
     }
 }
 
@@ -68,7 +64,7 @@ extension Transaction {
     func copy() -> Transaction {
         Transaction(
             id: id,
-            coin: coin,
+            coinID: coinID,
             quantity: quantity,
             pricePerCoin: pricePerCoin,
             date: date,

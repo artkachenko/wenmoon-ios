@@ -102,7 +102,7 @@ class CoinScannerServiceTests: XCTestCase {
         let coins = try await service.searchCoins(by: "")
         
         // Assertions
-        XCTAssert(coins.isEmpty)
+        XCTAssertTrue(coins.isEmpty)
     }
     
     func testSearchCoinsByQuery_networkError() async throws {

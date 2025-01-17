@@ -101,7 +101,7 @@ class CryptoCompareViewModelTests: XCTestCase {
     
     func testIsPositiveMultiplier() {
         // Assertions
-        XCTAssert(viewModel.isPositiveMultiplier(2))
+        XCTAssertTrue(viewModel.isPositiveMultiplier(2))
         XCTAssertFalse(viewModel.isPositiveMultiplier(0.5))
     }
 }

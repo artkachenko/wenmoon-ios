@@ -16,26 +16,33 @@ struct AddTransactionView: View {
     
     // MARK: - Properties
     @Environment(\.dismiss) private var dismiss
-
+    
     @StateObject private var viewModel = AddTransactionViewModel()
-
+    
     @FocusState private var isTextFieldFocused: Bool
-
+    
     @State private var transaction: Transaction
+    @State private var selectedCoin: CoinProtocol?
     @State private var showCoinSelectionView = false
-
+    
     private let mode: Mode
-    private let didAddTransaction: ((Transaction) -> Void)?
+    private let didAddTransaction: ((Transaction, CoinProtocol?) -> Void)?
     private let didEditTransaction: ((Transaction) -> Void)?
-
+    
+    private var isAddMode: Bool { mode == .add }
+    private var isEditMode: Bool { mode == .edit }
+    
     // MARK: - Initializers
     init(
-        transaction: Transaction? = nil,
-        didAddTransaction: ((Transaction) -> Void)? = nil,
+        transaction: Transaction = Transaction(),
+        mode: Mode = .add,
+        selectedCoin: CoinProtocol? = nil,
+        didAddTransaction: ((Transaction, CoinProtocol?) -> Void)? = nil,
         didEditTransaction: ((Transaction) -> Void)? = nil
     ) {
-        mode = (transaction == nil) ? .add : .edit
-        self.transaction = transaction ?? Transaction()
+        self.transaction = transaction
+        self.mode = mode
+        self.selectedCoin = selectedCoin
         self.didAddTransaction = didAddTransaction
         self.didEditTransaction = didEditTransaction
     }
@@ -44,7 +51,7 @@ struct AddTransactionView: View {
     var body: some View {
         VStack {
             ZStack {
-                Text(mode == .add ? "Add Transaction" : "Edit Transaction")
+                Text(isAddMode ? "Add Transaction" : "Edit Transaction")
                     .font(.headline)
                 
                 HStack {
@@ -66,17 +73,15 @@ struct AddTransactionView: View {
             
             let isAddTransactionButtonDisabled = viewModel.shouldDisableAddTransactionsButton(for: transaction)
             Button(action: {
-                Task {
-                    switch mode {
-                    case .add:
-                        didAddTransaction?(transaction)
-                    case .edit:
-                        didEditTransaction?(transaction)
-                    }
-                    dismiss()
+                switch mode {
+                case .add:
+                    didAddTransaction?(transaction, selectedCoin)
+                case .edit:
+                    didEditTransaction?(transaction)
                 }
+                dismiss()
             }) {
-                Text(mode == .add ? "Add Transaction" : "Edit Transaction")
+                Text(isAddMode ? "Add Transaction" : "Edit Transaction")
                     .padding(.vertical, 12)
                     .padding(.horizontal, 16)
                     .background(isAddTransactionButtonDisabled ? .gray.opacity(0.3) : .white)
@@ -93,10 +98,8 @@ struct AddTransactionView: View {
         }
         .sheet(isPresented: $showCoinSelectionView) {
             CoinSelectionView(mode: .selection, didSelectCoin: { selectedCoin in
-                Task {
-                    let coin = await viewModel.createCoinData(from: selectedCoin)
-                    transaction.coin = coin
-                }
+                transaction.coinID = selectedCoin.id
+                self.selectedCoin = selectedCoin
             })
         }
     }
@@ -109,13 +112,14 @@ struct AddTransactionView: View {
                 showCoinSelectionView.toggle()
             }) {
                 HStack {
-                    if let coin = transactionBinding.wrappedValue.coin {
+                    if let coin = selectedCoin {
                         HStack(spacing: 12) {
                             CoinImageView(
-                                imageData: coin.imageData,
+                                imageURL: coin.image,
                                 placeholderText: coin.symbol,
                                 size: 36
                             )
+                            .grayscale(isEditMode ? 1 : .zero)
                             
                             Text(coin.symbol.uppercased())
                                 .font(.headline)
@@ -135,6 +139,7 @@ struct AddTransactionView: View {
             }
             .tint(.white)
             .font(.headline)
+            .disabled(isEditMode)
             
             HStack(spacing: .zero) {
                 TextField("Quantity", value: transactionBinding.quantity, format: .number)

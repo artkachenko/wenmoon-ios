@@ -53,7 +53,7 @@ class AccountViewModelTests: XCTestCase {
         viewModel.signOut()
         
         // Assertions
-        XCTAssert(viewModel.loginState == .signedOut)
+        XCTAssertTrue(viewModel.loginState == .signedOut)
     }
 
     func testSignOut_failure() async {

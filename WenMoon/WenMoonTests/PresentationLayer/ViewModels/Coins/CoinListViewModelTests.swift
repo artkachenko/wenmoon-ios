@@ -88,10 +88,7 @@ class CoinListViewModelTests: XCTestCase {
             .isFirstLaunch: false,
             .coinsOrder(forOption: .custom): savedOrder
         ]
-        for coin in coins {
-            let newCoin = CoinFactoryMock.makeCoinData(from: coin)
-            swiftDataManager.fetchResult.append(newCoin)
-        }
+        swiftDataManager.fetchResult = coins.map { CoinFactoryMock.makeCoinData(from: $0) }
         let marketData = MarketDataFactoryMock.makeMarketData(for: coins)
         coinScannerService.getMarketDataResult = .success(marketData)
         
@@ -99,7 +96,7 @@ class CoinListViewModelTests: XCTestCase {
         await viewModel.fetchCoins()
         
         // Assertions
-        XCTAssert(swiftDataManager.fetchMethodCalled)
+        XCTAssertTrue(swiftDataManager.fetchMethodCalled)
         XCTAssertEqual(viewModel.coins.map(\.id), savedOrder)
         assertCoinsEqual(viewModel.coins, coins, marketData: marketData)
         XCTAssertNil(viewModel.errorMessage)
@@ -109,10 +106,7 @@ class CoinListViewModelTests: XCTestCase {
         // Setup
         userDefaultsManager.getObjectReturnValue = [.isFirstLaunch: false]
         let coins = CoinFactoryMock.makeCoins()
-        for coin in coins {
-            let newCoin = CoinFactoryMock.makeCoinData(from: coin)
-            swiftDataManager.fetchResult.append(newCoin)
-        }
+        swiftDataManager.fetchResult = coins.map { CoinFactoryMock.makeCoinData(from: $0) }
         let marketData = MarketDataFactoryMock.makeMarketData(for: coins)
         coinScannerService.getMarketDataResult = .success(marketData)
         
@@ -120,7 +114,7 @@ class CoinListViewModelTests: XCTestCase {
         await viewModel.fetchCoins()
         
         // Assertions
-        XCTAssert(swiftDataManager.fetchMethodCalled)
+        XCTAssertTrue(swiftDataManager.fetchMethodCalled)
         assertCoinsEqual(viewModel.coins, coins, marketData: marketData)
         XCTAssertNil(viewModel.errorMessage)
     }
@@ -135,7 +129,7 @@ class CoinListViewModelTests: XCTestCase {
         await viewModel.fetchCoins()
         
         // Assertions
-        XCTAssert(swiftDataManager.fetchMethodCalled)
+        XCTAssertTrue(swiftDataManager.fetchMethodCalled)
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
@@ -147,7 +141,7 @@ class CoinListViewModelTests: XCTestCase {
         await viewModel.fetchCoins()
         
         // Assertions
-        XCTAssert(viewModel.coins.isEmpty)
+        XCTAssertTrue(viewModel.coins.isEmpty)
         XCTAssertNil(viewModel.errorMessage)
     }
     
@@ -193,7 +187,7 @@ class CoinListViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.coins.count, 1)
         assertCoinsEqual(viewModel.coins, [coin])
         XCTAssertFalse(archivedCoin.isArchived)
-        XCTAssert(swiftDataManager.saveMethodCalled)
+        XCTAssertTrue(swiftDataManager.saveMethodCalled)
         XCTAssertNil(viewModel.errorMessage)
     }
     
@@ -206,7 +200,7 @@ class CoinListViewModelTests: XCTestCase {
         viewModel.saveCoinsOrder(for: .custom)
         
         // Assertions
-        XCTAssert(userDefaultsManager.setObjectCalled)
+        XCTAssertTrue(userDefaultsManager.setObjectCalled)
         XCTAssertEqual(userDefaultsManager.setObjectValue[.coinsOrder(forOption: .custom)] as! [String], coins.map(\.id))
         XCTAssertNil(viewModel.errorMessage)
     }
@@ -247,7 +241,7 @@ class CoinListViewModelTests: XCTestCase {
         let unarchivedCoin = CoinFactoryMock.makeCoinData(from: coin)
         let portfolio = PortfolioFactoryMock.makePortfolio(
             transactions: [
-                PortfolioFactoryMock.makeTransaction(coin: unarchivedCoin)
+                PortfolioFactoryMock.makeTransaction(coinID: unarchivedCoin.id)
             ]
         )
         swiftDataManager.fetchResult = [portfolio]
@@ -257,7 +251,7 @@ class CoinListViewModelTests: XCTestCase {
         
         // Assertions
         XCTAssertFalse(unarchivedCoin.isArchived)
-        XCTAssert(swiftDataManager.saveMethodCalled)
+        XCTAssertTrue(swiftDataManager.saveMethodCalled)
         XCTAssertNil(viewModel.errorMessage)
     }
     
@@ -315,7 +309,7 @@ class CoinListViewModelTests: XCTestCase {
         viewModel.clearCacheIfNeeded()
         
         // Assertions
-        XCTAssert(viewModel.marketData.isEmpty)
+        XCTAssertTrue(viewModel.marketData.isEmpty)
     }
     
     // Price Alerts
@@ -480,12 +474,12 @@ class CoinListViewModelTests: XCTestCase {
     
     // MARK: - Helpers
     private func assertInsertAndSaveMethodsCalled() {
-        XCTAssert(swiftDataManager.insertMethodCalled)
-        XCTAssert(swiftDataManager.saveMethodCalled)
+        XCTAssertTrue(swiftDataManager.insertMethodCalled)
+        XCTAssertTrue(swiftDataManager.saveMethodCalled)
     }
     
     private func assertDeleteAndSaveMethodsCalled() {
-        XCTAssert(swiftDataManager.deleteMethodCalled)
-        XCTAssert(swiftDataManager.saveMethodCalled)
+        XCTAssertTrue(swiftDataManager.deleteMethodCalled)
+        XCTAssertTrue(swiftDataManager.saveMethodCalled)
     }
 }

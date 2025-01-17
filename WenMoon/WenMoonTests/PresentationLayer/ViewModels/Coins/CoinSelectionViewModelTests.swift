@@ -108,7 +108,7 @@ class CoinSelectionViewModelTests: XCTestCase {
         await viewModel.searchCoins(for: "")
         
         // Assertions
-        XCTAssert(viewModel.coins.isEmpty)
+        XCTAssertTrue(viewModel.coins.isEmpty)
         XCTAssertNil(viewModel.errorMessage)
     }
     
@@ -166,17 +166,14 @@ class CoinSelectionViewModelTests: XCTestCase {
     
     func testFetchSavedCoins_success() async throws {
         // Setup
-        let mockCoins = CoinFactoryMock.makeCoins()
-        for coin in mockCoins {
-            let newCoin = CoinFactoryMock.makeCoinData(from: coin)
-            swiftDataManager.fetchResult.append(newCoin)
-        }
+        let mockCoins = CoinFactoryMock.makeCoinsData()
+        swiftDataManager.fetchResult = mockCoins
         
         // Action
         viewModel.fetchSavedCoins()
         
         // Assertions
-        XCTAssert(swiftDataManager.fetchMethodCalled)
+        XCTAssertTrue(swiftDataManager.fetchMethodCalled)
         XCTAssertEqual(viewModel.savedCoinIDs, Set(mockCoins.map(\.id)))
         XCTAssertNil(viewModel.errorMessage)
     }
@@ -190,7 +187,7 @@ class CoinSelectionViewModelTests: XCTestCase {
         viewModel.fetchSavedCoins()
         
         // Assertions
-        XCTAssert(swiftDataManager.fetchMethodCalled)
+        XCTAssertTrue(swiftDataManager.fetchMethodCalled)
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
@@ -200,7 +197,7 @@ class CoinSelectionViewModelTests: XCTestCase {
         
         // Toggle save state on
         viewModel.toggleSaveState(for: coin)
-        XCTAssert(viewModel.isCoinSaved(coin))
+        XCTAssertTrue(viewModel.isCoinSaved(coin))
         
         // Toggle save state off
         viewModel.toggleSaveState(for: coin)

@@ -23,10 +23,10 @@ final class PortfolioViewModel: BaseViewModel {
     @Published private(set) var portfolioChangeAllTimeValue: Double = .zero
     @Published private(set) var portfolioChangeAllTimePercentage: Double = .zero
     @Published private(set) var selectedTimeline: Timeline = .twentyFourHours
-
-    var portfolios: [Portfolio] = []
+    
     var selectedPortfolio: Portfolio!
-
+    var portfolios: [Portfolio] = []
+    
     var portfolioChangePercentage: Double {
         switch selectedTimeline {
         case .twentyFourHours:
@@ -35,7 +35,7 @@ final class PortfolioViewModel: BaseViewModel {
             return portfolioChangeAllTimePercentage
         }
     }
-
+    
     var portfolioChangeValue: Double {
         switch selectedTimeline {
         case .twentyFourHours:
@@ -64,38 +64,47 @@ final class PortfolioViewModel: BaseViewModel {
             portfolios = fetchedPortfolios
             selectedPortfolio = fetchedPortfolios.first
         }
-        updateAndSavePortfolio()
+        updatePortfolio()
     }
     
-    func addTransaction(_ transaction: Transaction) {
+    @MainActor
+    func addTransaction(_ transaction: Transaction, _ coin: CoinProtocol?) async {
+        if let coin = coin as? Coin {
+            await insertCoinIfNeeded(coin)
+        }
         selectedPortfolio.transactions.append(transaction)
         updateAndSavePortfolio()
     }
     
     func editTransaction(_ transaction: Transaction) {
-        deleteTransaction(by: transaction.id)
-        addTransaction(transaction)
+        guard let index = selectedPortfolio.transactions.firstIndex(where: { $0.id == transaction.id }) else {
+            return
+        }
+        selectedPortfolio.transactions[index].update(from: transaction)
+        updateAndSavePortfolio()
     }
     
     func deleteTransactions(for coinID: String) {
-        let transactionsToDelete = selectedPortfolio.transactions.filter { $0.coin?.id == coinID }
-        transactionsToDelete.forEach { transaction in
-            delete(transaction)
-        }
-        selectedPortfolio.transactions.removeAll { $0.coin?.id == coinID }
+        selectedPortfolio.transactions.removeAll { $0.coinID == coinID }
         updateAndSavePortfolio()
     }
-
+    
     func deleteTransaction(_ transactionID: String) {
-        deleteTransaction(by: transactionID)
+        selectedPortfolio.transactions.removeAll { $0.id == transactionID }
         updateAndSavePortfolio()
     }
     
     func updatePortfolio() {
-        groupedTransactions = groupTransactionsByCoin(selectedPortfolio.transactions)
+        groupedTransactions = groupTransactionsByCoin()
         totalValue = calculateTotalValue()
         calculatePortfolio24HChanges()
         calculatePortfolioChanges()
+    }
+    
+    func fetchCoin(by id: String) -> CoinData? {
+        let descriptor = FetchDescriptor<CoinData>()
+        let fetchedCoins = fetch(descriptor)
+        return fetchedCoins.first(where: { $0.id == id })
     }
     
     func isDeductiveTransaction(_ transactionType: Transaction.TransactionType) -> Bool {
@@ -107,12 +116,11 @@ final class PortfolioViewModel: BaseViewModel {
     }
     
     // MARK: - Private Methods
-    private func deleteTransaction(by id: String) {
-        guard let transactionToDelete = selectedPortfolio.transactions.first(where: { $0.id == id }) else {
-            return
-        }
-        delete(transactionToDelete)
-        selectedPortfolio.transactions.removeAll { $0.id == id }
+    private func insertCoinIfNeeded(_ coin: Coin) async {
+        guard fetchCoin(by: coin.id) == nil else { return }
+        let imageData = (coin.image != nil) ? await loadImage(from: coin.image!) : nil
+        let coinData = CoinData(from: coin, imageData: imageData)
+        insert(coinData)
     }
     
     private func updateAndSavePortfolio() {
@@ -120,10 +128,13 @@ final class PortfolioViewModel: BaseViewModel {
         save()
     }
     
-    private func groupTransactionsByCoin(_ transactions: [Transaction]) -> [CoinTransactions] {
-        let groupedTransactions = Dictionary(grouping: transactions) { $0.coin?.id }
+    private func groupTransactionsByCoin() -> [CoinTransactions] {
+        let groupedTransactions = Dictionary(grouping: selectedPortfolio.transactions) { $0.coinID }
         return groupedTransactions.compactMap { coinID, transactions in
-            guard let coin = transactions.first?.coin else { return nil }
+            guard let coinID,
+                  let coin = fetchCoin(by: coinID) else {
+                return nil
+            }
             return CoinTransactions(coin: coin, transactions: transactions)
         }
         .sorted { $0.totalValue > $1.totalValue }
@@ -138,7 +149,7 @@ final class PortfolioViewModel: BaseViewModel {
     private func calculatePortfolio24HChanges() {
         var total24HChange: Double = .zero
         var previousTotalValue: Double = .zero
-
+        
         groupedTransactions.forEach { coinTransaction in
             guard let currentPrice = coinTransaction.coin.currentPrice,
                   let priceChangePercentage24H = coinTransaction.coin.priceChangePercentage24H else {

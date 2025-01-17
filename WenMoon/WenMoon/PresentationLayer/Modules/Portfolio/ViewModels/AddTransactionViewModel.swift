@@ -14,17 +14,12 @@ final class AddTransactionViewModel: BaseViewModel {
     }
     
     // MARK: - Internal Methods
-    func createCoinData(from coin: Coin) async -> CoinData {
-        let imageData = (coin.image != nil) ? (await loadImage(from: coin.image!)) : nil
-        return CoinData(from: coin, imageData: imageData)
-    }
-    
     func shouldDisableAddTransactionsButton(for transaction: Transaction) -> Bool {
         switch transaction.type {
         case .buy, .sell:
-            return (transaction.coin == nil) || (transaction.quantity == nil) || (transaction.pricePerCoin == nil)
+            return (transaction.coinID == nil) || (transaction.quantity == nil) || (transaction.pricePerCoin == nil)
         default:
-            return (transaction.coin == nil) || (transaction.quantity == nil)
+            return (transaction.coinID == nil) || (transaction.quantity == nil)
         }
     }
     

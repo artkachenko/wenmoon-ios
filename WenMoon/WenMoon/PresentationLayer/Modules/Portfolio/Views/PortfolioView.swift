@@ -10,9 +10,9 @@ import SwiftUI
 struct PortfolioView: View {
     // MARK: - Properties
     @StateObject private var viewModel = PortfolioViewModel()
-
+    
     @State private var showAddTransactionView = false
-
+    
     @State private var expandedRows: Set<String> = []
     @State private var swipedTransaction: Transaction?
     
@@ -28,8 +28,10 @@ struct PortfolioView: View {
             }
         }
         .sheet(isPresented: $showAddTransactionView) {
-            AddTransactionView(didAddTransaction: { newTransaction in
-                viewModel.addTransaction(newTransaction)
+            AddTransactionView(didAddTransaction: { newTransaction, coin in
+                Task {
+                    await viewModel.addTransaction(newTransaction, coin)
+                }
             })
             .presentationDetents([.medium])
             .presentationCornerRadius(36)
@@ -37,11 +39,19 @@ struct PortfolioView: View {
         .sheet(item: $swipedTransaction, onDismiss: {
             swipedTransaction = nil
         }) { transaction in
-            AddTransactionView(transaction: transaction, didEditTransaction: { updatedTransaction in
-                viewModel.editTransaction(updatedTransaction)
-            })
-            .presentationDetents([.medium])
-            .presentationCornerRadius(36)
+            if let coinID = transaction.coinID,
+               let coin = viewModel.fetchCoin(by: coinID) {
+                AddTransactionView(
+                    transaction: transaction,
+                    mode: .edit,
+                    selectedCoin: coin,
+                    didEditTransaction: { updatedTransaction in
+                        viewModel.editTransaction(updatedTransaction)
+                    }
+                )
+                .presentationDetents([.medium])
+                .presentationCornerRadius(36)
+            }
         }
         .onAppear {
             viewModel.fetchPortfolios()
@@ -174,7 +184,7 @@ struct PortfolioView: View {
         ForEach(group.transactions.keys.sorted(by: { $0 > $1 }), id: \.self) { date in
             Section(date.formatted(as: .dateOnly)) {
                 ForEach(group.transactions[date] ?? [], id: \.id) { transaction in
-                    makeTransactionView(transaction)
+                    makeTransactionView(group.coin, transaction)
                         .swipeActions {
                             Button(role: .destructive) {
                                 viewModel.deleteTransaction(transaction.id)
@@ -196,7 +206,7 @@ struct PortfolioView: View {
     }
     
     @ViewBuilder
-    private func makeTransactionView(_ transaction: Transaction) -> some View {
+    private func makeTransactionView(_ coin: CoinData, _ transaction: Transaction) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text(transaction.type.rawValue)
@@ -215,10 +225,8 @@ struct PortfolioView: View {
                     Text(transaction.quantity.formattedAsQuantity(includeMinusSign: isDeductiveTransaction))
                         .font(.footnote).bold()
                     
-                    if let coin = transaction.coin {
-                        Text(coin.symbol.uppercased())
-                            .font(.footnote).bold()
-                    }
+                    Text(coin.symbol.uppercased())
+                        .font(.footnote).bold()
                 }
                 
                 Text(transaction.totalCost.formattedAsCurrency())

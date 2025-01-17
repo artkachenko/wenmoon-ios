@@ -34,8 +34,8 @@ final class PortfolioViewModelTests: XCTestCase {
         // Assertions
         XCTAssertEqual(viewModel.portfolios.count, 1)
         XCTAssertNotNil(viewModel.selectedPortfolio)
-        XCTAssert(swiftDataManager.insertMethodCalled)
-        XCTAssert(swiftDataManager.saveMethodCalled)
+        XCTAssertTrue(swiftDataManager.insertMethodCalled)
+        XCTAssertTrue(swiftDataManager.saveMethodCalled)
     }
     
     func testFetchPortfolios_fetchesExistingPortfolios() {
@@ -51,48 +51,53 @@ final class PortfolioViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.selectedPortfolio, portfolio)
     }
     
-    func testAddTransaction() {
+    func testAddTransaction() async {
         // Setup
         viewModel.selectedPortfolio = PortfolioFactoryMock.makePortfolio(transactions: [])
         let transaction = PortfolioFactoryMock.makeTransaction()
+        let coin = CoinFactoryMock.makeCoin()
         
         // Action
-        viewModel.addTransaction(transaction)
+        await viewModel.addTransaction(transaction, coin)
         
         // Assertions
         XCTAssertEqual(viewModel.selectedPortfolio.transactions.count, 1)
         XCTAssertEqual(viewModel.selectedPortfolio.transactions.first, transaction)
-        XCTAssert(swiftDataManager.saveMethodCalled)
+        XCTAssertTrue(swiftDataManager.insertMethodCalled)
+        XCTAssertTrue(swiftDataManager.saveMethodCalled)
     }
     
     func testEditTransaction() {
         // Setup
         let transactionID = UUID().uuidString
-        let originalTransaction = PortfolioFactoryMock.makeTransaction(id: transactionID)
+        let coinID = "coin-1"
+        let originalTransaction = PortfolioFactoryMock.makeTransaction(id: transactionID, coinID: coinID)
         viewModel.selectedPortfolio = PortfolioFactoryMock.makePortfolio(transactions: [originalTransaction])
-        let editedTransaction = PortfolioFactoryMock.makeTransaction(id: transactionID)
         
         // Action
+        let editedTransaction = PortfolioFactoryMock.makeTransaction(id: transactionID, coinID: coinID)
         viewModel.editTransaction(editedTransaction)
         
         // Assertions
-        XCTAssertEqual(viewModel.selectedPortfolio.transactions.first, editedTransaction)
-        XCTAssert(swiftDataManager.saveMethodCalled)
+        let transaction = viewModel.selectedPortfolio.transactions.first!
+        XCTAssertEqual(transaction.quantity, editedTransaction.quantity)
+        XCTAssertEqual(transaction.pricePerCoin, editedTransaction.pricePerCoin)
+        XCTAssertEqual(transaction.date, editedTransaction.date)
+        XCTAssertEqual(transaction.type, editedTransaction.type)
+        XCTAssertTrue(swiftDataManager.saveMethodCalled)
     }
     
     func testDeleteTransactions() {
         // Setup
-        let coin = CoinFactoryMock.makeCoinData()
-        let transactions = PortfolioFactoryMock.makeTransactions(coin: coin)
+        let transactions = PortfolioFactoryMock.makeTransactions()
         viewModel.selectedPortfolio = PortfolioFactoryMock.makePortfolio(transactions: transactions)
         
         // Action
-        viewModel.deleteTransactions(for: coin.id)
+        viewModel.deleteTransactions(for: "coin-1")
         
         // Assertions
-        XCTAssert(viewModel.selectedPortfolio.transactions.isEmpty)
-        XCTAssert(swiftDataManager.deleteMethodCalled)
-        XCTAssert(swiftDataManager.saveMethodCalled)
+        XCTAssertTrue(viewModel.selectedPortfolio.transactions.isEmpty)
+        XCTAssertTrue(swiftDataManager.saveMethodCalled)
     }
     
     func testDeleteTransaction() {
@@ -108,21 +113,17 @@ final class PortfolioViewModelTests: XCTestCase {
         // Assertions
         XCTAssertEqual(viewModel.selectedPortfolio.transactions.count, 1)
         XCTAssertEqual(viewModel.selectedPortfolio.transactions.first, transaction2)
-        XCTAssert(swiftDataManager.deleteMethodCalled)
-        XCTAssert(swiftDataManager.saveMethodCalled)
+        XCTAssertTrue(swiftDataManager.saveMethodCalled)
     }
     
     func testPortfolioCalculations() {
         // Setup
-        let coinData1 = CoinFactoryMock.makeCoinData(
-            from: CoinFactoryMock.makeCoin(id: "coin-1", currentPrice: 100, priceChangePercentage24H: 10)
-        )
-        let coinData2 = CoinFactoryMock.makeCoinData(
-            from: CoinFactoryMock.makeCoin(id: "coin-2", currentPrice: 200, priceChangePercentage24H: -5)
-        )
-        let transaction1 = PortfolioFactoryMock.makeTransaction(coin: coinData1, quantity: 10, pricePerCoin: 150, type: .buy)
-        let transaction2 = PortfolioFactoryMock.makeTransaction(coin: coinData2, quantity: 5, pricePerCoin: 300, type: .buy)
+        let coinData1 = CoinFactoryMock.makeCoinData(id: "coin-1", currentPrice: 100, priceChangePercentage24H: 10)
+        let coinData2 = CoinFactoryMock.makeCoinData(id: "coin-2", currentPrice: 200, priceChangePercentage24H: -5)
+        let transaction1 = PortfolioFactoryMock.makeTransaction(coinID: coinData1.id, quantity: 10, pricePerCoin: 150, type: .buy)
+        let transaction2 = PortfolioFactoryMock.makeTransaction(coinID: coinData2.id, quantity: 5, pricePerCoin: 300, type: .buy)
         viewModel.selectedPortfolio = PortfolioFactoryMock.makePortfolio(transactions: [transaction1, transaction2])
+        swiftDataManager.fetchResult = [coinData1, coinData2]
         
         // Action
         viewModel.updatePortfolio()
@@ -137,8 +138,8 @@ final class PortfolioViewModelTests: XCTestCase {
     
     func testIsDeductiveTransaction() {
         // Assertions
-        XCTAssert(viewModel.isDeductiveTransaction(.sell))
-        XCTAssert(viewModel.isDeductiveTransaction(.transferOut))
+        XCTAssertTrue(viewModel.isDeductiveTransaction(.sell))
+        XCTAssertTrue(viewModel.isDeductiveTransaction(.transferOut))
         XCTAssertFalse(viewModel.isDeductiveTransaction(.buy))
         XCTAssertFalse(viewModel.isDeductiveTransaction(.transferIn))
     }

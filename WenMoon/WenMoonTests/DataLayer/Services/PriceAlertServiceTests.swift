@@ -55,7 +55,7 @@ class PriceAlertServiceTests: XCTestCase {
         let priceAlerts = try await service.getPriceAlerts(userID: userID, deviceToken: deviceToken)
         
         // Assertions
-        XCTAssert(priceAlerts.isEmpty)
+        XCTAssertTrue(priceAlerts.isEmpty)
     }
     
     func testGetPriceAlerts_decodingError() async throws {

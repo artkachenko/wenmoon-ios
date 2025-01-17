@@ -26,31 +26,6 @@ final class AddTransactionViewModelTests: XCTestCase {
     }
     
     // MARK: - Tests
-    func testCreateCoinData_withImage() async {
-        // Setup
-        let imageURL = URL(string: "https://example.com/image.png")!
-        let coin = CoinFactoryMock.makeCoin(image: imageURL)
-        
-        // Action
-        let createdCoin = await viewModel.createCoinData(from: coin)
-        
-        // Assertions
-        assertCoinsEqual([coin], [createdCoin])
-        XCTAssertNotNil(createdCoin.imageData)
-    }
-    
-    func testCreateCoinData_withoutImage() async {
-        // Setup
-        let coin = CoinFactoryMock.makeCoin()
-        
-        // Action
-        let createdCoin = await viewModel.createCoinData(from: coin)
-        
-        // Assertions
-        assertCoinsEqual([coin], [createdCoin])
-        XCTAssertNil(createdCoin.imageData)
-    }
-    
     func testShouldDisableAddTransactionsButton_buyAndSell() {
         // Setup
         let transaction = PortfolioFactoryMock.makeTransaction(type: .buy)
@@ -59,10 +34,10 @@ final class AddTransactionViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.shouldDisableAddTransactionsButton(for: transaction))
         
         transaction.pricePerCoin = nil
-        XCTAssert(viewModel.shouldDisableAddTransactionsButton(for: transaction))
+        XCTAssertTrue(viewModel.shouldDisableAddTransactionsButton(for: transaction))
         
-        transaction.coin = nil
-        XCTAssert(viewModel.shouldDisableAddTransactionsButton(for: transaction))
+        transaction.coinID = nil
+        XCTAssertTrue(viewModel.shouldDisableAddTransactionsButton(for: transaction))
     }
     
     func testShouldDisableAddTransactionsButton_transferInAndOut() {
@@ -73,10 +48,10 @@ final class AddTransactionViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.shouldDisableAddTransactionsButton(for: transaction))
         
         transaction.quantity = nil
-        XCTAssert(viewModel.shouldDisableAddTransactionsButton(for: transaction))
+        XCTAssertTrue(viewModel.shouldDisableAddTransactionsButton(for: transaction))
         
-        transaction.coin = nil
-        XCTAssert(viewModel.shouldDisableAddTransactionsButton(for: transaction))
+        transaction.coinID = nil
+        XCTAssertTrue(viewModel.shouldDisableAddTransactionsButton(for: transaction))
     }
 
     

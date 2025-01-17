@@ -12,7 +12,7 @@ struct PortfolioFactoryMock {
     // MARK: - Transaction
     static func makeTransaction(
         id: String = UUID().uuidString,
-        coin: CoinData? = CoinFactoryMock.makeCoinData(),
+        coinID: String? = "coin-1",
         quantity: Double? = .random(in: 1...1_000),
         pricePerCoin: Double? = .random(in: 0.01...1_000),
         date: Date = .now,
@@ -20,7 +20,7 @@ struct PortfolioFactoryMock {
     ) -> Transaction {
         Transaction(
             id: id,
-            coin: coin,
+            coinID: coinID,
             quantity: quantity,
             pricePerCoin: pricePerCoin,
             date: date,
@@ -28,12 +28,9 @@ struct PortfolioFactoryMock {
         )
     }
 
-    static func makeTransactions(
-        count: Int = 10,
-        coin: CoinData? = CoinFactoryMock.makeCoinData()
-    ) -> [Transaction] {
-        (1...count).map { _ in
-            makeTransaction(coin: coin)
+    static func makeTransactions(count: Int = 10) -> [Transaction] {
+        (1...count).map { index in
+            makeTransaction()
         }
     }
 
