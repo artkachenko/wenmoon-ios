@@ -11,10 +11,10 @@ struct SelectionView: View {
     // MARK: - Properties
     @Environment(\.dismiss) var dismiss
     
-    @Binding var selectedOption: String
+    @Binding var selectedOption: Int
     
     let title: String
-    let options: [Setting.SettingType.Option]
+    let options: [SettingOption]
     
     // MARK: - Body
     var body: some View {
@@ -40,22 +40,28 @@ struct SelectionView: View {
             
             Spacer()
             
-            List(options, id: \.name) { option in
-                HStack {
-                    Text(option.name)
+            List(options, id: \.self) { option in
+                HStack(spacing: 12) {
+                    if let imageName = option.imageName {
+                        Image(imageName)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                    }
+                    Text(option.title)
                     
                     Spacer()
                     
-                    if option.name == selectedOption {
+                    if option.value == selectedOption {
                         Image(systemName: "checkmark")
-                            .foregroundColor(.wmPink)
+                            .foregroundColor(.blue)
                     }
                 }
                 .padding(.vertical, 8)
                 .contentShape(Rectangle())
                 .onTapGesture {
                     if option.isEnabled {
-                        selectedOption = option.name
+                        selectedOption = option.value
                         dismiss()
                     }
                 }
