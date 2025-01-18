@@ -5,7 +5,7 @@
 //  Created by Artur Tkachenko on 20.06.23.
 //
 
-import Foundation
+import UIKit
 import SwiftData
 
 class BaseViewModel: ObservableObject {
@@ -104,5 +104,15 @@ class BaseViewModel: ObservableObject {
         } else {
             errorMessage = "An unknown error occurred: \(error.localizedDescription)"
         }
+    }
+    
+    func triggerImpactFeedback(_ style: UIImpactFeedbackGenerator.FeedbackStyle = .light) {
+        let generator = UIImpactFeedbackGenerator(style: style)
+        generator.impactOccurred()
+    }
+    
+    func triggerSelectionFeedback() {
+        let generator = UISelectionFeedbackGenerator()
+        generator.selectionChanged()
     }
 }

@@ -81,7 +81,7 @@ struct PriceAlertsView: View {
                                     await viewModel.createPriceAlert(targetPrice: targetPrice)
                                 }
                             }) {
-                                Text("Create")
+                                Text("Create Price Alert")
                                     .padding(.vertical, 12)
                                     .padding(.horizontal, 16)
                                     .background(isCreateButtonDisabled ? .gray.opacity(0.3) : .white)

@@ -104,6 +104,7 @@ struct PortfolioView: View {
                                 withAnimation(.easeInOut) {
                                     toggleRowExpansion(for: group.coin.id)
                                 }
+                                viewModel.triggerImpactFeedback()
                             }
                         if expandedRows.contains(group.coin.id) {
                             makeExpandedTransactionsView(for: group)
@@ -123,7 +124,7 @@ struct PortfolioView: View {
     @ViewBuilder
     private func makeAddTransactionButton() -> some View {
         Button {
-            showAddTransactionView.toggle()
+            showAddTransactionView = true
         } label: {
             HStack {
                 Image(systemName: "slider.horizontal.3")

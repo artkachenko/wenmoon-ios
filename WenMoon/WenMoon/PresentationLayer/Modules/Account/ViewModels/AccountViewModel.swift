@@ -48,7 +48,6 @@ final class AccountViewModel: BaseViewModel {
     // MARK: - Authentication
     func signInWithGoogle() {
         isGoogleAuthInProgress = true
-        defer { isGoogleAuthInProgress = false }
         
         guard
             let clientID = firebaseAuthService.clientID,
@@ -70,13 +69,14 @@ final class AccountViewModel: BaseViewModel {
             }
             
             let credential = googleSignInService.credential(withIDToken: idToken, accessToken: user.accessToken.tokenString)
-            signIn(with: credential)
+            signIn(with: credential) {
+                self.isGoogleAuthInProgress = false
+            }
         }
     }
     
     func signInWithTwitter() {
         isTwitterAuthInProgress = true
-        defer { isTwitterAuthInProgress = false }
         
         twitterSignInService.signIn { [weak self] credential, error in
             guard
@@ -88,7 +88,9 @@ final class AccountViewModel: BaseViewModel {
                 return
             }
             
-            signIn(with: credential)
+            signIn(with: credential) {
+                self.isTwitterAuthInProgress = false
+            }
         }
     }
     
@@ -134,13 +136,14 @@ final class AccountViewModel: BaseViewModel {
     }
     
     // MARK: - Private Methods
-    private func signIn(with credential: AuthCredential) {
+    private func signIn(with credential: AuthCredential, completion: @escaping (() -> Void)) {
         firebaseAuthService.signIn(with: credential) { [weak self] authResult, error in
             if let error {
                 self?.setErrorMessage(error)
             } else {
                 self?.loginState = .signedIn(authResult?.user.displayName)
             }
+            completion()
         }
     }
     

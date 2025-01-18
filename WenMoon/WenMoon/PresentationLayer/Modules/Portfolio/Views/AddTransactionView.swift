@@ -109,7 +109,7 @@ struct AddTransactionView: View {
     private func makeTransactionFormView(_ transactionBinding: Binding<Transaction>) -> some View {
         VStack(spacing: 16) {
             Button(action: {
-                showCoinSelectionView.toggle()
+                showCoinSelectionView = true
             }) {
                 HStack {
                     if let coin = selectedCoin {

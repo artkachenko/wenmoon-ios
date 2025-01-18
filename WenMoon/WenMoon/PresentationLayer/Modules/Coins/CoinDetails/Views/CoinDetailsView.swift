@@ -67,10 +67,10 @@ struct CoinDetailsView: View {
                     HStack(spacing: 24) {
                         Button(action: {
                             guard viewModel.userID != nil else {
-                                showAuthAlert.toggle()
+                                showAuthAlert = true
                                 return
                             }
-                            showPriceAlertsView.toggle()
+                            showPriceAlertsView = true
                         }) {
                             Image(systemName: "bell.fill")
                                 .resizable()
@@ -91,9 +91,10 @@ struct CoinDetailsView: View {
                 }
                 
                 ZStack {
-                    if !viewModel.chartData.isEmpty {
-                        makeChartView(viewModel.chartData)
-                            .animation(.easeInOut(duration: 0.5), value: viewModel.chartData)
+                    let chartData = viewModel.chartData
+                    if !chartData.isEmpty {
+                        makeChartView(chartData)
+                            .animation(.easeInOut, value: chartData)
                     }
                     
                     if viewModel.isLoading {
@@ -140,6 +141,9 @@ struct CoinDetailsView: View {
                 await viewModel.fetchChartData(on: timeframe)
             }
         }
+        .onChange(of: selectedDate) {
+            viewModel.triggerSelectionFeedback()
+        }
         .sheet(isPresented: $showPriceAlertsView) {
             PriceAlertsView(coin: coin)
                 .presentationDetents([.medium, .large])
@@ -148,7 +152,7 @@ struct CoinDetailsView: View {
         .alert(isPresented: $showAuthAlert) {
             Alert(
                 title: Text("Need to Sign In, Buddy!"),
-                message: Text("You gotta slide over to the Account tab and log in to check out your price alerts"),
+                message: Text("You gotta slide over to the Account tab and log in to check out your price alerts."),
                 dismissButton: .default(Text("OK"))
             )
         }

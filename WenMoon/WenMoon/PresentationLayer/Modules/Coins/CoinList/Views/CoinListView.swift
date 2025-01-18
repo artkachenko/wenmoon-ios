@@ -105,7 +105,7 @@ struct CoinListView: View {
     @ViewBuilder
     private func makeAddCoinsButton() -> some View {
         Button(action: {
-            showCoinSelectionView.toggle()
+            showCoinSelectionView = true
         }) {
             HStack {
                 Image(systemName: "slider.horizontal.3")
@@ -185,7 +185,7 @@ struct CoinListView: View {
             
             Button {
                 guard viewModel.userID != nil else {
-                    showAuthAlert.toggle()
+                    showAuthAlert = true
                     return
                 }
                 swipedCoin = coin
@@ -201,7 +201,9 @@ struct CoinListView: View {
         Menu("Sort By") {
             ForEach(SortOption.allCases, id: \.self) { sortOption in
                 Button {
-                    viewModel.sortCoins(by: sortOption)
+                    if viewModel.selectedSortOption != sortOption {
+                        viewModel.sortCoins(by: sortOption)
+                    }
                 } label: {
                     HStack {
                         Text(sortOption.title)

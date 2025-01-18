@@ -35,6 +35,7 @@ struct CryptoCompareView: View {
                 Button(action: {
                     swap(&coinToBeCompared, &coinToCompareWith)
                     swap(&cachedImage1, &cachedImage2)
+                    viewModel.triggerImpactFeedback()
                 }) {
                     Image("arrows.swap")
                         .resizable()
@@ -129,11 +130,11 @@ struct CryptoCompareView: View {
                 isSelectingFirstCoin = isFirstCoin
                 showCoinSelectionView = true
             }) {
-                if let coin = coin.wrappedValue {
-                    makeCoinView(coin, cachedImage.wrappedValue)
-                } else {
-                    makeCoinPlaceholderView(placeholder)
-                }
+                makeCoinView(
+                    coin: coin.wrappedValue,
+                    cachedImage: cachedImage.wrappedValue,
+                    placeholderText: placeholder
+                )
             }
             
             if coin.wrappedValue != nil {
@@ -152,47 +153,41 @@ struct CryptoCompareView: View {
     }
     
     @ViewBuilder
-    private func makeCoinView(_ coin: Coin, _ cachedImage: Image?) -> some View {
+    private func makeCoinView(coin: Coin?, cachedImage: Image?, placeholderText: String) -> some View {
         HStack(spacing: 12) {
-            CoinImageView(
-                image: cachedImage,
-                placeholderText: coin.symbol,
-                size: 36
-            )
-            
-            Text(coin.symbol.uppercased())
-                .font(.headline)
-                .foregroundColor(.white)
-            
-            Spacer()
-            
-            Text(coin.currentPrice.formattedAsCurrency())
-                .font(.headline)
-                .foregroundColor(.white)
+            if let coin {
+                CoinImageView(
+                    image: cachedImage,
+                    placeholderText: coin.symbol,
+                    size: 36
+                )
+                
+                Text(coin.symbol.uppercased())
+                    .font(.headline)
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                Text(coin.currentPrice.formattedAsCurrency())
+                    .font(.headline)
+                    .foregroundColor(.white)
+            } else {
+                Circle()
+                    .stroke(Color.gray, lineWidth: 1)
+                    .frame(width: 36, height: 36)
+                
+                Text(placeholderText)
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+                
+                Spacer()
+            }
         }
         .padding(.vertical, 12)
         .padding(.horizontal, 16)
         .background(Color.gray.opacity(0.2))
         .cornerRadius(12)
-    }
-    
-    @ViewBuilder
-    private func makeCoinPlaceholderView(_ text: String) -> some View {
-        HStack(spacing: 12) {
-            Circle()
-                .stroke(Color.gray, lineWidth: 1)
-                .frame(width: 36, height: 36)
-            
-            Text(text)
-                .font(.subheadline)
-                .foregroundColor(.gray)
-            
-            Spacer()
-        }
-        .padding(.vertical, 12)
-        .padding(.horizontal, 16)
-        .background(Color.gray.opacity(0.2))
-        .cornerRadius(12)
+        .animation(.easeInOut(duration: 0.2), value: coin != nil)
     }
     
     // MARK: - Helper Methods
