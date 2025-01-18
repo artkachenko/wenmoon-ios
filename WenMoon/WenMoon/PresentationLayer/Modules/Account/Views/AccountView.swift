@@ -12,6 +12,7 @@ struct AccountView: View {
     @StateObject private var viewModel = AccountViewModel()
     
     @State private var selectedSetting: Setting!
+    @State private var showSignOutConfirmation = false
     
     // MARK: - Body
     var body: some View {
@@ -44,6 +45,16 @@ struct AccountView: View {
             )
             .presentationDetents([.fraction(0.45)])
             .presentationCornerRadius(36)
+        }
+        .alert(isPresented: $showSignOutConfirmation) {
+            Alert(
+                title: Text("Logging off?"),
+                message: Text("Take your time! Everything will be here when you return."),
+                primaryButton: .destructive(Text("Sign Out")) {
+                    viewModel.signOut()
+                },
+                secondaryButton: .cancel(Text("Stay Logged In"))
+            )
         }
         .onChange(of: viewModel.loginState) {
             viewModel.fetchSettings()
@@ -154,7 +165,7 @@ struct AccountView: View {
         .contentShape(Rectangle())
         .onTapGesture {
             if setting.type == .signOut {
-                viewModel.signOut()
+                showSignOutConfirmation = true
             } else {
                 selectedSetting = setting
             }
