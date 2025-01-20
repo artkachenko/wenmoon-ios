@@ -54,19 +54,19 @@ class CoinScannerServiceTests: XCTestCase {
         )
     }
     
-    func testGetCoinsByIDs_success() async throws {
+    func testGetCoinDetails_success() async throws {
         // Setup
-        let response = CoinFactoryMock.makeCoins()
+        let response = CoinDetailsFactoryMock.makeCoinDetails()
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
         
         // Action
-        let coins = try await service.getCoins(by: [])
+        let coinDetails = try await service.getCoinDetails(for: "coin-1")
         
         // Assertions
-        assertCoinsEqual(coins, response)
+        XCTAssertEqual(coinDetails, response)
     }
     
-    func testGetCoinsByIDs_invalidEndpoint() async throws {
+    func testGetCoinDetails_invalidEndpointError() async throws {
         // Setup
         let error = ErrorFactoryMock.makeInvalidEndpointError()
         httpClient.getResponse = .failure(error)
@@ -74,7 +74,7 @@ class CoinScannerServiceTests: XCTestCase {
         // Action & Assertions
         await assertFailure(
             for: { [weak self] in
-                try await self!.service.getCoins(by: [])
+                try await self!.service.getCoinDetails(for: "coin-1")
             },
             expectedError: error
         )
@@ -150,14 +150,14 @@ class CoinScannerServiceTests: XCTestCase {
     // Get Chart Data
     func testGetChartData_success() async throws {
         // Setup
-        let response = ChartDataFactoryMock.makeChartDataForTimeframes()
+        let response = ChartDataFactoryMock.makeChartData()
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
         
         // Action
-        let chartData = try await service.getChartData(for: "coin-1", timeframe: "1h", currency: "usd")
+        let chartData = try await service.getChartData(for: "coin-1", on: "1", currency: "usd")
         
         // Assertions
-        assertChartDataForTimeframesEqual(chartData, response)
+        assertChartDataEqual(chartData, response)
     }
     
     func testGetChartData_invalidParameter() async throws {
@@ -168,7 +168,7 @@ class CoinScannerServiceTests: XCTestCase {
         // Action & Assertions
         await assertFailure(
             for: { [weak self] in
-                try await self!.service.getChartData(for: "coin-1", timeframe: "1h", currency: "usd")
+                try await self!.service.getChartData(for: "coin-1", on: "1", currency: "usd")
             },
             expectedError: error
         )

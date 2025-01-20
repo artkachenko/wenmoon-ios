@@ -16,6 +16,9 @@ class HTTPClientMock: HTTPClient {
     var postResponse: Result<Data, APIError>!
     var deleteResponse: Result<Data, APIError>!
     
+    var lastRequestedPath: String?
+    var lastRequestedParameters: [String: String]?
+    
     // MARK: - Initializers
     convenience init() {
         self.init(encoder: JSONEncoder(), decoder: JSONDecoder())
@@ -27,7 +30,10 @@ class HTTPClientMock: HTTPClient {
     }
     
     // MARK: - HTTPClient
-    func get(path: String, parameters: [String: String]?, headers: [String : String]?) async throws -> Data {
+    func get(path: String, parameters: [String: String]?, headers: [String: String]?) async throws -> Data {
+        lastRequestedPath = path
+        lastRequestedParameters = parameters
+        
         guard let result = getResponse else {
             throw APIError.unknown(response: URLResponse())
         }
@@ -40,6 +46,9 @@ class HTTPClientMock: HTTPClient {
     }
     
     func post(path: String, parameters: [String: String]?, headers: [String: String]?, body: Data?) async throws -> Data {
+        lastRequestedPath = path
+        lastRequestedParameters = parameters
+        
         guard let result = postResponse else {
             throw APIError.unknown(response: URLResponse())
         }
@@ -52,6 +61,9 @@ class HTTPClientMock: HTTPClient {
     }
     
     func delete(path: String, parameters: [String: String]?, headers: [String: String]?) async throws -> Data {
+        lastRequestedPath = path
+        lastRequestedParameters = parameters
+        
         guard let result = deleteResponse else {
             throw APIError.unknown(response: URLResponse())
         }

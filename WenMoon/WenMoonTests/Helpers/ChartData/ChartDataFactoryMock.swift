@@ -9,10 +9,10 @@ import Foundation
 @testable import WenMoon
 
 struct ChartDataFactoryMock {
-    static func makeChartDataForTimeframes(_ timeframes: [Timeframe] = Timeframe.allCases) -> [String: [ChartData]] {
-        var data: [String: [ChartData]] = [:]
+    static func makeChartDataForTimeframes(_ timeframes: [Timeframe] = Timeframe.allCases) -> [Timeframe: [ChartData]] {
+        var data: [Timeframe: [ChartData]] = [:]
         for timeframe in timeframes {
-            data[timeframe.rawValue] = makeChartData()
+            data[timeframe] = makeChartData()
         }
         return data
     }

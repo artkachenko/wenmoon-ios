@@ -33,18 +33,24 @@ extension HTTPClient {
 final class HTTPClientImpl: HTTPClient {
     // MARK: - Properties
     private let baseURL: URL
-    private let apiKey: String
+    private let apiKey: String?
     private let session: URLSession
     
     private(set) var encoder: JSONEncoder
     private(set) var decoder: JSONDecoder
     
     // MARK: - Initializers
-    convenience init(baseURL: URL = API.baseURL, apiKey: String = API.key) {
+    convenience init(baseURL: URL = API.baseURL, apiKey: String? = API.key) {
         self.init(baseURL: baseURL, apiKey: apiKey, session: .shared, encoder: .init(), decoder: .init())
     }
     
-    init(baseURL: URL, apiKey: String, session: URLSession, encoder: JSONEncoder, decoder: JSONDecoder) {
+    init(
+        baseURL: URL,
+        apiKey: String?,
+        session: URLSession,
+        encoder: JSONEncoder,
+        decoder: JSONDecoder
+    ) {
         self.baseURL = baseURL
         self.apiKey = apiKey
         self.session = session
@@ -80,8 +86,12 @@ final class HTTPClientImpl: HTTPClient {
         urlRequest.httpBody = httpRequest.body
         
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        urlRequest.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+        if let apiKey {
+            urlRequest.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+        }
         httpRequest.headers?.forEach { urlRequest.setValue($0.value, forHTTPHeaderField: $0.key) }
+        
+        printRequestDetails(urlRequest)
         
         let (data, response) = try await session.data(for: urlRequest)
         
@@ -106,5 +116,26 @@ final class HTTPClientImpl: HTTPClient {
     
     private func queryitems(from parameters: [String: String]?) -> [URLQueryItem]? {
         parameters?.compactMap { URLQueryItem(name: $0.key, value: $0.value) }
+    }
+    
+    private func printRequestDetails(_ request: URLRequest) {
+        print("🌐 HTTP Request:")
+        if let url = request.url {
+            print("URL: \(url.absoluteString)")
+        }
+        print("Method: \(request.httpMethod ?? "N/A")")
+        if let headers = request.allHTTPHeaderFields {
+            print("Headers:")
+            for (key, value) in headers {
+                print("  \(key): \(value)")
+            }
+        }
+        if let body = request.httpBody,
+           let bodyString = String(data: body, encoding: .utf8) {
+            print("Body: \(bodyString)")
+        } else {
+            print("Body: None")
+        }
+        print("----------------------")
     }
 }

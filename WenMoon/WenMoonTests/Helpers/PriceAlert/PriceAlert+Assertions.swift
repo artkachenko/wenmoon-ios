@@ -14,10 +14,7 @@ func assertPriceAlertsEqual(_ priceAlerts: [PriceAlert], _ expectedPriceAlerts: 
     for (index, _) in priceAlerts.enumerated() {
         let priceAlert = priceAlerts[index]
         let expectedPriceAlert = expectedPriceAlerts[index]
-        XCTAssertEqual(priceAlert.id, expectedPriceAlert.id)
-        XCTAssertEqual(priceAlert.symbol, expectedPriceAlert.symbol)
-        XCTAssertEqual(priceAlert.targetPrice, expectedPriceAlert.targetPrice)
-        XCTAssertEqual(priceAlert.targetDirection, expectedPriceAlert.targetDirection)
+        XCTAssertEqual(priceAlert, expectedPriceAlert)
     }
 }
 

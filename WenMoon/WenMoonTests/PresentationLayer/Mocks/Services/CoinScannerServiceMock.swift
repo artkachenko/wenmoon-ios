@@ -11,10 +11,10 @@ import XCTest
 class CoinScannerServiceMock: CoinScannerService {
     // MARK: - Properties
     var getCoinsAtPageResult: Result<[Coin], APIError>!
-    var getCoinsByIDsResult: Result<[Coin], APIError>!
+    var getCoinDetailsResult: Result<CoinDetails, APIError>!
+    var getChartDataResult: Result<[ChartData], APIError>!
     var searchCoinsByQueryResult: Result<[Coin], APIError>!
     var getMarketDataResult: Result<[String: MarketData], APIError>!
-    var getChartDataResult: Result<[String: [ChartData]], APIError>!
     var getGlobalCryptoMarketDataResult: Result<GlobalCryptoMarketData, APIError>!
     var getGlobalMarketDataResult: Result<GlobalMarketData, APIError>!
     
@@ -31,14 +31,26 @@ class CoinScannerServiceMock: CoinScannerService {
         }
     }
     
-    func getCoins(by ids: [String]) async throws -> [Coin] {
-        switch getCoinsByIDsResult {
-        case .success(let coins):
-            return coins
+    func getCoinDetails(for id: String) async throws -> CoinDetails {
+        switch getCoinDetailsResult {
+        case .success(let coinDetails):
+            return coinDetails
         case .failure(let error):
             throw error
         case .none:
-            XCTFail("getCoinsByIDsResult not set")
+            XCTFail("getCoinDetailsResult not set")
+            throw APIError.unknown(response: URLResponse())
+        }
+    }
+    
+    func getChartData(for id: String, on timeframe: String, currency: String) async throws -> [ChartData] {
+        switch getChartDataResult {
+        case .success(let chartData):
+            return chartData
+        case .failure(let error):
+            throw error
+        case .none:
+            XCTFail("getChartDataResult not set")
             throw APIError.unknown(response: URLResponse())
         }
     }
@@ -55,7 +67,7 @@ class CoinScannerServiceMock: CoinScannerService {
         }
     }
     
-    func getMarketData(for coinIDs: [String]) async throws -> [String: MarketData] {
+    func getMarketData(for ids: [String]) async throws -> [String: MarketData] {
         switch getMarketDataResult {
         case .success(let marketData):
             return marketData
@@ -63,18 +75,6 @@ class CoinScannerServiceMock: CoinScannerService {
             throw error
         case .none:
             XCTFail("getMarketDataResult not set")
-            throw APIError.unknown(response: URLResponse())
-        }
-    }
-    
-    func getChartData(for symbol: String, timeframe: String, currency: String) async throws -> [String: [ChartData]] {
-        switch getChartDataResult {
-        case .success(let chartData):
-            return chartData
-        case .failure(let error):
-            throw error
-        case .none:
-            XCTFail("getChartDataResult not set")
             throw APIError.unknown(response: URLResponse())
         }
     }

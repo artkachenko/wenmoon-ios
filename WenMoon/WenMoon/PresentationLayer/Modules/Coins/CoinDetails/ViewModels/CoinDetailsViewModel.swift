@@ -10,11 +10,12 @@ import Foundation
 final class CoinDetailsViewModel: BaseViewModel {
     // MARK: - Properties
     private let coinScannerService: CoinScannerService
-
+    
     @Published private(set) var coin: CoinData
+    @Published private(set) var coinDetails: CoinDetails = .empty
     @Published private(set) var chartData: [ChartData] = []
-
-    var chartDataCache: [String: [ChartData]] = [:]
+    
+    var chartDataCache: [Timeframe: [ChartData]] = [:]
     
     // MARK: - Initializers
     convenience init(coin: CoinData) {
@@ -29,20 +30,30 @@ final class CoinDetailsViewModel: BaseViewModel {
     
     // MARK: - Internal Methods
     @MainActor
-    func fetchChartData(on timeframe: Timeframe = .oneHour) async {
+    func fetchChartData(on timeframe: Timeframe = .oneDay, currency: Currency = .usd) async {
         isLoading = true
         defer { isLoading = false }
         
-        if let cachedData = chartDataCache[timeframe.rawValue] {
-            chartData = cachedData
+        if let cachedChartData = chartDataCache[timeframe], !cachedChartData.isEmpty {
+            chartData = cachedChartData
             return
         }
         
         do {
-            let currency: Currency = .usd
-            let fetchedData = try await coinScannerService.getChartData(for: coin.symbol, timeframe: timeframe.rawValue, currency: currency.rawValue)
-            chartDataCache = fetchedData
-            chartData = chartDataCache[timeframe.rawValue] ?? []
+            chartData = try await coinScannerService.getChartData(for: coin.id, on: timeframe.value, currency: currency.rawValue)
+            chartDataCache[timeframe] = chartData
+        } catch {
+            setErrorMessage(error)
+        }
+    }
+    
+    @MainActor
+    func fetchCoinDetails() async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            coinDetails = try await coinScannerService.getCoinDetails(for: coin.id)
         } catch {
             setErrorMessage(error)
         }

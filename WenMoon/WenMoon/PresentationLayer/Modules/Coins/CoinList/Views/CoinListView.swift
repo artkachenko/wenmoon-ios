@@ -64,10 +64,15 @@ struct CoinListView: View {
                 }
             }
         }
-        .fullScreenCover(isPresented: $showCoinSelectionView) {
+        .sheet(isPresented: $showCoinSelectionView, onDismiss: {
+            Task {
+                await viewModel.fetchMarketData()
+                viewModel.sortCoins()
+            }
+        }) {
             CoinSelectionView(didToggleCoin: handleCoinSelection)
         }
-        .fullScreenCover(item: $selectedCoin, onDismiss: {
+        .sheet(item: $selectedCoin, onDismiss: {
             selectedCoin = nil
         }) { coin in
             CoinDetailsView(coin: coin)
@@ -95,9 +100,6 @@ struct CoinListView: View {
         .task {
             await viewModel.fetchCoins()
             await viewModel.fetchPriceAlerts()
-        }
-        .onAppear {
-            viewModel.getSavedSortOption()
         }
     }
     

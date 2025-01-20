@@ -7,11 +7,27 @@
 
 import Foundation
 
-enum Timeframe: String, CaseIterable {
-    case oneHour = "1h"
-    case oneDay = "1d"
-    case oneWeek = "1w"
-    case oneMonth = "1M"
-    case oneYear = "1y"
-    case all = "all"
+enum Timeframe: CaseIterable {
+    case oneDay
+    case oneWeek
+    case oneMonth
+    case yearToDate
+    
+    var value: String {
+        switch self {
+        case .oneDay: return "1"
+        case .oneWeek: return "7"
+        case .oneMonth: return "31"
+        case .yearToDate: return "365"
+        }
+    }
+    
+    var displayValue: String {
+        switch self {
+        case .oneDay: return "1D"
+        case .oneWeek: return "1W"
+        case .oneMonth: return "1M"
+        case .yearToDate: return "YTD"
+        }
+    }
 }

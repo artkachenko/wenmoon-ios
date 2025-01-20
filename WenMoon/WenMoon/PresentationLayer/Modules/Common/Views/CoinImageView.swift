@@ -50,7 +50,7 @@ struct CoinImageView: View {
                         .tint(.black)
                 })
             } else {
-                Text(placeholderText.prefix(1))
+                Text(placeholderText.prefix(1).uppercased())
                     .font(.body)
                     .foregroundColor(.black)
             }

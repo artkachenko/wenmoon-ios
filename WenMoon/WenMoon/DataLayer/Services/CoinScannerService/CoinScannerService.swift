@@ -9,10 +9,10 @@ import Foundation
 
 protocol CoinScannerService {
     func getCoins(at page: Int) async throws -> [Coin]
-    func getCoins(by ids: [String]) async throws -> [Coin]
+    func getCoinDetails(for id: String) async throws -> CoinDetails
+    func getChartData(for id: String, on timeframe: String, currency: String) async throws -> [ChartData]
     func searchCoins(by query: String) async throws -> [Coin]
-    func getMarketData(for coinIDs: [String]) async throws -> [String: MarketData]
-    func getChartData(for symbol: String, timeframe: String, currency: String) async throws -> [String: [ChartData]]
+    func getMarketData(for ids: [String]) async throws -> [String: MarketData]
     func getGlobalCryptoMarketData() async throws -> GlobalCryptoMarketData
     func getGlobalMarketData() async throws -> GlobalMarketData
 }
@@ -29,11 +29,20 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
         }
     }
     
-    func getCoins(by ids: [String]) async throws -> [Coin] {
-        let parameters = ["ids": ids.joined(separator: ",")]
+    func getCoinDetails(for id: String) async throws -> CoinDetails {
         do {
-            let data = try await httpClient.get(path: "coins", parameters: parameters)
-            return try decoder.decode([Coin].self, from: data)
+            let data = try await httpClient.get(path: "coin-details", parameters: ["id": id])
+            return try decoder.decode(CoinDetails.self, from: data)
+        } catch {
+            throw mapToAPIError(error)
+        }
+    }
+    
+    func getChartData(for id: String, on timeframe: String, currency: String) async throws -> [ChartData] {
+        let parameters = ["id": id, "timeframe": timeframe, "currency": currency]
+        do {
+            let data = try await httpClient.get(path: "chart-data", parameters: parameters)
+            return try decoder.decode([ChartData].self, from: data)
         } catch {
             throw mapToAPIError(error)
         }
@@ -43,32 +52,20 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
         do {
             let data = try await httpClient.get(path: "search", parameters: ["query": query])
             let searchedCoins = try decoder.decode([Coin].self, from: data)
-            print("Searched coins: \(searchedCoins)")
             return searchedCoins
         } catch {
             throw mapToAPIError(error)
         }
     }
     
-    func getMarketData(for coinIDs: [String]) async throws -> [String: MarketData] {
+    func getMarketData(for ids: [String]) async throws -> [String: MarketData] {
         do {
             let data = try await httpClient.get(
                 path: "market-data",
-                parameters: ["ids": coinIDs.joined(separator: ",")]
+                parameters: ["ids": ids.joined(separator: ",")]
             )
             let marketData = try decoder.decode([String: MarketData].self, from: data)
-            print("Market Data: \(marketData)")
             return marketData
-        } catch {
-            throw mapToAPIError(error)
-        }
-    }
-    
-    func getChartData(for symbol: String, timeframe: String, currency: String) async throws -> [String: [ChartData]] {
-        let parameters = ["symbol": symbol, "timeframe": timeframe, "currency": currency]
-        do {
-            let data = try await httpClient.get(path: "ohlc", parameters: parameters)
-            return try decoder.decode([String: [ChartData]].self, from: data)
         } catch {
             throw mapToAPIError(error)
         }

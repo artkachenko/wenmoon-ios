@@ -11,17 +11,22 @@ import Charts
 struct CoinDetailsView: View {
     // MARK: - Properties
     @Environment(\.dismiss) private var dismiss
-
+    
     @StateObject private var viewModel: CoinDetailsViewModel
-
+    
     @State private var selectedPrice: String
     @State private var selectedDate = ""
     @State private var selectedXPosition: CGFloat?
-    @State private var selectedTimeframe: Timeframe = .oneHour
-
+    @State private var selectedTimeframe: Timeframe = .oneDay
+    
     @State private var showPriceAlertsView = false
     @State private var showAuthAlert = false
-
+    
+    private var coin: CoinData { viewModel.coin }
+    private var marketData: CoinDetails.MarketData { viewModel.coinDetails.marketData }
+    private var chartData: [ChartData] { viewModel.chartData }
+    private var isLoading: Bool { viewModel.isLoading }
+    
     // MARK: - Initializers
     init(coin: CoinData) {
         _viewModel = StateObject(wrappedValue: CoinDetailsViewModel(coin: coin))
@@ -30,9 +35,8 @@ struct CoinDetailsView: View {
     
     // MARK: - Body
     var body: some View {
-        let coin = viewModel.coin
         BaseView(errorMessage: $viewModel.errorMessage) {
-            VStack(spacing: 16) {
+            VStack(spacing: 24) {
                 HStack(spacing: 12) {
                     CoinImageView(
                         imageData: coin.imageData,
@@ -46,7 +50,7 @@ struct CoinDetailsView: View {
                                 .font(.headline)
                                 .bold()
                             
-                            Text("#\(coin.marketCapRank.formattedOrNone())")
+                            Text("#\(marketData.marketCapRank.formattedOrNone())")
                                 .font(.caption)
                                 .bold()
                         }
@@ -89,52 +93,57 @@ struct CoinDetailsView: View {
                         }
                     }
                 }
+                .padding(.horizontal, 24)
                 
                 ZStack {
-                    let chartData = viewModel.chartData
-                    if !chartData.isEmpty {
+                    if !chartData.isEmpty && !isLoading {
                         makeChartView(chartData)
-                            .animation(.easeInOut, value: chartData)
                     }
                     
-                    if viewModel.isLoading {
+                    if chartData.isEmpty && !isLoading {
+                        PlaceholderView(text: "No data available")
+                    }
+                    
+                    if isLoading {
                         ProgressView()
                     }
                 }
-                .frame(height: 200)
+                .frame(height: 300)
                 
                 Picker("Select Timeframe", selection: $selectedTimeframe) {
                     ForEach(Timeframe.allCases, id: \.self) { timeframe in
-                        Text(timeframe.rawValue.uppercased()).tag(timeframe)
+                        Text(timeframe.displayValue).tag(timeframe)
                     }
                 }
                 .pickerStyle(.segmented)
                 .scaleEffect(0.85)
+                .disabled(isLoading)
                 
                 HStack {
                     VStack(alignment: .leading, spacing: 8) {
                         makeDetailRow(label: "Market Cap", value: coin.marketCap.formattedWithAbbreviation(suffix: "$"))
-                        makeDetailRow(label: "24h Volume", value: coin.totalVolume.formattedWithAbbreviation(suffix: "$"))
-                        makeDetailRow(label: "Max Supply", value: coin.maxSupply.formattedWithAbbreviation(placeholder: "∞"))
-                        makeDetailRow(label: "All-Time High", value: coin.ath.formattedAsCurrency())
+                        makeDetailRow(label: "24h Volume", value: marketData.totalVolume.formattedWithAbbreviation(suffix: "$"))
+                        makeDetailRow(label: "Max Supply", value: marketData.maxSupply.formattedWithAbbreviation(placeholder: "∞"))
+                        makeDetailRow(label: "All-Time High", value: marketData.ath.formattedAsCurrency())
                     }
                     
                     Spacer()
                     
                     VStack(alignment: .leading, spacing: 8) {
-                        makeDetailRow(label: "Fully Diluted Market Cap", value: coin.fullyDilutedValuation.formattedWithAbbreviation(suffix: "$"))
-                        makeDetailRow(label: "Circulating Supply", value: coin.circulatingSupply.formattedWithAbbreviation())
-                        makeDetailRow(label: "Total Supply", value: coin.totalSupply.formattedWithAbbreviation())
-                        makeDetailRow(label: "All-Time Low", value: coin.atl.formattedAsCurrency())
+                        makeDetailRow(label: "Fully Diluted Market Cap", value: marketData.fullyDilutedValuation.formattedWithAbbreviation(suffix: "$"))
+                        makeDetailRow(label: "Circulating Supply", value: marketData.circulatingSupply.formattedWithAbbreviation())
+                        makeDetailRow(label: "Total Supply", value: marketData.totalSupply.formattedWithAbbreviation())
+                        makeDetailRow(label: "All-Time Low", value: marketData.atl.formattedAsCurrency())
                     }
                 }
                 .padding()
                 .background(Color(.secondarySystemBackground))
                 .cornerRadius(12)
+                .padding(.horizontal, 24)
                 
                 Spacer()
             }
-            .padding(.horizontal, 24)
+            .padding(.vertical, 12)
         }
         .onChange(of: selectedTimeframe) { _, timeframe in
             Task {
@@ -158,6 +167,7 @@ struct CoinDetailsView: View {
         }
         .task {
             await viewModel.fetchChartData(on: selectedTimeframe)
+            await viewModel.fetchCoinDetails()
         }
     }
     
@@ -170,6 +180,25 @@ struct CoinDetailsView: View {
         let priceRange = minPrice...maxPrice
         
         Chart {
+            ForEach(data, id: \.date) { dataPoint in
+                AreaMark(
+                    x: .value("Date", dataPoint.date),
+                    yStart: .value("Min Price", minPrice),
+                    yEnd: .value("Price", dataPoint.price)
+                )
+                .interpolationMethod(.catmullRom)
+                .foregroundStyle(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color.wmPink.opacity(0.25),
+                            Color.wmPink.opacity(0)
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+            }
+            
             ForEach(data, id: \.date) { dataPoint in
                 LineMark(
                     x: .value("Date", dataPoint.date),
@@ -207,14 +236,19 @@ struct CoinDetailsView: View {
                                 )
                             case .second(true, let drag):
                                 if let location = drag?.location {
-                                    updateSelectedData(location: location, proxy: proxy, data: data, geometry: geometry)
+                                    updateSelectedData(
+                                        location: location,
+                                        proxy: proxy,
+                                        data: data,
+                                        geometry: geometry
+                                    )
                                 }
                             default:
                                 break
                             }
                         }
                         .onEnded { _ in
-                            selectedPrice = viewModel.coin.currentPrice.formattedAsCurrency()
+                            selectedPrice = coin.currentPrice.formattedAsCurrency()
                             selectedDate = ""
                             selectedXPosition = nil
                         }
@@ -222,15 +256,16 @@ struct CoinDetailsView: View {
             
             if let selectedXPosition {
                 ZStack {
+                    let separatorWidth: CGFloat = 1
                     Rectangle()
                         .fill(Color.white)
-                        .frame(width: 1, height: geometry.size.height + 20)
+                        .frame(width: separatorWidth, height: geometry.size.height + 20)
                         .position(x: selectedXPosition, y: geometry.size.height / 2)
                     
                     Rectangle()
                         .fill(Color(.systemBackground).opacity(0.6))
-                        .frame(width: geometry.size.width - selectedXPosition, height: geometry.size.height + 20)
-                        .position(x: selectedXPosition + (geometry.size.width - selectedXPosition) / 2, y: geometry.size.height / 2)
+                        .frame(width: geometry.size.width - selectedXPosition + separatorWidth, height: geometry.size.height + 20)
+                        .position(x: selectedXPosition + separatorWidth + (geometry.size.width - selectedXPosition) / 2, y: geometry.size.height / 2)
                 }
             }
         }
@@ -254,7 +289,7 @@ struct CoinDetailsView: View {
         data: [ChartData],
         geometry: GeometryProxy
     ) {
-        guard location.x >= 0, location.x <= geometry.size.width else {
+        guard location.x >= .zero, location.x <= geometry.size.width else {
             selectedXPosition = nil
             return
         }
@@ -268,7 +303,7 @@ struct CoinDetailsView: View {
                 
                 let formatType: Date.FormatType
                 switch selectedTimeframe {
-                case .oneHour, .oneDay:
+                case .oneDay:
                     formatType = .timeOnly
                 case .oneWeek:
                     formatType = .dateAndTime
