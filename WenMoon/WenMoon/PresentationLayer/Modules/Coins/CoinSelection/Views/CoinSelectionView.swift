@@ -16,8 +16,7 @@ struct CoinSelectionView: View {
     
     // MARK: - Properties
     @Environment(\.dismiss) private var dismiss
-
-    @StateObject private var viewModel = CoinSelectionViewModel()
+    @EnvironmentObject private var viewModel: CoinSelectionViewModel
 
     @FocusState private var isTextFieldFocused: Bool
 

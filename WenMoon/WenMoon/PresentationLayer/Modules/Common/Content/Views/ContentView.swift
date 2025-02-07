@@ -9,7 +9,8 @@ import SwiftUI
 
 struct ContentView: View {
     // MARK: - Properties
-    @StateObject private var viewModel = ContentViewModel()
+    @StateObject private var contentViewModel = ContentViewModel()
+    @StateObject private var coinSelectionViewModel = CoinSelectionViewModel()
     
     @State private var scrollText = false
     
@@ -17,7 +18,7 @@ struct ContentView: View {
     var body: some View {
         VStack {
             HStack(spacing: 8) {
-                ForEach(viewModel.globalMarketItems, id: \.self) { item in
+                ForEach(contentViewModel.globalMarketItems, id: \.self) { item in
                     makeGlobalMarketItemView(item)
                 }
             }
@@ -25,7 +26,7 @@ struct ContentView: View {
             .offset(x: scrollText ? -680 : 680)
             .animation(.linear(duration: 20).repeatForever(autoreverses: false), value: scrollText)
             
-            TabView(selection: $viewModel.startScreenIndex) {
+            TabView(selection: $contentViewModel.startScreenIndex) {
                 CoinListView()
                     .tabItem {
                         Image("coins")
@@ -57,16 +58,17 @@ struct ContentView: View {
                     .tag(4)
             }
         }
+        .environmentObject(coinSelectionViewModel)
         .task {
-            await viewModel.fetchGlobalCryptoMarketData()
-            await viewModel.fetchGlobalMarketData()
+            await contentViewModel.fetchGlobalCryptoMarketData()
+            await contentViewModel.fetchGlobalMarketData()
         }
         .onAppear {
             Task { @MainActor in
                 try await Task.sleep(for: .seconds(1))
                 scrollText = true
             }
-            viewModel.fetchStartScreen()
+            contentViewModel.fetchStartScreen()
         }
     }
     
