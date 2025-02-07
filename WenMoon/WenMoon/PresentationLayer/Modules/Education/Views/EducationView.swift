@@ -15,9 +15,7 @@ struct EducationView: View {
     var body: some View {
         NavigationView {
             VStack {
-                Text("Coming soon...")
-                    .font(.headline)
-                    .foregroundColor(.gray)
+                PlaceholderView(text: "Coming soon...", style: .medium)
             }
             .navigationTitle("Education")
         }

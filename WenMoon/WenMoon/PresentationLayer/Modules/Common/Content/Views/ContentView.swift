@@ -81,8 +81,7 @@ struct ContentView: View {
                 .foregroundColor(.lightGray)
             
             Text(item.value)
-                .font(.footnote)
-                .bold()
+                .font(.footnote).bold()
         }
     }
 }

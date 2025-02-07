@@ -128,8 +128,8 @@ struct CoinSelectionView: View {
                         }
                     ))
                     .tint(.wmPink)
-                    .scaleEffect(0.90)
-                    .padding(.trailing, -24)
+                    .scaleEffect(0.9)
+                    .padding(.trailing, -16)
                 } else if mode == .selection {
                     Image(systemName: "chevron.right")
                         .resizable()

@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import SwiftUI
 
 final class CoinListViewModel: BaseViewModel {
     // MARK: - Properties
@@ -16,7 +17,6 @@ final class CoinListViewModel: BaseViewModel {
     @Published var coins: [CoinData] = []
     @Published var marketData: [String: MarketData] = [:]
     @Published var globalMarketItems: [GlobalMarketItem] = []
-    @Published var selectedSortOption: SortOption = .marketCap
     
     private var cacheTimer: Timer?
     
@@ -50,17 +50,24 @@ final class CoinListViewModel: BaseViewModel {
     }
     
     // MARK: - Internal Methods
-    @MainActor
     func fetchCoins() async {
         let descriptor = FetchDescriptor<CoinData>(
             predicate: #Predicate { !$0.isArchived },
-            sortBy: [SortDescriptor(\.marketCapRank)]
+            sortBy: [SortDescriptor(\.marketCap)]
         )
         let fetchedCoins = fetch(descriptor)
-        coins = fetchedCoins
+        
+        if let savedOrder = try? userDefaultsManager.getObject(forKey: .coinsOrder, objectType: [String].self) {
+            coins = fetchedCoins.sorted { coin1, coin2 in
+                let index1 = savedOrder.firstIndex(of: coin1.id) ?? .max
+                let index2 = savedOrder.firstIndex(of: coin2.id) ?? .max
+                return index1 < index2
+            }
+        } else {
+            coins = fetchedCoins
+        }
+        
         await fetchMarketData()
-        getSavedSortOption()
-        sortCoinsBySavedOrder()
     }
     
     @MainActor
@@ -161,31 +168,9 @@ final class CoinListViewModel: BaseViewModel {
         }
     }
     
-    // Sorting
-    func sortCoins(by sortOption: SortOption? = nil) {
-        let sortOption = sortOption ?? selectedSortOption
-        switch sortOption {
-        case .symbol:
-            coins.sort(by: sortByName)
-        case .marketCap:
-            coins.sort(by: sortByMarketCap)
-        case .priceChange24H:
-            coins.sort(by: sortByPriceChange)
-        case .custom:
-            sortCoinsBySavedOrder(for: .custom)
-        }
-        saveSortOption(sortOption)
-        saveCoinsOrder(for: sortOption)
-    }
-    
-    func saveSortOption(_ sortOption: SortOption) {
-        try? userDefaultsManager.setObject(sortOption.rawValue, forKey: .sortOption)
-        selectedSortOption = sortOption
-    }
-    
-    func saveCoinsOrder(for sortOption: SortOption) {
+    func saveCoinsOrder() {
         let coinIDs = coins.map { $0.id }
-        try? userDefaultsManager.setObject(coinIDs, forKey: .coinsOrder(forOption: sortOption))
+        try? userDefaultsManager.setObject(coinIDs, forKey: .coinsOrder)
     }
     
     // MARK: - Private Methods
@@ -227,41 +212,6 @@ final class CoinListViewModel: BaseViewModel {
             self?.clearCacheIfNeeded()
         }
     }
-    
-    // Sorting
-    private func getSavedSortOption() {
-        if let rawValue = try? userDefaultsManager.getObject(forKey: .sortOption, objectType: String.self),
-           let savedSortOption = SortOption(rawValue: rawValue) {
-            selectedSortOption = savedSortOption
-        }
-    }
-    
-    private func sortCoinsBySavedOrder(for sortOption: SortOption? = nil) {
-        let sortOption = sortOption ?? selectedSortOption
-        if let savedOrder = try? userDefaultsManager.getObject(forKey: .coinsOrder(forOption: sortOption), objectType: [String].self) {
-            coins.sort { coin1, coin2 in
-                let index1 = savedOrder.firstIndex(of: coin1.id) ?? .max
-                let index2 = savedOrder.firstIndex(of: coin2.id) ?? .max
-                return index1 < index2
-            }
-        }
-    }
-    
-    private func sortByName(_ coin1: CoinData, _ coin2: CoinData) -> Bool {
-        coin1.symbol.lowercased() < coin2.symbol.lowercased()
-    }
-    
-    private func sortByRank(_ coin1: CoinData, _ coin2: CoinData) -> Bool {
-        (coin1.marketCapRank ?? .max) < (coin2.marketCapRank ?? .max)
-    }
-    
-    private func sortByMarketCap(_ coin1: CoinData, _ coin2: CoinData) -> Bool {
-        (coin1.marketCap ?? .zero) > (coin2.marketCap ?? .zero)
-    }
-    
-    private func sortByPriceChange(_ coin1: CoinData, _ coin2: CoinData) -> Bool {
-        (coin1.priceChangePercentage24H ?? .zero) > (coin2.priceChangePercentage24H ?? .zero)
-    }
 }
 
 struct GlobalMarketItem: Hashable {
@@ -291,20 +241,4 @@ struct GlobalMarketItem: Hashable {
     // MARK: - Properties
     let type: ItemType
     let value: String
-}
-
-enum SortOption: String, CaseIterable {
-    case symbol
-    case marketCap
-    case priceChange24H
-    case custom
-    
-    var title: String {
-        switch self {
-        case .symbol: return "Symbol"
-        case .marketCap: return "Market Cap"
-        case .priceChange24H: return "24h Change"
-        case .custom: return "Custom"
-        }
-    }
 }

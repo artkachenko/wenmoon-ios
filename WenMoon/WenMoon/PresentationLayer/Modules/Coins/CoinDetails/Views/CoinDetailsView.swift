@@ -37,7 +37,7 @@ struct CoinDetailsView: View {
     var body: some View {
         BaseView(errorMessage: $viewModel.errorMessage) {
             VStack(spacing: 24) {
-                HStack(spacing: 12) {
+                HStack(alignment: .top, spacing: 12) {
                     CoinImageView(
                         imageData: coin.imageData,
                         placeholderText: coin.symbol,
@@ -47,12 +47,10 @@ struct CoinDetailsView: View {
                     VStack(alignment: .leading) {
                         HStack {
                             Text(coin.symbol.uppercased())
-                                .font(.headline)
-                                .bold()
+                                .font(.headline).bold()
                             
                             Text("#\(marketData.marketCapRank.formattedOrNone())")
-                                .font(.caption)
-                                .bold()
+                                .font(.caption).bold()
                         }
                         
                         HStack {
@@ -93,7 +91,7 @@ struct CoinDetailsView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 24)
+                .padding(24)
                 
                 ZStack {
                     if !chartData.isEmpty && !isLoading {
@@ -143,7 +141,7 @@ struct CoinDetailsView: View {
                 
                 Spacer()
             }
-            .padding(.vertical, 12)
+            .background(Color.black)
         }
         .onChange(of: selectedTimeframe) { _, timeframe in
             Task {
@@ -263,7 +261,7 @@ struct CoinDetailsView: View {
                         .position(x: selectedXPosition, y: geometry.size.height / 2)
                     
                     Rectangle()
-                        .fill(Color(.systemBackground).opacity(0.6))
+                        .fill(.black.opacity(0.6))
                         .frame(width: geometry.size.width - selectedXPosition + separatorWidth, height: geometry.size.height + 20)
                         .position(x: selectedXPosition + separatorWidth + (geometry.size.width - selectedXPosition) / 2, y: geometry.size.height / 2)
                 }

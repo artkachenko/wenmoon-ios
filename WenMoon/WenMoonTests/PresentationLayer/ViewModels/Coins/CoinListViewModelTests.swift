@@ -93,7 +93,7 @@ class CoinListViewModelTests: XCTestCase {
         // Setup
         let coins = CoinFactoryMock.makeCoins().shuffled()
         let savedOrder = coins.map(\.id)
-        userDefaultsManager.getObjectReturnValue = [.coinsOrder(forOption: .custom): savedOrder]
+        userDefaultsManager.getObjectReturnValue = [.coinsOrder: savedOrder]
         swiftDataManager.fetchResult = coins.map { CoinFactoryMock.makeCoinData(from: $0) }
         let marketData = MarketDataFactoryMock.makeMarketData(for: coins)
         coinScannerService.getMarketDataResult = .success(marketData)
@@ -160,11 +160,11 @@ class CoinListViewModelTests: XCTestCase {
         viewModel.coins = coins
         
         // Action
-        viewModel.saveCoinsOrder(for: .custom)
+        viewModel.saveCoinsOrder()
         
         // Assertions
         XCTAssertTrue(userDefaultsManager.setObjectCalled)
-        XCTAssertEqual(userDefaultsManager.setObjectValue[.coinsOrder(forOption: .custom)] as! [String], coins.map(\.id))
+        XCTAssertEqual(userDefaultsManager.setObjectValue[.coinsOrder] as! [String], coins.map(\.id))
         XCTAssertNil(viewModel.errorMessage)
     }
     
@@ -333,64 +333,6 @@ class CoinListViewModelTests: XCTestCase {
         assertCoinHasNoAlert(coin)
     }
     
-    func testSortCoinsBySymbol() {
-        // Setup
-        let coins = [
-            CoinFactoryMock.makeCoinData(symbol: "eth"),
-            CoinFactoryMock.makeCoinData(symbol: "doge"),
-            CoinFactoryMock.makeCoinData(symbol: "btc")
-        ]
-        viewModel.coins = coins
-
-        // Action
-        viewModel.sortCoins(by: .symbol)
-
-        // Assertions
-        XCTAssertEqual(viewModel.coins.map(\.symbol), ["btc", "doge", "eth"])
-    }
-
-    func testSortCoinsByMarketCap() {
-        // Setup
-        let coins = [
-            CoinFactoryMock.makeCoinData(marketCap: 5000),
-            CoinFactoryMock.makeCoinData(marketCap: 300),
-            CoinFactoryMock.makeCoinData(marketCap: 10000)
-        ]
-        viewModel.coins = coins
-
-        // Action
-        viewModel.sortCoins(by: .marketCap)
-
-        // Assertions
-        XCTAssertEqual(viewModel.coins.map(\.marketCap), [10000, 5000, 300])
-    }
-
-    func testSortCoinsByPriceChange() {
-        // Setup
-        let coins = [
-            CoinFactoryMock.makeCoinData(priceChangePercentage24H: 1.2),
-            CoinFactoryMock.makeCoinData(priceChangePercentage24H: 0.5),
-            CoinFactoryMock.makeCoinData(priceChangePercentage24H: -0.8)
-        ]
-        viewModel.coins = coins
-
-        // Action
-        viewModel.sortCoins(by: .priceChange24H)
-
-        // Assertions
-        XCTAssertEqual(viewModel.coins.map(\.priceChangePercentage24H), [1.2, 0.5, -0.8])
-    }
-    
-    func testSaveSortOption() {
-        // Action
-        viewModel.saveSortOption(.marketCap)
-
-        // Assertions
-        XCTAssertTrue(userDefaultsManager.setObjectCalled)
-        XCTAssertEqual(userDefaultsManager.setObjectValue[.sortOption] as? String, "marketCap")
-        XCTAssertEqual(viewModel.selectedSortOption, .marketCap)
-    }
-    
     func testSaveCoinsOrder() {
         // Setup
         let coins = [
@@ -401,11 +343,11 @@ class CoinListViewModelTests: XCTestCase {
         viewModel.coins = coins
 
         // Action
-        viewModel.saveCoinsOrder(for: .marketCap)
+        viewModel.saveCoinsOrder()
 
         // Assertions
         XCTAssertTrue(userDefaultsManager.setObjectCalled)
-        XCTAssertEqual(userDefaultsManager.setObjectValue[.coinsOrder(forOption: .marketCap)] as! [String], ["bitcoin", "ethereum", "dogecoin"])
+        XCTAssertEqual(userDefaultsManager.setObjectValue[.coinsOrder] as! [String], ["bitcoin", "ethereum", "dogecoin"])
     }
     
     // MARK: - Helpers

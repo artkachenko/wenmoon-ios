@@ -52,22 +52,11 @@ struct CoinListView: View {
                 }
                 .animation(.easeInOut, value: coins)
                 .navigationTitle("Coins")
-                .toolbar {
-                    if !coins.isEmpty {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            EditButton()
-                        }
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            makeSortByButton()
-                        }
-                    }
-                }
             }
         }
         .sheet(isPresented: $showCoinSelectionView, onDismiss: {
             Task {
                 await viewModel.fetchMarketData()
-                viewModel.sortCoins()
             }
         }) {
             CoinSelectionView(didToggleCoin: handleCoinSelection)
@@ -76,6 +65,7 @@ struct CoinListView: View {
             selectedCoin = nil
         }) { coin in
             CoinDetailsView(coin: coin)
+                .presentationDragIndicator(.visible)
                 .presentationCornerRadius(36)
         }
         .sheet(item: $swipedCoin, onDismiss: {
@@ -122,54 +112,60 @@ struct CoinListView: View {
     
     @ViewBuilder
     private func makeCoinView(_ coin: CoinData) -> some View {
-        HStack(spacing: .zero) {
-            ZStack(alignment: .topTrailing) {
-                CoinImageView(
-                    imageData: coin.imageData,
-                    placeholderText: coin.symbol,
-                    size: 48
-                )
+        ZStack(alignment: .trailing) {
+            HStack(spacing: .zero) {
+                ZStack(alignment: .topTrailing) {
+                    CoinImageView(
+                        imageData: coin.imageData,
+                        placeholderText: coin.symbol,
+                        size: 48
+                    )
+                    
+                    if !coin.priceAlerts.isEmpty {
+                        Image(systemName: "bell.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                            .foregroundColor(.lightGray)
+                            .padding(4)
+                            .background(Color(.systemBackground))
+                            .clipShape(.circle)
+                            .padding(.trailing, -8)
+                            .padding(.top, -8)
+                    }
+                }
                 
-                if !coin.priceAlerts.isEmpty {
-                    Image(systemName: "bell.fill")
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(coin.symbol.uppercased())
+                        .font(.headline)
+                    
+                    Text(coin.marketCap.formattedWithAbbreviation(suffix: "$"))
+                        .font(.caption2).bold()
+                        .foregroundColor(.gray)
+                }
+                .padding(.leading, 16)
+                
+                Spacer()
+                
+                HStack(spacing: 8) {
+                    let isPriceChangeNegative = coin.priceChangePercentage24H?.isNegative ?? false
+                    Image(isPriceChangeNegative ? "arrow.decrease" : "arrow.increase")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 16, height: 16)
-                        .foregroundColor(.lightGray)
-                        .padding(4)
-                        .background(Color(.systemBackground))
-                        .clipShape(.circle)
-                        .padding(.trailing, -8)
-                        .padding(.top, -8)
+                        .foregroundColor(isPriceChangeNegative ? .red : .green)
+                    
+                    Text(coin.priceChangePercentage24H.formattedAsPercentage())
+                        .lineLimit(1)
+                        .font(.caption2).bold()
+                        .foregroundColor(isPriceChangeNegative ? .red : .green)
                 }
             }
             
-            VStack(alignment: .leading, spacing: 4) {
-                Text(coin.symbol.uppercased())
-                    .font(.headline)
-                
-                Text(coin.currentPrice.formattedAsCurrency())
-                    .font(.caption)
-                    .foregroundColor(.gray)
-            }
-            .padding(.leading, 16)
-            
-            Spacer()
-            
-            VStack(alignment: .trailing, spacing: 8) {
-                ChartShape(value: coin.priceChangePercentage24H ?? .zero)
-                    .trim(from: .zero, to: chartDrawProgress)
-                    .stroke(Color.wmPink, lineWidth: 2)
-                    .frame(width: 50, height: 10)
-                    .onAppear {
-                        withAnimation {
-                            chartDrawProgress = 1
-                        }
-                    }
-                
-                Text(coin.priceChangePercentage24H.formattedAsPercentage())
-                    .font(.caption2)
-            }
+            Text(coin.currentPrice.formattedAsCurrency())
+                .lineLimit(1)
+                .font(.footnote).bold()
+                .padding(.trailing, 100)
         }
         .contentShape(Rectangle())
         .onTapGesture {
@@ -198,28 +194,6 @@ struct CoinListView: View {
         }
     }
     
-    @ViewBuilder
-    private func makeSortByButton() -> some View {
-        Menu("Sort By") {
-            ForEach(SortOption.allCases, id: \.self) { sortOption in
-                Button {
-                    if viewModel.selectedSortOption != sortOption {
-                        viewModel.sortCoins(by: sortOption)
-                    }
-                } label: {
-                    HStack {
-                        Text(sortOption.title)
-                        if viewModel.selectedSortOption == sortOption {
-                            Spacer()
-                            Image(systemName: "checkmark")
-                                .foregroundStyle(.blue, .primary)
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
     // MARK: - Helper Methods
     private func deleteCoin(at offsets: IndexSet) {
         for index in offsets {
@@ -232,8 +206,7 @@ struct CoinListView: View {
     
     private func moveCoin(from source: IndexSet, to destination: Int) {
         viewModel.coins.move(fromOffsets: source, toOffset: destination)
-        viewModel.saveSortOption(.custom)
-        viewModel.saveCoinsOrder(for: .custom)
+        viewModel.saveCoinsOrder()
     }
     
     private func handleCoinSelection(coin: Coin, shouldAdd: Bool) {

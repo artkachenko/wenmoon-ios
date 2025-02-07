@@ -48,7 +48,7 @@ enum UserDefaultsKey: Hashable {
     case isFirstLaunch
     case deviceToken
     case sortOption
-    case coinsOrder(forOption: SortOption)
+    case coinsOrder
     case setting(ofType: Setting.SettingType)
     
     var value: String {
@@ -59,8 +59,8 @@ enum UserDefaultsKey: Hashable {
             return "deviceToken"
         case .sortOption:
             return "sortOption"
-        case .coinsOrder(let sortOption):
-            return "coinsOrder_\(sortOption)"
+        case .coinsOrder:
+            return "coinsOrder"
         case .setting(let type):
             return "setting_\(type)"
         }

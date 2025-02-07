@@ -79,9 +79,10 @@ struct AddTransactionView: View {
                 case .edit:
                     didEditTransaction?(transaction)
                 }
+                viewModel.triggerImpactFeedback()
                 dismiss()
             }) {
-                Text(isAddMode ? "Add Transaction" : "Edit Transaction")
+                Text(isAddMode ? "Add" : "Edit")
                     .padding(.vertical, 12)
                     .padding(.horizontal, 16)
                     .background(isAddTransactionButtonDisabled ? .gray.opacity(0.3) : .white)
