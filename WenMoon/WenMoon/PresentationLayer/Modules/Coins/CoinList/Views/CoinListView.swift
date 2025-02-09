@@ -41,7 +41,6 @@ struct CoinListView: View {
                             makeAddCoinsButton()
                         }
                         .listStyle(.plain)
-                        .animation(.default, value: viewModel.coins)
                         .refreshable {
                             Task {
                                 await viewModel.fetchMarketData()
@@ -139,9 +138,12 @@ struct CoinListView: View {
                     Text(coin.symbol.uppercased())
                         .font(.headline)
                     
-                    Text(coin.marketCap.formattedWithAbbreviation(suffix: "$"))
-                        .font(.caption2).bold()
-                        .foregroundColor(.gray)
+                    RollingNumberView(
+                        value: coin.marketCap,
+                        formatter: { $0.formattedWithAbbreviation(suffix: "$") },
+                        font: .caption2.bold(),
+                        foregroundColor: .gray
+                    )
                 }
                 .padding(.leading, 16)
                 
@@ -149,23 +151,30 @@ struct CoinListView: View {
                 
                 HStack(spacing: 8) {
                     let isPriceChangeNegative = coin.priceChangePercentage24H?.isNegative ?? false
-                    Image(isPriceChangeNegative ? "arrow.decrease" : "arrow.increase")
+                    let imageName = isPriceChangeNegative ? "arrow.decrease" : "arrow.increase"
+                    Image(imageName)
                         .resizable()
                         .scaledToFit()
                         .frame(width: 16, height: 16)
-                        .foregroundColor(isPriceChangeNegative ? .red : .green)
+                        .foregroundColor(.wmPink)
+                        .animation(.easeInOut, value: imageName)
                     
-                    Text(coin.priceChangePercentage24H.formattedAsPercentage())
-                        .lineLimit(1)
-                        .font(.caption2).bold()
-                        .foregroundColor(isPriceChangeNegative ? .red : .green)
+                    RollingNumberView(
+                        value: coin.priceChangePercentage24H,
+                        formatter: { $0.formattedAsPercentage() },
+                        font: .caption2.bold(),
+                        foregroundColor: .wmPink
+                    )
                 }
             }
             
-            Text(coin.currentPrice.formattedAsCurrency())
-                .lineLimit(1)
-                .font(.footnote).bold()
-                .padding(.trailing, 100)
+            RollingNumberView(
+                value: coin.currentPrice,
+                formatter: { $0.formattedAsCurrency() },
+                font: .footnote.bold(),
+                foregroundColor: .white
+            )
+            .padding(.trailing, 100)
         }
         .contentShape(Rectangle())
         .onTapGesture {

@@ -43,7 +43,7 @@ final class CoinDetailsViewModel: BaseViewModel {
             chartData = try await coinScannerService.getChartData(for: coin.id, on: timeframe.value, currency: currency.rawValue)
             chartDataCache[timeframe] = chartData
         } catch {
-            setErrorMessage(error)
+            setError(error)
         }
     }
     
@@ -55,7 +55,7 @@ final class CoinDetailsViewModel: BaseViewModel {
         do {
             coinDetails = try await coinScannerService.getCoinDetails(for: coin.id)
         } catch {
-            setErrorMessage(error)
+            setError(error)
         }
     }
 }

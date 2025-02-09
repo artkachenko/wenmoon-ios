@@ -54,7 +54,7 @@ final class ContentViewModel: BaseViewModel {
             let newItems = items.filter { !globalMarketItems.contains($0) }
             globalMarketItems.append(contentsOf: newItems)
         } catch {
-            setErrorMessage(error)
+            setError(error)
         }
     }
     
@@ -83,7 +83,7 @@ final class ContentViewModel: BaseViewModel {
             let newItems = items.filter { !globalMarketItems.contains($0) }
             globalMarketItems.append(contentsOf: newItems)
         } catch {
-            setErrorMessage(error)
+            setError(error)
         }
     }
 }

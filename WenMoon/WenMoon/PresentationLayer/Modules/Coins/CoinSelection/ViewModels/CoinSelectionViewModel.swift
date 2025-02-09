@@ -65,7 +65,7 @@ final class CoinSelectionViewModel: BaseViewModel {
             coins = page > 1 ? coins + fetchedCoins : fetchedCoins
             currentPage = page
         } catch {
-            setErrorMessage(error)
+            setError(error)
         }
     }
     
@@ -97,7 +97,7 @@ final class CoinSelectionViewModel: BaseViewModel {
             searchCoinsCache[query] = fetchedCoins
             self.coins = fetchedCoins
         } catch {
-            setErrorMessage(error)
+            setError(error)
         }
     }
     

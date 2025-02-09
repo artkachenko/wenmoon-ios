@@ -33,9 +33,9 @@ final class PriceAlertsViewModel: BaseViewModel {
     
     // MARK: - Internal Methods
     @MainActor
-    func createPriceAlert(targetPrice: Double?) async {
-        guard let userID, let deviceToken, let targetPrice else {
-            print("User ID, or device token, or target price is nil")
+    func createPriceAlert(targetPrice: Double) async {
+        guard let userID, let deviceToken else {
+            setErrorMessage("User ID, or device token is nil")
             return
         }
         
@@ -52,14 +52,14 @@ final class PriceAlertsViewModel: BaseViewModel {
             let createdPriceAlert = try await priceAlertService.createPriceAlert(priceAlert, userID: userID, deviceToken: deviceToken)
             coin.priceAlerts.append(createdPriceAlert)
         } catch {
-            setErrorMessage(error)
+            setError(error)
         }
     }
     
     @MainActor
     func deletePriceAlert(_ priceAlert: PriceAlert) async {
         guard let userID, let deviceToken else {
-            print("User ID or device token is nil")
+            setErrorMessage("User ID or device token is nil")
             return
         }
         
@@ -76,7 +76,7 @@ final class PriceAlertsViewModel: BaseViewModel {
                 coin.priceAlerts.remove(at: index)
             }
         } catch {
-            setErrorMessage(error)
+            setError(error)
         }
     }
     

@@ -77,10 +77,12 @@ struct PriceAlertsView: View {
                         } else {
                             let isCreateButtonDisabled = viewModel.shouldDisableCreateButton(targetPrice: targetPrice)
                             Button(action: {
-                                Task {
-                                    await viewModel.createPriceAlert(targetPrice: targetPrice)
+                                if let targetPrice {
+                                    Task {
+                                        await viewModel.createPriceAlert(targetPrice: targetPrice)
+                                    }
+                                    viewModel.triggerImpactFeedback()
                                 }
-                                viewModel.triggerImpactFeedback()
                             }) {
                                 Text("Create")
                                     .padding(.vertical, 12)
@@ -133,7 +135,8 @@ struct PriceAlertsView: View {
                     .font(.body)
                 
                 HStack(spacing: 8) {
-                    Image(viewModel.getTargetDirection(for: priceAlert.targetPrice).iconName)
+                    let targetDirection = viewModel.getTargetDirection(for: priceAlert.targetPrice)
+                    Image(targetDirection.iconName)
                         .resizable()
                         .scaledToFit()
                         .frame(width: 16, height: 16)

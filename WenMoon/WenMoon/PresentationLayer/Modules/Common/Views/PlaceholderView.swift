@@ -35,7 +35,7 @@ struct PlaceholderView: View {
     let text: String
     let style: Style
     
-    init(text: String, style: Style = .small) {
+    init(text: String, style: Style = .medium) {
         self.text = text
         self.style = style
     }

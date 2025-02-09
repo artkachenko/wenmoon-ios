@@ -50,6 +50,7 @@ final class CoinListViewModel: BaseViewModel {
     }
     
     // MARK: - Internal Methods
+    @MainActor
     func fetchCoins() async {
         let descriptor = FetchDescriptor<CoinData>(
             predicate: #Predicate { !$0.isArchived },
@@ -87,7 +88,7 @@ final class CoinListViewModel: BaseViewModel {
             }
             save()
         } catch {
-            setErrorMessage(error)
+            setError(error)
         }
     }
     
@@ -117,7 +118,7 @@ final class CoinListViewModel: BaseViewModel {
                 coins[index].priceAlerts = matchingPriceAlerts
             }
         } catch {
-            setErrorMessage(error)
+            setError(error)
         }
     }
     
@@ -181,6 +182,7 @@ final class CoinListViewModel: BaseViewModel {
         let newCoin = CoinData(from: coin, imageData: imageData)
         coins.append(newCoin)
         insert(newCoin)
+        saveCoinsOrder()
     }
     
     private func deleteCoin(_ coin: CoinData) {
@@ -189,6 +191,7 @@ final class CoinListViewModel: BaseViewModel {
             coins.remove(at: index)
         }
         delete(coin)
+        saveCoinsOrder()
     }
     
     private func archiveCoin(_ coin: CoinData) {
@@ -198,6 +201,7 @@ final class CoinListViewModel: BaseViewModel {
             coins.remove(at: index)
         }
         save()
+        saveCoinsOrder()
     }
     
     private func unarchiveCoin(_ coin: CoinData) {
@@ -205,6 +209,7 @@ final class CoinListViewModel: BaseViewModel {
         coin.isArchived = false
         coins.append(coin)
         save()
+        saveCoinsOrder()
     }
     
     private func startCacheTimer() {

@@ -28,7 +28,9 @@ struct BaseView<Content: View>: View {
                 Alert(
                     title: Text("Error"),
                     message: Text(errorMessage!),
-                    dismissButton: .default(Text("OK"))
+                    dismissButton: .default(Text("OK")) {
+                        errorMessage = nil
+                    }
                 )
             }
             .onChange(of: errorMessage) { _, newValue in

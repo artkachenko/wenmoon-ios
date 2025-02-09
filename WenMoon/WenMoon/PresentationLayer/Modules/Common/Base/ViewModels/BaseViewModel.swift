@@ -58,7 +58,7 @@ class BaseViewModel: ObservableObject {
         do {
             return try swiftDataManager?.fetch(descriptor) ?? []
         } catch {
-            setErrorMessage(error)
+            setError(error)
             return []
         }
     }
@@ -67,7 +67,7 @@ class BaseViewModel: ObservableObject {
         do {
             try swiftDataManager?.insert(model)
         } catch {
-            setErrorMessage(error)
+            setError(error)
         }
     }
     
@@ -75,7 +75,7 @@ class BaseViewModel: ObservableObject {
         do {
             try swiftDataManager?.delete(model)
         } catch {
-            setErrorMessage(error)
+            setError(error)
         }
     }
     
@@ -83,7 +83,7 @@ class BaseViewModel: ObservableObject {
         do {
             try swiftDataManager?.save()
         } catch {
-            setErrorMessage(error)
+            setError(error)
         }
     }
     
@@ -97,13 +97,17 @@ class BaseViewModel: ObservableObject {
             return nil
         }
     }
-
-    func setErrorMessage(_ error: Error) {
+    
+    func setError(_ error: Error) {
         if let descriptiveError = error as? DescriptiveError {
             errorMessage = descriptiveError.errorDescription
         } else {
             errorMessage = "An unknown error occurred: \(error.localizedDescription)"
         }
+    }
+
+    func setErrorMessage(_ message: String) {
+        errorMessage = message
     }
     
     func triggerImpactFeedback(_ style: UIImpactFeedbackGenerator.FeedbackStyle = .light) {

@@ -15,7 +15,7 @@ struct EducationView: View {
     var body: some View {
         NavigationView {
             VStack {
-                PlaceholderView(text: "Coming soon...", style: .medium)
+                PlaceholderView(text: "Coming soon...")
             }
             .navigationTitle("Education")
         }

@@ -68,26 +68,17 @@ struct AccountView: View {
     // MARK: - Subviews
     @ViewBuilder
     private func makeAuthView() -> some View {
-        if case .signedIn = viewModel.loginState {
-            VStack(spacing: 16) {
-                Image(systemName: "person.crop.circle")
-                    .resizable()
-                    .frame(width: 60, height: 60)
-                
-                if case .signedIn(let userID) = viewModel.loginState {
-                    Text(userID ?? "User")
-                        .font(.headline)
-                }
-            }
-            .padding(.top, 48)
-            .padding(.bottom, 24)
-        } else {
-            VStack(spacing: 16) {
-                Image("moon")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 48, height: 48)
-                
+        VStack(spacing: 16) {
+            Image("moon")
+                .renderingMode(.original)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 48, height: 48)
+            
+            if case .signedIn(let userID) = viewModel.loginState {
+                Text(userID ?? "User")
+                    .font(.headline)
+            } else {
                 Text("Sign into your account")
                     .font(.headline)
                 
@@ -136,9 +127,9 @@ struct AccountView: View {
                     }
                 }
             }
-            .padding(.top, 48)
-            .padding(.bottom, 24)
         }
+        .padding(.top, 48)
+        .padding(.bottom, 24)
     }
     
     @ViewBuilder

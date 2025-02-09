@@ -99,7 +99,7 @@ final class AccountViewModel: BaseViewModel {
             try firebaseAuthService.signOut()
             loginState = .signedOut
         } catch {
-            setErrorMessage(error)
+            setError(error)
         }
     }
     
@@ -144,7 +144,7 @@ final class AccountViewModel: BaseViewModel {
     private func signIn(with credential: AuthCredential, completion: @escaping (() -> Void)) {
         firebaseAuthService.signIn(with: credential) { [weak self] authResult, error in
             if let error {
-                self?.setErrorMessage(error)
+                self?.setError(error)
             } else {
                 self?.loginState = .signedIn(authResult?.user.displayName)
             }

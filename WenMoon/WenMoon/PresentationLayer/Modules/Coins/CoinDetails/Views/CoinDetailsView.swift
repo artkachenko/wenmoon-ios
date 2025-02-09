@@ -15,9 +15,9 @@ struct CoinDetailsView: View {
     @StateObject private var viewModel: CoinDetailsViewModel
     
     @State private var selectedPrice: String
-    @State private var selectedDate = ""
-    @State private var selectedXPosition: CGFloat?
+    @State private var selectedDate = String()
     @State private var selectedTimeframe: Timeframe = .oneDay
+    @State private var selectedXPosition: CGFloat?
     
     @State private var showPriceAlertsView = false
     @State private var showAuthAlert = false
@@ -51,6 +51,7 @@ struct CoinDetailsView: View {
                             
                             Text("#\(marketData.marketCapRank.formattedOrNone())")
                                 .font(.caption).bold()
+                                .animation(.easeInOut, value: marketData.marketCapRank)
                         }
                         
                         HStack {
@@ -99,7 +100,7 @@ struct CoinDetailsView: View {
                     }
                     
                     if chartData.isEmpty && !isLoading {
-                        PlaceholderView(text: "No data available")
+                        PlaceholderView(text: "No data available", style: .small)
                     }
                     
                     if isLoading {
@@ -277,6 +278,7 @@ struct CoinDetailsView: View {
                 .foregroundColor(.gray)
             Text(value)
                 .font(.caption)
+                .animation(.easeInOut, value: value)
         }
     }
     

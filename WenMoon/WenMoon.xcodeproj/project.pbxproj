@@ -11,6 +11,7 @@
 		191DCD492D2805CC00892757 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 191DCD472D2805CC00892757 /* Release.xcconfig */; };
 		191DCD4B2D2805D900892757 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 191DCD4A2D2805D900892757 /* Debug.xcconfig */; };
 		191DCD4C2D2805D900892757 /* Debug.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 191DCD4A2D2805D900892757 /* Debug.xcconfig */; };
+		194212A32D58F86C008DE753 /* RollingNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194212A22D58F86C008DE753 /* RollingNumberView.swift */; };
 		1961B51F2D34407600D0CEBC /* PlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1961B51E2D34407600D0CEBC /* PlaceholderView.swift */; };
 		1961B5242D37C04600D0CEBC /* ContentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1961B5232D37C04600D0CEBC /* ContentViewModel.swift */; };
 		1961B5262D37C1C600D0CEBC /* ContentViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1961B5252D37C1C600D0CEBC /* ContentViewModelTests.swift */; };
@@ -129,6 +130,7 @@
 /* Begin PBXFileReference section */
 		191DCD472D2805CC00892757 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		191DCD4A2D2805D900892757 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		194212A22D58F86C008DE753 /* RollingNumberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RollingNumberView.swift; sourceTree = "<group>"; };
 		1961B51E2D34407600D0CEBC /* PlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderView.swift; sourceTree = "<group>"; };
 		1961B5232D37C04600D0CEBC /* ContentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewModel.swift; sourceTree = "<group>"; };
 		1961B5252D37C1C600D0CEBC /* ContentViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewModelTests.swift; sourceTree = "<group>"; };
@@ -671,6 +673,7 @@
 			children = (
 				198655052D30394F00216097 /* CoinImageView.swift */,
 				1961B51E2D34407600D0CEBC /* PlaceholderView.swift */,
+				194212A22D58F86C008DE753 /* RollingNumberView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1183,6 +1186,7 @@
 				D28C18502D0B270000291920 /* GlobalMarketData.swift in Sources */,
 				D28558492CF8B43C0023A2D5 /* PriceAlertsView.swift in Sources */,
 				D2EFF90E2CDD1129004AA5A5 /* CoinDetailsView.swift in Sources */,
+				194212A32D58F86C008DE753 /* RollingNumberView.swift in Sources */,
 				FA8A08902A1CFD040083B8DB /* UserDefaultsManager.swift in Sources */,
 				D2AAC1EE2CCFD17B00CBAFB0 /* Color+Extensions.swift in Sources */,
 				FA61B3F12A41B71D008A9FB9 /* BaseViewModel.swift in Sources */,

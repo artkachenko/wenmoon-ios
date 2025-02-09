@@ -34,8 +34,7 @@ final class FirebaseAuthServiceImpl: FirebaseAuthService {
     }
     
     var userID: String? {
-        guard let currentUser = auth.currentUser else { return nil }
-        return currentUser.email ?? currentUser.phoneNumber ?? currentUser.uid
+        auth.currentUser?.displayName
     }
     
     func signIn(with credential: AuthCredential, completion: @escaping (AuthDataResult?, Error?) -> Void) {
