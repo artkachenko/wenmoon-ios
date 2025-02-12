@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftData
-import SwiftUI
 
 final class CoinListViewModel: BaseViewModel {
     // MARK: - Properties
@@ -69,6 +68,7 @@ final class CoinListViewModel: BaseViewModel {
         }
         
         await fetchMarketData()
+        triggerImpactFeedback()
     }
     
     @MainActor

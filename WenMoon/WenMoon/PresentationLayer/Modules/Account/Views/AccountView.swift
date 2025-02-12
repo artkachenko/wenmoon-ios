@@ -115,7 +115,7 @@ struct AccountView: View {
                             if viewModel.isTwitterAuthInProgress {
                                 ProgressView()
                             } else {
-                                Image("twitter.logo")
+                                Image("x.logo")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 24, height: 24)

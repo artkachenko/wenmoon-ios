@@ -80,28 +80,33 @@ final class HTTPClientImpl: HTTPClient {
             throw APIError.invalidEndpoint(endpoint: httpRequest.path)
         }
         urlComponents.queryItems = queryitems(from: httpRequest.parameters)
-        
+
         var urlRequest = URLRequest(url: urlComponents.url!)
         urlRequest.httpMethod = httpRequest.httpMethod.rawValue
         urlRequest.httpBody = httpRequest.body
-        
+
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         if let apiKey {
             urlRequest.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
         }
         httpRequest.headers?.forEach { urlRequest.setValue($0.value, forHTTPHeaderField: $0.key) }
-        
-        printRequestDetails(urlRequest)
-        
+
+        printPrettyRequest(urlRequest)
+
         let (data, response) = try await session.data(for: urlRequest)
-        
+
+        if let httpResponse = response as? HTTPURLResponse {
+            printPrettyResponse(httpResponse, data: data)
+        }
+
         guard let httpResponse = response as? HTTPURLResponse, (200..<300).contains(httpResponse.statusCode) else {
             throw APIError.unknown(response: response)
         }
-        
+
         return data
     }
-    
+
+    // MARK: - Private Methods
     private func absolutePath(_ relativePath: String) -> URL {
         guard !relativePath.isEmpty else { return baseURL }
         assert(relativePath.first != "/", "'/' symbol at the beginning of url relativePath will cause 'RestrictedIP' error")
@@ -118,24 +123,54 @@ final class HTTPClientImpl: HTTPClient {
         parameters?.compactMap { URLQueryItem(name: $0.key, value: $0.value) }
     }
     
-    private func printRequestDetails(_ request: URLRequest) {
-        print("🌐 HTTP Request:")
-        if let url = request.url {
-            print("URL: \(url.absoluteString)")
-        }
+    private func printPrettyRequest(_ request: URLRequest) {
+        print("\n──────────────────────────────────")
+        print("HTTP REQUEST")
+        print("URL: \(request.url?.absoluteString ?? "N/A")")
         print("Method: \(request.httpMethod ?? "N/A")")
-        if let headers = request.allHTTPHeaderFields {
+        
+        if let headers = request.allHTTPHeaderFields, !headers.isEmpty {
             print("Headers:")
             for (key, value) in headers {
-                print("  \(key): \(value)")
+                print("   \(key): \(value)")
             }
         }
-        if let body = request.httpBody,
-           let bodyString = String(data: body, encoding: .utf8) {
-            print("Body: \(bodyString)")
+        
+        if let body = request.httpBody, let jsonString = prettyPrintedJSON(from: body) {
+            print("Body:")
+            print(jsonString)
         } else {
             print("Body: None")
         }
-        print("----------------------")
+        print("──────────────────────────────────\n")
+    }
+
+    private func printPrettyResponse(_ response: HTTPURLResponse, data: Data) {
+        print("\n──────────────────────────────────")
+        print("HTTP RESPONSE")
+        print("Status Code: \(response.statusCode) (\(HTTPURLResponse.localizedString(forStatusCode: response.statusCode)))")
+        
+        print("Headers:")
+        for (key, value) in response.allHeaderFields {
+            print("   \(key): \(value)")
+        }
+        
+        if let jsonString = prettyPrintedJSON(from: data) {
+            print("Response Body:")
+            print(jsonString)
+        } else {
+            print("Response Body: Unable to decode")
+        }
+        print("──────────────────────────────────\n")
+    }
+
+    private func prettyPrintedJSON(from data: Data) -> String? {
+        do {
+            let jsonObject = try JSONSerialization.jsonObject(with: data, options: [])
+            let prettyData = try JSONSerialization.data(withJSONObject: jsonObject, options: .prettyPrinted)
+            return String(decoding: prettyData, as: UTF8.self)
+        } catch {
+            return nil
+        }
     }
 }

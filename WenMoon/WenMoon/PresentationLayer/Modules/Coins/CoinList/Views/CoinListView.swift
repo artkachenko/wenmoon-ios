@@ -16,6 +16,7 @@ struct CoinListView: View {
     
     @State private var chartDrawProgress: CGFloat = .zero
     
+    @State private var viewDidAppear = false
     @State private var showCoinSelectionView = false
     @State private var showAuthAlert = false
     
@@ -87,8 +88,10 @@ struct CoinListView: View {
             }
         }
         .task {
+            guard !viewDidAppear else { return }
             await viewModel.fetchCoins()
             await viewModel.fetchPriceAlerts()
+            viewDidAppear = true
         }
     }
     

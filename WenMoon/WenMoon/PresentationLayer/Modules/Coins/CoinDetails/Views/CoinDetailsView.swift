@@ -19,10 +19,12 @@ struct CoinDetailsView: View {
     @State private var selectedTimeframe: Timeframe = .oneDay
     @State private var selectedXPosition: CGFloat?
     
+    @State private var isExpanded = false
     @State private var showPriceAlertsView = false
     @State private var showAuthAlert = false
     
     private var coin: CoinData { viewModel.coin }
+    private var coinDetails: CoinDetails { viewModel.coinDetails }
     private var marketData: CoinDetails.MarketData { viewModel.coinDetails.marketData }
     private var chartData: [ChartData] { viewModel.chartData }
     private var isLoading: Bool { viewModel.isLoading }
@@ -36,7 +38,7 @@ struct CoinDetailsView: View {
     // MARK: - Body
     var body: some View {
         BaseView(errorMessage: $viewModel.errorMessage) {
-            VStack(spacing: 24) {
+            VStack(spacing: 8) {
                 HStack(alignment: .top, spacing: 12) {
                     CoinImageView(
                         imageData: coin.imageData,
@@ -92,56 +94,73 @@ struct CoinDetailsView: View {
                         }
                     }
                 }
-                .padding(24)
-                
-                ZStack {
-                    if !chartData.isEmpty && !isLoading {
-                        makeChartView(chartData)
-                    }
-                    
-                    if chartData.isEmpty && !isLoading {
-                        PlaceholderView(text: "No data available", style: .small)
-                    }
-                    
-                    if isLoading {
-                        ProgressView()
-                    }
-                }
-                .frame(height: 300)
-                
-                Picker("Select Timeframe", selection: $selectedTimeframe) {
-                    ForEach(Timeframe.allCases, id: \.self) { timeframe in
-                        Text(timeframe.displayValue).tag(timeframe)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .scaleEffect(0.85)
-                .disabled(isLoading)
-                
-                HStack {
-                    VStack(alignment: .leading, spacing: 8) {
-                        makeDetailRow(label: "Market Cap", value: coin.marketCap.formattedWithAbbreviation(suffix: "$"))
-                        makeDetailRow(label: "24h Volume", value: marketData.totalVolume.formattedWithAbbreviation(suffix: "$"))
-                        makeDetailRow(label: "Max Supply", value: marketData.maxSupply.formattedWithAbbreviation(placeholder: "∞"))
-                        makeDetailRow(label: "All-Time High", value: marketData.ath.formattedAsCurrency())
-                    }
-                    
-                    Spacer()
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        makeDetailRow(label: "Fully Diluted Market Cap", value: marketData.fullyDilutedValuation.formattedWithAbbreviation(suffix: "$"))
-                        makeDetailRow(label: "Circulating Supply", value: marketData.circulatingSupply.formattedWithAbbreviation())
-                        makeDetailRow(label: "Total Supply", value: marketData.totalSupply.formattedWithAbbreviation())
-                        makeDetailRow(label: "All-Time Low", value: marketData.atl.formattedAsCurrency())
-                    }
-                }
-                .padding()
-                .background(Color(.secondarySystemBackground))
-                .cornerRadius(12)
                 .padding(.horizontal, 24)
                 
-                Spacer()
+                ScrollView(showsIndicators: false) {
+                    LazyVStack(spacing: 24) {
+                        ZStack {
+                            if !chartData.isEmpty && !isLoading {
+                                makeChartView(chartData)
+                            }
+                            
+                            if chartData.isEmpty && !isLoading {
+                                PlaceholderView(text: "No data available", style: .small)
+                            }
+                            
+                            if isLoading {
+                                ProgressView()
+                            }
+                        }
+                        .frame(height: 300)
+                        .padding(.top, 12)
+                        
+                        Picker("Select Timeframe", selection: $selectedTimeframe) {
+                            ForEach(Timeframe.allCases, id: \.self) { timeframe in
+                                Text(timeframe.displayValue).tag(timeframe)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .scaleEffect(0.85)
+                        .disabled(isLoading)
+                        
+                        VStack(spacing: 32) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    makeDetailRow(label: "Market Cap", value: coin.marketCap.formattedWithAbbreviation(suffix: "$"))
+                                    makeDetailRow(label: "24h Volume", value: marketData.totalVolume.formattedWithAbbreviation(suffix: "$"))
+                                    makeDetailRow(label: "Max Supply", value: marketData.maxSupply.formattedWithAbbreviation(placeholder: "∞"))
+                                    makeDetailRow(label: "All-Time High", value: marketData.ath.formattedAsCurrency())
+                                }
+                                
+                                Spacer()
+                                
+                                VStack(alignment: .leading, spacing: 8) {
+                                    makeDetailRow(label: "Fully Diluted Market Cap", value: marketData.fullyDilutedValuation.formattedWithAbbreviation(suffix: "$"))
+                                    makeDetailRow(label: "Circulating Supply", value: marketData.circulatingSupply.formattedWithAbbreviation())
+                                    makeDetailRow(label: "Total Supply", value: marketData.totalSupply.formattedWithAbbreviation())
+                                    makeDetailRow(label: "All-Time Low", value: marketData.atl.formattedAsCurrency())
+                                }
+                            }
+                            .padding()
+                            .background(Color(.secondarySystemBackground))
+                            .cornerRadius(12)
+                            
+                            if let description = coinDetails.description?.htmlStripped, !description.isEmpty {
+                                makeSectionView(title: "Description") {
+                                    ExpandableTextView(text: description)
+                                }
+                            }
+                            
+                            makeSectionView(title: "Links") {
+                                LinksView(links: coinDetails.links)
+                            }
+                        }
+                        .padding(.horizontal, 24)
+                    }
+                    .padding(.bottom, 16)
+                }
             }
+            .padding(.top, 24)
             .background(Color.black)
         }
         .onChange(of: selectedTimeframe) { _, timeframe in
@@ -279,6 +298,18 @@ struct CoinDetailsView: View {
             Text(value)
                 .font(.caption)
                 .animation(.easeInOut, value: value)
+        }
+    }
+    
+    @ViewBuilder
+    private func makeSectionView(title: String, @ViewBuilder content: () -> some View) -> some View {
+        VStack(spacing: 16) {
+            HStack {
+                Text(title)
+                    .font(.headline)
+                Spacer()
+            }
+            content()
         }
     }
     

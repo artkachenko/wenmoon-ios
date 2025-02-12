@@ -83,29 +83,29 @@ struct RollingDigitView: View {
             .scaleEffect(scale)
             .onAppear {
                 if animateOnAppear {
-                    offset = (direction == .fromTop) ? -10 : 10
-                    opacity = 0.0
+                    offset = (direction == .fromTop) ? -5 : 5
+                    opacity = .zero
                     scale = 0.8
                     withAnimation(rollingAnimation.delay(delay)) {
-                        offset = 0
-                        opacity = 1.0
-                        scale = 1.0
+                        offset = .zero
+                        opacity = 1
+                        scale = 1
                     }
                 } else {
                     offset = .zero
-                    opacity = 1.0
-                    scale = 1.0
+                    opacity = 1
+                    scale = 1
                 }
             }
             .onChange(of: digit) { oldValue, newValue in
                 guard oldValue != newValue else { return }
-                offset = (direction == .fromTop) ? -10 : 10
-                opacity = 0.0
+                offset = (direction == .fromTop) ? -5 : 5
+                opacity = .zero
                 scale = 0.8
                 withAnimation(rollingAnimation.delay(delay)) {
                     offset = .zero
-                    opacity = 1.0
-                    scale = 1.0
+                    opacity = 1
+                    scale = 1
                 }
             }
     }
