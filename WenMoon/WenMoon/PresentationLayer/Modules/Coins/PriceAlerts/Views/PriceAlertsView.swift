@@ -81,7 +81,6 @@ struct PriceAlertsView: View {
                                     Task {
                                         await viewModel.createPriceAlert(targetPrice: targetPrice)
                                     }
-                                    viewModel.triggerImpactFeedback()
                                 }
                             }) {
                                 Text("Create")
@@ -119,9 +118,11 @@ struct PriceAlertsView: View {
             }
         }
         .contentShape(Rectangle())
-        .onTapGesture {
-            isTextFieldFocused = false
-        }
+        .simultaneousGesture(
+            TapGesture().onEnded {
+                isTextFieldFocused = false
+            }
+        )
         .onAppear {
             targetPrice = viewModel.coin.currentPrice
         }

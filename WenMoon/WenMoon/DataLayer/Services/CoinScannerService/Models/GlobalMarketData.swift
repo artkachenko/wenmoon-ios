@@ -8,18 +8,11 @@
 import Foundation
 
 struct GlobalMarketData: Codable {
+    // MARK: - Properties
     let cpiPercentage: Double
     let nextCPIDate: Date
     let interestRatePercentage: Double
     let nextFOMCMeetingDate: Date
-    
-    // MARK: - Coding Keys
-    private enum CodingKeys: String, CodingKey {
-        case cpiPercentage
-        case nextCPITimestamp
-        case interestRatePercentage
-        case nextFOMCMeetingTimestamp
-    }
     
     // MARK: - Initializers
     init(
@@ -32,6 +25,11 @@ struct GlobalMarketData: Codable {
         self.nextCPIDate = nextCPIDate
         self.interestRatePercentage = interestRatePercentage
         self.nextFOMCMeetingDate = nextFOMCMeetingDate
+    }
+    
+    // MARK: - Codable
+    private enum CodingKeys: String, CodingKey {
+        case cpiPercentage, nextCPITimestamp, interestRatePercentage, nextFOMCMeetingTimestamp
     }
     
     init(from decoder: Decoder) throws {

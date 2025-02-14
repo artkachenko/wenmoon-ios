@@ -12,7 +12,7 @@ final class CoinDetailsViewModel: BaseViewModel {
     private let coinScannerService: CoinScannerService
     
     @Published private(set) var coin: CoinData
-    @Published private(set) var coinDetails: CoinDetails = .empty
+    @Published private(set) var coinDetails = CoinDetails()
     @Published private(set) var chartData: [ChartData] = []
     
     var chartDataCache: [Timeframe: [ChartData]] = [:]

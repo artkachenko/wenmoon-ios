@@ -157,7 +157,7 @@ class CoinSelectionViewModelTests: XCTestCase {
         await viewModel.fetchCoins()
         
         // Action
-        await viewModel.handleSearchInput("")
+        await viewModel.handleQueryChange("")
         
         // Assertions
         assertCoinsEqual(viewModel.coins, initialCoins)

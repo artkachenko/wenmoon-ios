@@ -91,7 +91,6 @@ struct AccountView: View {
                 HStack(spacing: 16) {
                     Button(action: {
                         viewModel.signInWithGoogle()
-                        viewModel.triggerImpactFeedback()
                     }) {
                         ZStack {
                             if viewModel.isGoogleAuthInProgress {
@@ -109,7 +108,6 @@ struct AccountView: View {
                     }
                     Button(action: {
                         viewModel.signInWithTwitter()
-                        viewModel.triggerImpactFeedback()
                     }) {
                         ZStack {
                             if viewModel.isTwitterAuthInProgress {

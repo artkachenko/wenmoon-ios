@@ -73,6 +73,8 @@ final class AccountViewModel: BaseViewModel {
                 self.isGoogleAuthInProgress = false
             }
         }
+        
+        triggerImpactFeedback()
     }
     
     func signInWithTwitter() {
@@ -92,6 +94,8 @@ final class AccountViewModel: BaseViewModel {
                 self.isTwitterAuthInProgress = false
             }
         }
+        
+        triggerImpactFeedback()
     }
     
     func signOut() {

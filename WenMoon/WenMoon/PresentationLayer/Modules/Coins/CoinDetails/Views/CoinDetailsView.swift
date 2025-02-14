@@ -19,7 +19,7 @@ struct CoinDetailsView: View {
     @State private var selectedTimeframe: Timeframe = .oneDay
     @State private var selectedXPosition: CGFloat?
     
-    @State private var isExpanded = false
+    @State private var showMarketsView = false
     @State private var showPriceAlertsView = false
     @State private var showAuthAlert = false
     
@@ -123,7 +123,19 @@ struct CoinDetailsView: View {
                         .scaleEffect(0.85)
                         .disabled(isLoading)
                         
-                        VStack(spacing: 32) {
+                        VStack(spacing: 24) {
+                            Button(action: {
+                                showMarketsView = true
+                                viewModel.triggerImpactFeedback()
+                            }) {
+                                Text("Buy")
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 12)
+                                    .foregroundColor(.black)
+                                    .background(.white)
+                                    .cornerRadius(32)
+                            }
+                            
                             HStack {
                                 VStack(alignment: .leading, spacing: 8) {
                                     makeDetailRow(label: "Market Cap", value: coin.marketCap.formattedWithAbbreviation(suffix: "$"))
@@ -170,6 +182,12 @@ struct CoinDetailsView: View {
         }
         .onChange(of: selectedDate) {
             viewModel.triggerSelectionFeedback()
+        }
+        .sheet(isPresented: $showMarketsView) {
+            let tickers = coinDetails.tickers
+            let detents: Set<PresentationDetent> = tickers.count > 5 ? [.large] : [.medium, .large]
+            CoinMarketsView(tickers: tickers)
+                .presentationDetents(detents)
         }
         .sheet(isPresented: $showPriceAlertsView) {
             PriceAlertsView(coin: coin)

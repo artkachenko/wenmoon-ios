@@ -15,6 +15,8 @@ final class CoinSelectionViewModel: BaseViewModel {
 
     @Published private(set) var coins: [Coin] = []
     @Published private(set) var isLoadingMoreItems = false
+    
+    @Published var searchText: String = ""
     @Published var isInSearchMode = false
 
     var coinsCache: [Int: [Coin]] = [:]
@@ -23,9 +25,8 @@ final class CoinSelectionViewModel: BaseViewModel {
     private(set) var currentPage = 1
     private(set) var savedCoinIDs: Set<String> = []
 
-    private var searchQuerySubject = PassthroughSubject<String, Never>()
     private var cancellables = Set<AnyCancellable>()
-    
+
     // MARK: - Initializers
     convenience init() {
         self.init(coinScannerService: CoinScannerServiceImpl())
@@ -35,16 +36,15 @@ final class CoinSelectionViewModel: BaseViewModel {
         self.coinScannerService = coinScannerService
         super.init(swiftDataManager: swiftDataManager)
         
-        searchQuerySubject
+        $searchText
             .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
+            .removeDuplicates()
             .sink { [weak self] query in
-                Task {
-                    await self?.handleQueryChange(query)
-                }
+                Task { await self?.handleQueryChange(query) }
             }
             .store(in: &cancellables)
     }
-    
+
     // MARK: - Internal Methods
     @MainActor
     func fetchCoins(at page: Int = 1) async {
@@ -77,9 +77,35 @@ final class CoinSelectionViewModel: BaseViewModel {
             await fetchCoins(at: currentPage + 1)
         }
     }
+
+    func fetchSavedCoins() {
+        let descriptor = FetchDescriptor<CoinData>(predicate: #Predicate { !$0.isArchived })
+        let fetchedCoinIDs = fetch(descriptor).compactMap(\.id)
+        savedCoinIDs = Set(fetchedCoinIDs)
+    }
+
+    func toggleSaveState(for coin: Coin) {
+        if !savedCoinIDs.insert(coin.id).inserted {
+            savedCoinIDs.remove(coin.id)
+        }
+    }
+
+    func isCoinSaved(_ coin: Coin) -> Bool {
+        savedCoinIDs.contains(coin.id)
+    }
     
-    func handleSearchInput(_ query: String) async {
-        searchQuerySubject.send(query)
+    // Search
+    @MainActor
+    func handleQueryChange(_ query: String) async {
+        if query.isEmpty {
+            isInSearchMode = false
+            currentPage = 1
+            coins = []
+            await fetchCoins(at: currentPage)
+        } else {
+            isInSearchMode = true
+            await searchCoins(for: query)
+        }
     }
     
     @MainActor
@@ -98,36 +124,6 @@ final class CoinSelectionViewModel: BaseViewModel {
             self.coins = fetchedCoins
         } catch {
             setError(error)
-        }
-    }
-    
-    func fetchSavedCoins() {
-        let descriptor = FetchDescriptor<CoinData>(predicate: #Predicate { !$0.isArchived })
-        let fetchedCoinIDs = fetch(descriptor).compactMap(\.id)
-        savedCoinIDs = Set(fetchedCoinIDs)
-    }
-    
-    func toggleSaveState(for coin: Coin) {
-        if !savedCoinIDs.insert(coin.id).inserted {
-            savedCoinIDs.remove(coin.id)
-        }
-    }
-    
-    func isCoinSaved(_ coin: Coin) -> Bool {
-        savedCoinIDs.contains(coin.id)
-    }
-    
-    // MARK: - Private Methods
-    @MainActor
-    private func handleQueryChange(_ query: String) async {
-        if query.isEmpty {
-            isInSearchMode = false
-            currentPage = 1
-            coins = []
-            await fetchCoins(at: currentPage)
-        } else {
-            isInSearchMode = true
-            await searchCoins(for: query)
         }
     }
 }

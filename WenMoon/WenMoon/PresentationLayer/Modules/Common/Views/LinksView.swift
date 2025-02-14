@@ -11,9 +11,9 @@ import SwiftUI
 struct LinksView: View {
     let links: CoinDetails.Links
     
-    @Environment(\.openURL) private var openURLAction
+    @Environment(\.openURL) private var openURL
     
-    @State private var selectedLinks: [URL] = []
+    @State private var selectedURLs: [URL] = []
     @State private var showingActionSheet = false
     
     var body: some View {
@@ -25,9 +25,9 @@ struct LinksView: View {
             }
         }
         .confirmationDialog("Select a Link", isPresented: $showingActionSheet, titleVisibility: .visible) {
-            ForEach(selectedLinks, id: \.self) { url in
+            ForEach(selectedURLs, id: \.self) { url in
                 Button {
-                    openURLAction(url)
+                    openURL(url)
                 } label: {
                     Text(extractDomain(from: url))
                 }
@@ -39,105 +39,111 @@ struct LinksView: View {
     private func generateLinkButtons() -> [AnyView] {
         var buttons: [AnyView] = []
         
-        appendMultiLinkButton(
-            to: &buttons,
-            title: "Website",
-            links: validLinks(from: links.homepage),
-            showFullURL: false,
-            systemImageName: "globe"
-        )
+        if let urls = links.homepage {
+            appendMultiLinkButton(
+                to: &buttons,
+                title: "Website",
+                urls: urls,
+                showFullURL: false,
+                systemImageName: "globe"
+            )
+        }
         
-        if let whitepaperURL = validURL(links.whitepaper) {
+        if let url = links.whitepaper {
             buttons.append(
                 AnyView(
                     LinkButtonView(
                         title: "Whitepaper",
-                        url: whitepaperURL,
+                        url: url,
                         systemImageName: "doc"
                     )
                 )
             )
         }
         
-        if let twitter = links.twitterScreenName, !twitter.isEmpty,
-           let twitterURL = URL(string: "https://twitter.com/\(twitter)") {
+        if let username = links.twitterScreenName, !username.isEmpty,
+           let url = URL(string: "https://twitter.com/\(username)") {
             buttons.append(
                 AnyView(
                     LinkButtonView(
                         title: "X",
-                        url: twitterURL,
+                        url: url,
                         imageName: "x.logo"
                     )
                 )
             )
         }
         
-        if let subredditURL = validURL(links.subredditUrl),
-           subredditURL.absoluteString != "https://www.reddit.com" {
+        if let url = links.subredditUrl,
+           url.absoluteString != "https://www.reddit.com" {
             buttons.append(
                 AnyView(
                     LinkButtonView(
                         title: "Reddit",
-                        url: subredditURL,
+                        url: url,
                         imageName: "reddit.logo"
                     )
                 )
             )
         }
         
-        if let telegram = links.telegramChannelIdentifier, !telegram.isEmpty,
-           let telegramURL = URL(string: "https://t.me/\(telegram)") {
+        if let username = links.telegramChannelIdentifier, !username.isEmpty,
+           let url = URL(string: "https://t.me/\(username)") {
             buttons.append(
                 AnyView(
                     LinkButtonView(
                         title: "Telegram",
-                        url: telegramURL,
+                        url: url,
                         imageName: "telegram.logo"
                     )
                 )
             )
         }
         
+        let urls = (links.chatUrl ?? []) + (links.announcementUrl ?? [])
         appendMultiLinkButton(
             to: &buttons,
             title: "Communication",
-            links: validLinks(from: links.communication),
+            urls: urls,
             showFullURL: false,
             systemImageName: "message.fill"
         )
         
-        appendMultiLinkButton(
-            to: &buttons,
-            title: "Explorer",
-            links: validLinks(from: links.blockchainSite),
-            showFullURL: false,
-            systemImageName: "link"
-        )
+        if let urls = links.blockchainSite {
+            appendMultiLinkButton(
+                to: &buttons,
+                title: "Explorer",
+                urls: urls,
+                showFullURL: false,
+                systemImageName: "link"
+            )
+        }
         
-        let githubLinks = validLinks(from: links.reposUrl.github)
-        if githubLinks.count == 1, let url = githubLinks.first {
-            buttons.append(
-                AnyView(
-                    LinkButtonView(
-                        title: "GitHub",
-                        url: url,
-                        imageName: "github.logo"
+        if let urls = links.reposUrl.github {
+            if urls.count == 1, let url = urls.first {
+                buttons.append(
+                    AnyView(
+                        LinkButtonView(
+                            title: "GitHub",
+                            url: url,
+                            imageName: "github.logo"
+                        )
                     )
                 )
-            )
-        } else if !githubLinks.isEmpty {
-            buttons.append(
-                AnyView(
-                    MultiLinkButtonView(
-                        title: "GitHub",
-                        links: githubLinks,
-                        imageName: "github.logo",
-                        showFullURL: true,
-                        showingActionSheet: $showingActionSheet,
-                        selectedLinks: $selectedLinks
+            } else if !urls.isEmpty {
+                buttons.append(
+                    AnyView(
+                        MultiLinkButtonView(
+                            title: "GitHub",
+                            urls: urls,
+                            imageName: "github.logo",
+                            showFullURL: true,
+                            showingActionSheet: $showingActionSheet,
+                            selectedURLs: $selectedURLs
+                        )
                     )
                 )
-            )
+            }
         }
         
         return buttons
@@ -146,13 +152,13 @@ struct LinksView: View {
     private func appendMultiLinkButton(
         to buttons: inout [AnyView],
         title: String,
-        links: [URL],
+        urls: [URL],
         showFullURL: Bool,
         imageName: String? = nil,
         systemImageName: String? = nil
     ) {
-        guard !links.isEmpty else { return }
-        if links.count == 1, let url = links.first {
+        guard !urls.isEmpty else { return }
+        if urls.count == 1, let url = urls.first {
             buttons.append(
                 AnyView(
                     LinkButtonView(
@@ -168,31 +174,16 @@ struct LinksView: View {
                 AnyView(
                     MultiLinkButtonView(
                         title: title,
-                        links: links,
+                        urls: urls,
                         imageName: imageName,
                         systemImageName: systemImageName,
                         showFullURL: showFullURL,
                         showingActionSheet: $showingActionSheet,
-                        selectedLinks: $selectedLinks
+                        selectedURLs: $selectedURLs
                     )
                 )
             )
         }
-    }
-    
-    private func validURL(_ urlString: String?) -> URL? {
-        guard
-            let urlString = urlString,
-            !urlString.isEmpty,
-            let url = URL(string: urlString)
-        else {
-            return nil
-        }
-        return url
-    }
-    
-    private func validLinks(from urls: [String]?) -> [URL] {
-        urls?.compactMap { validURL($0) } ?? []
     }
     
     private func extractDomain(from url: URL) -> String {
@@ -243,35 +234,35 @@ struct LinkButtonView: View {
 // MARK: - MultiLinkButtonView
 struct MultiLinkButtonView: View {
     let title: String
-    let links: [URL]
+    let urls: [URL]
     let imageName: String?
     let systemImageName: String?
     let showFullURL: Bool
     
     @Binding var showingActionSheet: Bool
-    @Binding var selectedLinks: [URL]
+    @Binding var selectedURLs: [URL]
     
     init(
         title: String,
-        links: [URL],
+        urls: [URL],
         imageName: String? = nil,
         systemImageName: String? = nil,
         showFullURL: Bool = false,
         showingActionSheet: Binding<Bool>,
-        selectedLinks: Binding<[URL]>
+        selectedURLs: Binding<[URL]>
     ) {
         self.title = title
-        self.links = links
+        self.urls = urls
         self.imageName = imageName
         self.systemImageName = systemImageName
         self.showFullURL = showFullURL
         self._showingActionSheet = showingActionSheet
-        self._selectedLinks = selectedLinks
+        self._selectedURLs = selectedURLs
     }
     
     var body: some View {
         Button {
-            selectedLinks = links
+            selectedURLs = urls
             showingActionSheet = true
         } label: {
             LinkButtonContent(

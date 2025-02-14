@@ -54,6 +54,8 @@ final class PriceAlertsViewModel: BaseViewModel {
         } catch {
             setError(error)
         }
+        
+        triggerImpactFeedback()
     }
     
     @MainActor

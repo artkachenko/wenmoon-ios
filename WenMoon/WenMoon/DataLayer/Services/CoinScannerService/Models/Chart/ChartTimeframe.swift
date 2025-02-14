@@ -8,10 +8,7 @@
 import Foundation
 
 enum Timeframe: CaseIterable {
-    case oneDay
-    case oneWeek
-    case oneMonth
-    case yearToDate
+    case oneDay, oneWeek, oneMonth, yearToDate
     
     var value: String {
         switch self {

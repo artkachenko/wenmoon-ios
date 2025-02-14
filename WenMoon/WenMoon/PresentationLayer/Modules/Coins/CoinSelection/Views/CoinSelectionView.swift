@@ -17,15 +17,13 @@ struct CoinSelectionView: View {
     // MARK: - Properties
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject private var viewModel: CoinSelectionViewModel
-
+    
     @FocusState private var isTextFieldFocused: Bool
-
-    @State private var searchText = ""
-
+    
     private let mode: Mode
     private let didToggleCoin: ((Coin, Bool) -> Void)?
     private let didSelectCoin: ((Coin) -> Void)?
-
+    
     // MARK: - Initializers
     init(
         mode: Mode = .toggle,
@@ -61,12 +59,14 @@ struct CoinSelectionView: View {
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .navigationBarTrailing) {
-                            Button("Close") {
-                                dismiss()
-                            }
+                            Button("Close") { dismiss() }
                         }
                     }
-                    .searchable(text: $searchText, placement: .toolbar, prompt: "e.g. Bitcoin")
+                    .searchable(
+                        text: $viewModel.searchText,
+                        placement: .toolbar,
+                        prompt: "e.g. Bitcoin"
+                    )
                     .searchFocused($isTextFieldFocused)
                     .scrollDismissesKeyboard(.immediately)
                     
@@ -78,16 +78,13 @@ struct CoinSelectionView: View {
                         PlaceholderView(text: "No coins found")
                     }
                 }
-                .onTapGesture {
-                    isTextFieldFocused = false
-                }
             }
         }
-        .onChange(of: searchText) { _, query in
-            Task {
-                await viewModel.handleSearchInput(query)
+        .simultaneousGesture(
+            TapGesture().onEnded {
+                isTextFieldFocused = false
             }
-        }
+        )
         .task {
             await viewModel.fetchCoins()
         }
@@ -144,7 +141,6 @@ struct CoinSelectionView: View {
         .padding(.horizontal, 16)
         .contentShape(Rectangle())
         .onTapGesture {
-            isTextFieldFocused = false
             if mode == .selection {
                 didSelectCoin?(coin)
                 dismiss()
