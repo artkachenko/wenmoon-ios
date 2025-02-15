@@ -100,8 +100,19 @@ struct CryptoCompareView: View {
                 }
                 
                 Spacer()
+                
+                HStack(spacing: 4) {
+                    Text("Powered by CoinGecko")
+                        .font(.footnote)
+                    
+                    Image("gecko")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 16, height: 16)
+                }
+                .foregroundColor(.gray)
             }
-            .padding()
+            .padding(16)
             .sheet(isPresented: $showCoinSelectionView) {
                 CoinSelectionView(mode: .selection, didSelectCoin: { selectedCoin in
                     loadAndCacheCoinImage(for: selectedCoin)
