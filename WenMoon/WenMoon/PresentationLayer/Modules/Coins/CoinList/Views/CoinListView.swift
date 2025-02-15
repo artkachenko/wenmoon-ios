@@ -25,7 +25,6 @@ struct CoinListView: View {
                 VStack {
                     let coins = viewModel.coins
                     if coins.isEmpty {
-                        makeAddCoinsButton()
                         Spacer()
                         PlaceholderView(text: "No coins added yet")
                         Spacer()
@@ -45,15 +44,15 @@ struct CoinListView: View {
                                 }
                             }
                             
-                            Section(header: Text("All")) {
-                                ForEach(unpinnedCoins, id: \.self) { coin in
-                                    makeCoinView(coin)
-                                        .transition(.move(edge: .top))
+                            if !unpinnedCoins.isEmpty {
+                                Section(header: Text("All")) {
+                                    ForEach(unpinnedCoins, id: \.self) { coin in
+                                        makeCoinView(coin)
+                                            .transition(.move(edge: .top))
+                                    }
+                                    .onDelete(perform: deleteUnpinnedCoin)
+                                    .onMove(perform: moveUnpinnedCoin)
                                 }
-                                .onDelete(perform: deleteUnpinnedCoin)
-                                .onMove(perform: moveUnpinnedCoin)
-                                
-                                makeAddCoinsButton()
                             }
                         }
                         .listStyle(.plain)
@@ -66,6 +65,18 @@ struct CoinListView: View {
                     }
                 }
                 .navigationTitle("Coins")
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            showCoinSelectionView = true
+                        }) {
+                            Image(systemName: "plus")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 20, height: 20)
+                        }
+                    }
+                }
             }
         }
         .sheet(isPresented: $showCoinSelectionView, onDismiss: {
@@ -109,22 +120,6 @@ struct CoinListView: View {
     }
     
     // MARK: - Subviews
-    @ViewBuilder
-    private func makeAddCoinsButton() -> some View {
-        Button(action: {
-            showCoinSelectionView = true
-        }) {
-            HStack {
-                Image(systemName: "slider.horizontal.3")
-                Text("Add Coins")
-            }
-            .frame(maxWidth: .infinity)
-        }
-        .listRowSeparator(.hidden)
-        .buttonStyle(.borderless)
-        .padding(.vertical, 8)
-    }
-    
     @ViewBuilder
     private func makeCoinView(_ coin: CoinData) -> some View {
         ZStack(alignment: .trailing) {
