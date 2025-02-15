@@ -18,7 +18,7 @@ struct LinksView: View {
     
     var body: some View {
         ScrollView {
-            FlowLayout(spacing: 10) {
+            FlowLayout() {
                 ForEach(Array(generateLinkButtons().enumerated()), id: \.offset) { _, view in
                     view
                 }
@@ -53,8 +53,8 @@ struct LinksView: View {
             buttons.append(
                 AnyView(
                     LinkButtonView(
-                        title: "Whitepaper",
                         url: url,
+                        title: "Whitepaper",
                         systemImageName: "doc"
                     )
                 )
@@ -66,8 +66,8 @@ struct LinksView: View {
             buttons.append(
                 AnyView(
                     LinkButtonView(
-                        title: "X",
                         url: url,
+                        title: "X",
                         imageName: "x.logo"
                     )
                 )
@@ -79,8 +79,8 @@ struct LinksView: View {
             buttons.append(
                 AnyView(
                     LinkButtonView(
-                        title: "Reddit",
                         url: url,
+                        title: "Reddit",
                         imageName: "reddit.logo"
                     )
                 )
@@ -92,8 +92,8 @@ struct LinksView: View {
             buttons.append(
                 AnyView(
                     LinkButtonView(
-                        title: "Telegram",
                         url: url,
+                        title: "Telegram",
                         imageName: "telegram.logo"
                     )
                 )
@@ -124,8 +124,8 @@ struct LinksView: View {
                 buttons.append(
                     AnyView(
                         LinkButtonView(
-                            title: "GitHub",
                             url: url,
+                            title: "GitHub",
                             imageName: "github.logo"
                         )
                     )
@@ -162,8 +162,8 @@ struct LinksView: View {
             buttons.append(
                 AnyView(
                     LinkButtonView(
-                        title: title,
                         url: url,
+                        title: title,
                         imageName: imageName,
                         systemImageName: systemImageName
                     )
@@ -199,21 +199,21 @@ struct LinksView: View {
 
 // MARK: - LinkButtonView
 struct LinkButtonView: View {
-    let title: String
     let url: URL
+    let title: String?
     let imageName: String?
     let systemImageName: String?
     
     @Environment(\.openURL) private var openURLAction
     
     init(
-        title: String,
         url: URL,
+        title: String? = nil,
         imageName: String? = nil,
         systemImageName: String? = nil
     ) {
-        self.title = title
         self.url = url
+        self.title = title
         self.imageName = imageName
         self.systemImageName = systemImageName
     }
@@ -276,7 +276,7 @@ struct MultiLinkButtonView: View {
 
 // MARK: - LinkButtonContent
 struct LinkButtonContent: View {
-    let title: String
+    let title: String?
     let imageName: String?
     let systemImageName: String?
     
@@ -293,16 +293,18 @@ struct LinkButtonContent: View {
                     .scaledToFit()
                     .frame(width: 16, height: 16)
             }
-            Text(title)
-                .font(.caption)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
+            if let title {
+                Text(title)
+                    .font(.caption)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
         }
         .foregroundColor(.white)
-        .padding(.horizontal, 12)
+        .padding(.horizontal, (title == nil) ? 8 : 12)
         .padding(.vertical, 8)
         .background(Color(.systemGray6))
-        .cornerRadius(18)
+        .cornerRadius(16)
         .fixedSize()
     }
 }

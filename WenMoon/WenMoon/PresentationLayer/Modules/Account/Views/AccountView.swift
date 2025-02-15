@@ -29,10 +29,18 @@ struct AccountView: View {
                 
                 Spacer()
                 
+                HStack(spacing: 10) {
+                    ForEach(viewModel.communityLinks, id: \.self) { link in
+                        if let url = link.url {
+                            LinkButtonView(url: url, imageName: link.imageName)
+                        }
+                    }
+                }
+                
                 Text("App Version \(Constants.appVersion)")
                     .font(.footnote)
                     .foregroundColor(.gray)
-                    .padding(.bottom, 20)
+                    .padding(.bottom, 16)
             }
         }
         .sheet(item: $selectedSetting, onDismiss: {

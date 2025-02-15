@@ -16,12 +16,36 @@ final class AccountViewModel: BaseViewModel {
         case signedOut
     }
     
+    enum CommunityLinks: CaseIterable {
+        case x, telegram, reddit
+        
+        var url: URL? {
+            switch self {
+            case .x:
+                return URL(string: "https://x.com/wenmoon_app")
+            case .telegram:
+                return URL(string: "https://t.me/wenmoon_app")
+            case .reddit:
+                return URL(string: "https://www.reddit.com/r/wenmoon_app")
+            }
+        }
+        
+        var imageName: String {
+            switch self {
+            case .x: return "x.logo"
+            case .telegram: return "telegram.logo"
+            case .reddit: return "reddit.logo"
+            }
+        }
+    }
+    
     // MARK: - Properties
     private let googleSignInService: GoogleSignInService
     private let twitterSignInService: TwitterSignInService
     
     @Published var settings: [Setting] = []
     @Published var loginState: LoginState = .signedOut
+    @Published var communityLinks = CommunityLinks.allCases
     
     @Published private(set) var isGoogleAuthInProgress = false
     @Published private(set) var isTwitterAuthInProgress = false
