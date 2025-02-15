@@ -172,14 +172,14 @@ struct CoinListView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 16, height: 16)
-                        .foregroundColor(.wmPink)
+                        .foregroundColor(isPriceChangeNegative ? .wmRed : .wmGreen)
                         .animation(.easeInOut, value: imageName)
                     
                     RollingNumberView(
                         value: coin.priceChangePercentage24H,
                         formatter: { $0.formattedAsPercentage() },
                         font: .caption2.bold(),
-                        foregroundColor: .wmPink
+                        foregroundColor: isPriceChangeNegative ? .wmRed : .wmGreen
                     )
                 }
             }

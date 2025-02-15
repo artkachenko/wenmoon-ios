@@ -216,6 +216,8 @@ struct CoinDetailsView: View {
         let priceRange = minPrice...maxPrice
         
         Chart {
+            let isPriceChangeNegative = coin.priceChangePercentage24H?.isNegative ?? false
+            let chartColor: Color = isPriceChangeNegative ? .wmRed : .wmGreen
             ForEach(data, id: \.date) { dataPoint in
                 AreaMark(
                     x: .value("Date", dataPoint.date),
@@ -226,8 +228,9 @@ struct CoinDetailsView: View {
                 .foregroundStyle(
                     LinearGradient(
                         gradient: Gradient(colors: [
-                            Color.wmPink.opacity(0.25),
-                            Color.wmPink.opacity(0)
+                            chartColor.opacity(0.5),
+                            chartColor.opacity(0.25),
+                            chartColor.opacity(0)
                         ]),
                         startPoint: .top,
                         endPoint: .bottom
@@ -241,7 +244,7 @@ struct CoinDetailsView: View {
                     y: .value("Price", dataPoint.price)
                 )
                 .interpolationMethod(.catmullRom)
-                .foregroundStyle(Color.wmPink)
+                .foregroundStyle(chartColor)
             }
         }
         .chartYScale(domain: priceRange)

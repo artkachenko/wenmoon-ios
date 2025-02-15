@@ -155,7 +155,7 @@ struct AccountView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 12, height: 12)
-                .foregroundColor(setting.type == .signOut ? .red : .gray)
+                .foregroundColor(setting.type == .signOut ? .wmRed : .gray)
         }
         .padding(.vertical, 8)
         .contentShape(Rectangle())
@@ -168,7 +168,7 @@ struct AccountView: View {
             }
         }
         .disabled(settingType == .privacyPolicy)
-        .foregroundColor(settingType == .signOut ? .red : .primary)
+        .foregroundColor(settingType == .signOut ? .wmRed : .primary)
     }
     
     // MARK: - Helper Methods

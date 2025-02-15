@@ -10,4 +10,6 @@ import SwiftUI
 extension Color {
     static let lightGray = Color("lightGray")
     static let wmPink = Color("wmPink")
+    static let wmGreen = Color("wmGreen")
+    static let wmRed = Color("wmRed")
 }
