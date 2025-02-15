@@ -23,6 +23,7 @@ final class CoinData {
     var ath: Double?
     var imageData: Data?
     var priceAlerts: [PriceAlert]
+    var isPinned: Bool
     var isArchived: Bool
     
     convenience init(
@@ -43,6 +44,7 @@ final class CoinData {
             ath: coin.ath,
             imageData: imageData,
             priceAlerts: priceAlerts,
+            isPinned: false,
             isArchived: false
         )
     }
@@ -60,6 +62,7 @@ final class CoinData {
         ath: Double? = nil,
         imageData: Data? = nil,
         priceAlerts: [PriceAlert] = [],
+        isPinned: Bool = false,
         isArchived: Bool = false
     ) {
         self.id = id
@@ -74,6 +77,7 @@ final class CoinData {
         self.ath = ath
         self.imageData = imageData
         self.priceAlerts = priceAlerts
+        self.isPinned = isPinned
         self.isArchived = isArchived
     }
     

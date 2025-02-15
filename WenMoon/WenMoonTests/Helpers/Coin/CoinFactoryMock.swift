@@ -59,6 +59,7 @@ struct CoinFactoryMock {
         priceChangePercentage24H: Double? = .random(in: -50...50),
         circulatingSupply: Double? = .random(in: 1_000_000...1_000_000_000),
         ath: Double? = .random(in: 10...100_000),
+        isPinned: Bool = false,
         isArchived: Bool = false
     ) -> CoinData {
         .init(
@@ -72,6 +73,7 @@ struct CoinFactoryMock {
             priceChangePercentage24H: priceChangePercentage24H,
             circulatingSupply: circulatingSupply,
             ath: ath,
+            isPinned: isPinned,
             isArchived: isArchived
         )
     }
@@ -81,7 +83,11 @@ struct CoinFactoryMock {
         return coins.map { makeCoinData(from: $0) }
     }
 
-    static func makeCoinData(from coin: Coin, isArchived: Bool = false) -> CoinData {
+    static func makeCoinData(
+        from coin: Coin,
+        isPinned: Bool = false,
+        isArchived: Bool = false
+    ) -> CoinData {
         .init(
             id: coin.id,
             symbol: coin.symbol,
@@ -93,6 +99,7 @@ struct CoinFactoryMock {
             priceChangePercentage24H: coin.priceChangePercentage24H,
             circulatingSupply: coin.circulatingSupply,
             ath: coin.ath,
+            isPinned: isPinned,
             isArchived: isArchived
         )
     }

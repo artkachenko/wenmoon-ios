@@ -11,10 +11,8 @@ struct CoinListView: View {
     // MARK: - Properties
     @StateObject private var viewModel = CoinListViewModel()
     
-    @State private var selectedCoin: CoinData!
-    @State private var swipedCoin: CoinData!
-    
-    @State private var chartDrawProgress: CGFloat = .zero
+    @State private var selectedCoin: CoinData?
+    @State private var swipedCoin: CoinData?
     
     @State private var viewDidAppear = false
     @State private var showCoinSelectionView = false
@@ -23,9 +21,9 @@ struct CoinListView: View {
     // MARK: - Body
     var body: some View {
         BaseView(errorMessage: $viewModel.errorMessage) {
-            NavigationView {
-                let coins = viewModel.coins
+            NavigationStack {
                 VStack {
+                    let coins = viewModel.coins
                     if coins.isEmpty {
                         makeAddCoinsButton()
                         Spacer()
@@ -33,13 +31,30 @@ struct CoinListView: View {
                         Spacer()
                     } else {
                         List {
-                            ForEach(coins, id: \.self) { coin in
-                                makeCoinView(coin)
-                            }
-                            .onDelete(perform: deleteCoin)
-                            .onMove(perform: moveCoin)
+                            let pinnedCoins = viewModel.pinnedCoins
+                            let unpinnedCoins = viewModel.unpinnedCoins
                             
-                            makeAddCoinsButton()
+                            if !pinnedCoins.isEmpty {
+                                Section(header: Text("Pinned")) {
+                                    ForEach(pinnedCoins, id: \.self) { coin in
+                                        makeCoinView(coin)
+                                            .transition(.move(edge: .bottom))
+                                    }
+                                    .onDelete(perform: deletePinnedCoin)
+                                    .onMove(perform: movePinnedCoin)
+                                }
+                            }
+                            
+                            Section(header: Text("All")) {
+                                ForEach(unpinnedCoins, id: \.self) { coin in
+                                    makeCoinView(coin)
+                                        .transition(.move(edge: .top))
+                                }
+                                .onDelete(perform: deleteUnpinnedCoin)
+                                .onMove(perform: moveUnpinnedCoin)
+                                
+                                makeAddCoinsButton()
+                            }
                         }
                         .listStyle(.plain)
                         .refreshable {
@@ -50,7 +65,6 @@ struct CoinListView: View {
                         }
                     }
                 }
-                .animation(.easeInOut, value: coins)
                 .navigationTitle("Coins")
             }
         }
@@ -90,7 +104,6 @@ struct CoinListView: View {
         .task {
             guard !viewDidAppear else { return }
             await viewModel.fetchCoins()
-            await viewModel.fetchPriceAlerts()
             viewDidAppear = true
         }
     }
@@ -131,7 +144,7 @@ struct CoinListView: View {
                             .foregroundColor(.lightGray)
                             .padding(4)
                             .background(Color(.systemBackground))
-                            .clipShape(.circle)
+                            .clipShape(Circle())
                             .padding(.trailing, -8)
                             .padding(.top, -8)
                     }
@@ -203,22 +216,41 @@ struct CoinListView: View {
                 Image(systemName: "bell.fill")
             }
             .tint(.blue)
+            
+            Button {
+                coin.isPinned ? viewModel.unpinCoin(coin) : viewModel.pinCoin(coin)
+            } label: {
+                Image(systemName: coin.isPinned ? "pin.slash.fill" : "pin.fill")
+            }
+            .tint(.indigo)
         }
     }
     
-    // MARK: - Helper Methods
-    private func deleteCoin(at offsets: IndexSet) {
+    // MARK: - Private Methods
+    private func deletePinnedCoin(at offsets: IndexSet) {
+        let pinnedCoins = viewModel.pinnedCoins
         for index in offsets {
-            let coinID = viewModel.coins[index].id
             Task {
-                await viewModel.deleteCoin(coinID)
+                await viewModel.deleteCoin(pinnedCoins[index].id)
             }
         }
     }
     
-    private func moveCoin(from source: IndexSet, to destination: Int) {
-        viewModel.coins.move(fromOffsets: source, toOffset: destination)
-        viewModel.saveCoinsOrder()
+    private func deleteUnpinnedCoin(at offsets: IndexSet) {
+        let unpinnedCoins = viewModel.unpinnedCoins
+        for index in offsets {
+            Task {
+                await viewModel.deleteCoin(unpinnedCoins[index].id)
+            }
+        }
+    }
+    
+    private func movePinnedCoin(from source: IndexSet, to destination: Int) {
+        viewModel.moveCoin(from: source, to: destination, isPinned: true)
+    }
+    
+    private func moveUnpinnedCoin(from source: IndexSet, to destination: Int) {
+        viewModel.moveCoin(from: source, to: destination, isPinned: false)
     }
     
     private func handleCoinSelection(coin: Coin, shouldAdd: Bool) {

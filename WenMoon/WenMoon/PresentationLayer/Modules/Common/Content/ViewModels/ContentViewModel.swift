@@ -87,3 +87,32 @@ final class ContentViewModel: BaseViewModel {
         }
     }
 }
+
+struct GlobalMarketItem: Hashable {
+    // MARK: - Nested Types
+    enum ItemType: CaseIterable {
+        case btcDominance
+        case ethDominance
+        case othersDominance
+        case cpi
+        case nextCPI
+        case interestRate
+        case nextFOMCMeeting
+        
+        var title: String {
+            switch self {
+            case .btcDominance: return "BTC.D:"
+            case .ethDominance: return "ETH.D:"
+            case .othersDominance: return "OTHERS.D:"
+            case .cpi: return "CPI:"
+            case .nextCPI: return "Next CPI:"
+            case .interestRate: return "Interest Rate:"
+            case .nextFOMCMeeting: return "Next FOMC:"
+            }
+        }
+    }
+    
+    // MARK: - Properties
+    let type: ItemType
+    let value: String
+}

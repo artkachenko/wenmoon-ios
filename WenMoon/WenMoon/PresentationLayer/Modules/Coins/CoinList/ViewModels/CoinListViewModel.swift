@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import SwiftUI
 
 final class CoinListViewModel: BaseViewModel {
     // MARK: - Properties
@@ -15,9 +16,12 @@ final class CoinListViewModel: BaseViewModel {
     
     @Published var coins: [CoinData] = []
     @Published var marketData: [String: MarketData] = [:]
-    @Published var globalMarketItems: [GlobalMarketItem] = []
     
     private var cacheTimer: Timer?
+    
+    /// Computed properties for coins marked as pinned and not pinned.
+    var pinnedCoins: [CoinData] { coins.filter { $0.isPinned } }
+    var unpinnedCoins: [CoinData] { coins.filter { !$0.isPinned } }
     
     // MARK: - Initializers
     convenience init() {
@@ -49,6 +53,7 @@ final class CoinListViewModel: BaseViewModel {
     }
     
     // MARK: - Internal Methods
+    /// Fetch coins from the persistent store, apply saved order, update market data and price alerts.
     @MainActor
     func fetchCoins() async {
         let descriptor = FetchDescriptor<CoinData>(
@@ -68,9 +73,11 @@ final class CoinListViewModel: BaseViewModel {
         }
         
         await fetchMarketData()
+        await fetchPriceAlerts()
         triggerImpactFeedback()
     }
     
+    /// Fetch latest market data for the coins.
     @MainActor
     func fetchMarketData() async {
         let coinIDs = coins.map { $0.id }
@@ -92,17 +99,11 @@ final class CoinListViewModel: BaseViewModel {
         }
     }
     
-    func clearCacheIfNeeded() {
-        if !marketData.isEmpty {
-            marketData.removeAll()
-            print("Market Data cache cleared.")
-        }
-    }
-    
+    /// Fetch price alerts for the coins.
     @MainActor
     func fetchPriceAlerts() async {
         guard let userID, let deviceToken, !coins.isEmpty else {
-            print("User ID is nil, or the device token is nil, or the coins array is empty")
+            // If critical user info is missing, clear all price alerts.
             coins = coins.map { coin in
                 let updatedCoin = coin
                 updatedCoin.priceAlerts = []
@@ -114,7 +115,7 @@ final class CoinListViewModel: BaseViewModel {
         do {
             let priceAlerts = try await priceAlertService.getPriceAlerts(userID: userID, deviceToken: deviceToken)
             for (index, coin) in coins.enumerated() {
-                let matchingPriceAlerts = priceAlerts.filter({ $0.id.contains(coin.id) })
+                let matchingPriceAlerts = priceAlerts.filter { $0.id.contains(coin.id) }
                 coins[index].priceAlerts = matchingPriceAlerts
             }
         } catch {
@@ -122,6 +123,7 @@ final class CoinListViewModel: BaseViewModel {
         }
     }
     
+    /// Save a new coin. If the coin exists but is archived, it is unarchived.
     @MainActor
     func saveCoin(_ coin: Coin) async {
         let descriptor = FetchDescriptor<CoinData>(predicate: #Predicate { $0.id == coin.id })
@@ -137,6 +139,7 @@ final class CoinListViewModel: BaseViewModel {
         await insertCoin(coin)
     }
     
+    /// Delete a coin. If the coin is referenced in a portfolio, archive it instead.
     @MainActor
     func deleteCoin(_ coinID: String) async {
         guard let coin = coins.first(where: { $0.id == coinID }) else { return }
@@ -155,11 +158,11 @@ final class CoinListViewModel: BaseViewModel {
         if isCoinReferenced {
             archiveCoin(coin)
         } else {
-            deleteCoin(coin)
+            removeCoin(coin)
         }
     }
     
-    // When the target price has been reached
+    /// Toggles off a price alert after its target is reached.
     func toggleOffPriceAlert(for id: String) {
         for index in coins.indices {
             if let alertIndex = coins[index].priceAlerts.firstIndex(where: { $0.id == id }) {
@@ -169,81 +172,117 @@ final class CoinListViewModel: BaseViewModel {
         }
     }
     
-    func saveCoinsOrder() {
-        let coinIDs = coins.map { $0.id }
-        try? userDefaultsManager.setObject(coinIDs, forKey: .coinsOrder)
+    /// Pins a coin and reorders the list.
+    func pinCoin(_ coin: CoinData) {
+        if let index = coins.firstIndex(where: { $0.id == coin.id }) {
+            withAnimation {
+                coins[index].isPinned = true
+                sortCoins()
+                saveCoinsOrder()
+            }
+        }
+    }
+    
+    /// Unpins a coin and reorders the list.
+    func unpinCoin(_ coin: CoinData) {
+        if let index = coins.firstIndex(where: { $0.id == coin.id }) {
+            withAnimation {
+                coins[index].isPinned = false
+                sortCoins()
+                saveCoinsOrder()
+            }
+        }
+    }
+    
+    /// Move coin(s) within a pinned or unpinned group.
+    func moveCoin(from source: IndexSet, to destination: Int, isPinned: Bool) {
+        var filteredCoins = coins.filter { $0.isPinned == isPinned }
+        filteredCoins.move(fromOffsets: source, toOffset: destination)
+        
+        let otherCoins = coins.filter { $0.isPinned != isPinned }
+        withAnimation {
+            coins = isPinned ? (filteredCoins + otherCoins) : (otherCoins + filteredCoins)
+        }
+        saveCoinsOrder()
     }
     
     // MARK: - Private Methods
+    /// Inserts a new coin with optional image data.
     @MainActor
     private func insertCoin(_ coin: Coin) async {
-        print("Inserting coin: \(coin.id)")
         let imageData = coin.image != nil ? await loadImage(from: coin.image!) : nil
         let newCoin = CoinData(from: coin, imageData: imageData)
-        coins.append(newCoin)
+        withAnimation {
+            coins.append(newCoin)
+        }
         insert(newCoin)
         saveCoinsOrder()
     }
     
-    private func deleteCoin(_ coin: CoinData) {
-        print("Deleting coin: \(coin.id)")
-        if let index = coins.firstIndex(of: coin) {
-            coins.remove(at: index)
+    /// Removes a coin from the list and deletes it from the persistent store.
+    private func removeCoin(_ coin: CoinData) {
+        withAnimation {
+            if let index = coins.firstIndex(of: coin) {
+                coins.remove(at: index)
+            }
         }
+        // Also remove related market data if present.
+        marketData.removeValue(forKey: coin.id)
         delete(coin)
         saveCoinsOrder()
     }
     
+    /// Archives a coin (marks as archived and removes it from the active list).
     private func archiveCoin(_ coin: CoinData) {
-        print("Archiving coin: \(coin.id)")
         coin.isArchived = true
-        if let index = coins.firstIndex(of: coin) {
-            coins.remove(at: index)
+        withAnimation {
+            if let index = coins.firstIndex(of: coin) {
+                coins.remove(at: index)
+            }
         }
         save()
         saveCoinsOrder()
     }
     
+    /// Unarchives a coin (marks as not archived and adds it back to the list).
     private func unarchiveCoin(_ coin: CoinData) {
-        print("Unarchiving coin: \(coin.id)")
         coin.isArchived = false
-        coins.append(coin)
+        withAnimation {
+            coins.append(coin)
+        }
         save()
         saveCoinsOrder()
     }
     
+    /// Save the current coin order to persistent storage.
+    private func saveCoinsOrder() {
+        let coinIDs = coins.map { $0.id }
+        try? userDefaultsManager.setObject(coinIDs, forKey: .coinsOrder)
+    }
+    
+    /// Sort coins so that pinned coins always appear at the top.
+    private func sortCoins() {
+        withAnimation {
+            coins.sort {
+                if $0.isPinned == $1.isPinned {
+                    return false
+                }
+                return $0.isPinned && !$1.isPinned
+            }
+        }
+    }
+    
+    /// Starts a timer to clear cached market data periodically.
     private func startCacheTimer() {
         cacheTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
             self?.clearCacheIfNeeded()
         }
     }
-}
-
-struct GlobalMarketItem: Hashable {
-    // MARK: - Nested Types
-    enum ItemType: CaseIterable {
-        case btcDominance
-        case ethDominance
-        case othersDominance
-        case cpi
-        case nextCPI
-        case interestRate
-        case nextFOMCMeeting
-        
-        var title: String {
-            switch self {
-            case .btcDominance: return "BTC.D:"
-            case .ethDominance: return "ETH.D:"
-            case .othersDominance: return "OTHERS.D:"
-            case .cpi: return "CPI:"
-            case .nextCPI: return "Next CPI:"
-            case .interestRate: return "Interest Rate:"
-            case .nextFOMCMeeting: return "Next FOMC:"
-            }
+    
+    /// Clears the market data cache.
+    private func clearCacheIfNeeded() {
+        if !marketData.isEmpty {
+            marketData.removeAll()
         }
     }
-    
-    // MARK: - Properties
-    let type: ItemType
-    let value: String
 }

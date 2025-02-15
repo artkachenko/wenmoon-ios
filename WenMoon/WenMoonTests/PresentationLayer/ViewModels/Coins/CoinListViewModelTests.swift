@@ -154,20 +154,6 @@ class CoinListViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testSaveCoinsOrder_success() throws {
-        // Setup
-        let coins = CoinFactoryMock.makeCoinsData()
-        viewModel.coins = coins
-        
-        // Action
-        viewModel.saveCoinsOrder()
-        
-        // Assertions
-        XCTAssertTrue(userDefaultsManager.setObjectCalled)
-        XCTAssertEqual(userDefaultsManager.setObjectValue[.coinsOrder] as! [String], coins.map(\.id))
-        XCTAssertNil(viewModel.errorMessage)
-    }
-    
     // Delete Coin
     func testDeleteCoin_success() async throws {
         // Setup
@@ -263,18 +249,6 @@ class CoinListViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
-    func testClearCache_resetsMarketData() async throws {
-        // Setup
-        let marketData = MarketDataFactoryMock.makeMarketData()
-        viewModel.marketData = marketData
-        
-        // Action
-        viewModel.clearCacheIfNeeded()
-        
-        // Assertions
-        XCTAssertTrue(viewModel.marketData.isEmpty)
-    }
-    
     // Price Alerts
     func testFetchPriceAlerts_success() async throws {
         // Setup
@@ -333,21 +307,69 @@ class CoinListViewModelTests: XCTestCase {
         assertCoinHasNoAlert(coin)
     }
     
-    func testSaveCoinsOrder() {
+    // Pin & Unpin
+    func testPinCoin() {
         // Setup
-        let coins = [
-            CoinFactoryMock.makeCoinData(id: "bitcoin", marketCapRank: 1),
-            CoinFactoryMock.makeCoinData(id: "ethereum", marketCapRank: 2),
-            CoinFactoryMock.makeCoinData(id: "dogecoin", marketCapRank: 10)
-        ]
-        viewModel.coins = coins
-
+        let coin1 = CoinFactoryMock.makeCoinData(id: "coin-1", isPinned: false)
+        let coin2 = CoinFactoryMock.makeCoinData(id: "coin-2", isPinned: false)
+        viewModel.coins = [coin1, coin2]
+        
         // Action
-        viewModel.saveCoinsOrder()
-
+        viewModel.pinCoin(coin2)
+        
         // Assertions
-        XCTAssertTrue(userDefaultsManager.setObjectCalled)
-        XCTAssertEqual(userDefaultsManager.setObjectValue[.coinsOrder] as! [String], ["bitcoin", "ethereum", "dogecoin"])
+        XCTAssertTrue(coin2.isPinned)
+        XCTAssertFalse(coin1.isPinned)
+        XCTAssertEqual(viewModel.coins.first?.id, coin2.id)
+    }
+    
+    func testUnpinCoin() {
+        // Setup
+        let coin1 = CoinFactoryMock.makeCoinData(id: "coin-1", isPinned: true)
+        let coin2 = CoinFactoryMock.makeCoinData(id: "coin-2", isPinned: true)
+        viewModel.coins = [coin1, coin2]
+        
+        // Action
+        viewModel.unpinCoin(coin1)
+        
+        // Assertions
+        XCTAssertFalse(coin1.isPinned)
+        XCTAssertTrue(coin2.isPinned)
+        
+        let pinnedCoins = viewModel.coins.filter { $0.isPinned }
+        XCTAssertFalse(pinnedCoins.contains(where: { $0.id == coin1.id }))
+    }
+    
+    func testMoveCoinPinnedGroup() {
+        // Setup
+        let coin1 = CoinFactoryMock.makeCoinData(id: "coin-1", isPinned: true)
+        let coin2 = CoinFactoryMock.makeCoinData(id: "coin-2", isPinned: true)
+        let coin3 = CoinFactoryMock.makeCoinData(id: "coin-3", isPinned: true)
+        viewModel.coins = [coin1, coin2, coin3]
+        
+        // Action
+        let source = IndexSet(integer: 2)
+        viewModel.moveCoin(from: source, to: .zero, isPinned: true)
+        
+        // Assertions
+        let pinnedCoins = viewModel.coins.filter { $0.isPinned }
+        XCTAssertEqual(pinnedCoins.map { $0.id }, ["coin-3", "coin-1", "coin-2"])
+    }
+    
+    func testMoveCoinUnpinnedGroup() {
+        // Setup
+        let coin1 = CoinFactoryMock.makeCoinData(id: "coin-1", isPinned: false)
+        let coin2 = CoinFactoryMock.makeCoinData(id: "coin-2", isPinned: false)
+        let coin3 = CoinFactoryMock.makeCoinData(id: "coin-3", isPinned: false)
+        viewModel.coins = [coin1, coin2, coin3]
+        
+        // Action
+        let source = IndexSet(integer: .zero)
+        viewModel.moveCoin(from: source, to: 2, isPinned: false)
+        
+        // Assertions
+        let unpinnedCoins = viewModel.coins.filter { !$0.isPinned }
+        XCTAssertEqual(unpinnedCoins.map { $0.id }, ["coin-2", "coin-1", "coin-3"])
     }
     
     // MARK: - Helpers
