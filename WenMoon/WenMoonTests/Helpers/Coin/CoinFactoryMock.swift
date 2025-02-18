@@ -55,10 +55,7 @@ struct CoinFactoryMock {
         image: URL? = nil,
         currentPrice: Double? = .random(in: 0.01...100_000),
         marketCap: Double? = .random(in: 1_000...1_000_000_000),
-        marketCapRank: Int64? = .random(in: 1...1_000),
         priceChangePercentage24H: Double? = .random(in: -50...50),
-        circulatingSupply: Double? = .random(in: 1_000_000...1_000_000_000),
-        ath: Double? = .random(in: 10...100_000),
         isPinned: Bool = false,
         isArchived: Bool = false
     ) -> CoinData {
@@ -69,10 +66,7 @@ struct CoinFactoryMock {
             image: image,
             currentPrice: currentPrice,
             marketCap: marketCap,
-            marketCapRank: marketCapRank,
             priceChangePercentage24H: priceChangePercentage24H,
-            circulatingSupply: circulatingSupply,
-            ath: ath,
             isPinned: isPinned,
             isArchived: isArchived
         )
@@ -95,10 +89,7 @@ struct CoinFactoryMock {
             image: coin.image,
             currentPrice: coin.currentPrice,
             marketCap: coin.marketCap,
-            marketCapRank: coin.marketCapRank,
             priceChangePercentage24H: coin.priceChangePercentage24H,
-            circulatingSupply: coin.circulatingSupply,
-            ath: coin.ath,
             isPinned: isPinned,
             isArchived: isArchived
         )

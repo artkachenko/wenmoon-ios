@@ -8,34 +8,73 @@
 import Foundation
 
 final class CryptoCompareViewModel: BaseViewModel {
+    // MARK: - Properties
+    private let coinScannerService: CoinScannerService
+    
+    // MARK: - Initializers
+    convenience init() {
+        self.init(coinScannerService: CoinScannerServiceImpl())
+    }
+    
+    init(coinScannerService: CoinScannerService) {
+        self.coinScannerService = coinScannerService
+        super.init()
+    }
+    
     // MARK: - Internal Methods
-    func calculatePrice(for coinToBeCompared: Coin, coinToCompareWith: Coin, option: PriceOption) -> Double? {
+    func updateCoinIfNeeded(_ coin: Coin) async -> Coin {
+        var updatedCoin = coin
+        if (coin.ath == nil) || (coin.circulatingSupply == nil) {
+            guard let coinDetails = try? await coinScannerService.getCoinDetails(for: coin.id) else {
+                return updatedCoin
+            }
+            updatedCoin.ath = coinDetails.marketData.ath
+            updatedCoin.circulatingSupply = coinDetails.marketData.circulatingSupply
+        }
+        return updatedCoin
+    }
+    
+    func calculatePrice(for coinA: Coin?, coinB: Coin?, option: PriceOption) -> Double? {
+        guard let coinA, let coinB else { return nil }
+        
         switch option {
         case .now:
-            guard let marketCap = coinToCompareWith.marketCap, let supply = coinToBeCompared.circulatingSupply else { return nil }
+            guard let marketCap = coinB.marketCap, let supply = coinA.circulatingSupply else { return nil }
             return marketCap / supply
         case .ath:
             guard
-                let coinToCompareWithATH = coinToCompareWith.ath,
-                let coinToCompareWithSupply = coinToCompareWith.circulatingSupply,
-                let coinToBeComparedSupply = coinToBeCompared.circulatingSupply
+                let bATH = coinB.ath,
+                let bSupply = coinB.circulatingSupply,
+                let aSupply = coinA.circulatingSupply
             else {
                 return nil
             }
-            return (coinToCompareWithATH * coinToCompareWithSupply) / coinToBeComparedSupply
+            
+            return (bATH * bSupply) / aSupply
         }
     }
     
-    func calculateMultiplier(for coinToBeCompared: Coin, coinToCompareWith: Coin, option: PriceOption) -> Double? {
-        guard let hypotheticalPrice = calculatePrice(for: coinToBeCompared, coinToCompareWith: coinToCompareWith, option: option),
-              let currentPrice = coinToBeCompared.currentPrice else {
+    func calculateMultiplier(for coinA: Coin?, coinB: Coin?, option: PriceOption) -> Double? {
+        let hypotheticalPrice = calculatePrice(
+            for: coinA,
+            coinB: coinB,
+            option: option
+        )
+        
+        guard
+            let coinA,
+            let hypotheticalPrice,
+            let currentPrice = coinA.currentPrice
+        else {
             return nil
         }
+        
         return hypotheticalPrice / currentPrice
     }
     
-    func isPositiveMultiplier(_ multiplier: Double) -> Bool {
-        multiplier >= 1
+    func isPositiveMultiplier(_ multiplier: Double) -> Bool? {
+        guard !multiplier.isZero else { return nil }
+        return multiplier >= 1
     }
 }
 

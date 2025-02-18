@@ -26,10 +26,7 @@ func assertCoinsEqual(_ coins: [CoinProtocol], _ expectedCoins: [CoinProtocol], 
         } else {
             XCTAssertEqual(coin.currentPrice, expectedCoin.currentPrice)
             XCTAssertEqual(coin.marketCap, expectedCoin.marketCap)
-            XCTAssertEqual(coin.marketCapRank, expectedCoin.marketCapRank)
             XCTAssertEqual(coin.priceChangePercentage24H, expectedCoin.priceChangePercentage24H)
-            XCTAssertEqual(coin.circulatingSupply, expectedCoin.circulatingSupply)
-            XCTAssertEqual(coin.ath, expectedCoin.ath)
         }
     }
 }

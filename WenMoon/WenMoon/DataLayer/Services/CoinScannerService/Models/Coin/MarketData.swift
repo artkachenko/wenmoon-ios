@@ -10,5 +10,5 @@ import Foundation
 struct MarketData: Codable, Equatable {
     let currentPrice: Double?
     let marketCap: Double?
-    let priceChange24H: Double?
+    let priceChangePercentage24H: Double?
 }

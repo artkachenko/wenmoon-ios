@@ -15,7 +15,7 @@ func assertMarketDataEqual(for coins: [CoinProtocol], with marketData: [String: 
         let expectedMarketData = marketData[coin.id]!
         XCTAssertEqual(coin.currentPrice, expectedMarketData.currentPrice)
         XCTAssertEqual(coin.marketCap, expectedMarketData.marketCap)
-        XCTAssertEqual(coin.priceChangePercentage24H, expectedMarketData.priceChange24H)
+        XCTAssertEqual(coin.priceChangePercentage24H, expectedMarketData.priceChangePercentage24H)
     }
 }
 

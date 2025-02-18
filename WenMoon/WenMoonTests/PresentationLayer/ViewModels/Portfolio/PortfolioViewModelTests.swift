@@ -28,12 +28,15 @@ final class PortfolioViewModelTests: XCTestCase {
     
     // MARK: - Tests
     func testFetchPortfolios_createsNewPortfolio() {
+        // Setup
+        let transactions = Transaction.predefinedTransactions
+        
         // Action
         viewModel.fetchPortfolios()
         
         // Assertions
         XCTAssertEqual(viewModel.portfolios.count, 1)
-        XCTAssertNotNil(viewModel.selectedPortfolio)
+        XCTAssertEqual(viewModel.selectedPortfolio.transactions, transactions)
         XCTAssertTrue(swiftDataManager.insertMethodCalled)
         XCTAssertTrue(swiftDataManager.saveMethodCalled)
     }

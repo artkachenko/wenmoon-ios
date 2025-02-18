@@ -51,8 +51,24 @@ class CoinListViewModelTests: XCTestCase {
     
     // MARK: - Tests
     // Fetch Coins
+    func testFetchCoins_isFirstLaunch() async throws {
+        // Setup
+        userDefaultsManager.getObjectReturnValue = [.isFirstLaunch: true]
+        let coins = CoinData.predefinedCoins
+        let marketData = MarketDataFactoryMock.makeMarketData(for: coins)
+        coinScannerService.getMarketDataResult = .success(marketData)
+        
+        // Action
+        await viewModel.fetchCoins()
+        
+        // Assertions
+        assertCoinsEqual(viewModel.coins, coins, marketData: marketData)
+        XCTAssertNil(viewModel.errorMessage)
+    }
+    
     func testFetchCoins_success() async throws {
         // Setup
+        userDefaultsManager.getObjectReturnValue = [.isFirstLaunch: false]
         let coins = CoinFactoryMock.makeCoins()
         swiftDataManager.fetchResult = coins.map { CoinFactoryMock.makeCoinData(from: $0) }
         let marketData = MarketDataFactoryMock.makeMarketData(for: coins)
@@ -69,6 +85,7 @@ class CoinListViewModelTests: XCTestCase {
     
     func testFetchCoins_fetchError() async throws {
         // Setup
+        userDefaultsManager.getObjectReturnValue = [.isFirstLaunch: false]
         let error: SwiftDataError = .failedToFetchModels
         swiftDataManager.swiftDataError = error
         
@@ -81,6 +98,9 @@ class CoinListViewModelTests: XCTestCase {
     }
     
     func testFetchCoins_emptyResult() async throws {
+        // Setup
+        userDefaultsManager.getObjectReturnValue = [.isFirstLaunch: false]
+        
         // Action
         await viewModel.fetchCoins()
         
@@ -93,7 +113,10 @@ class CoinListViewModelTests: XCTestCase {
         // Setup
         let coins = CoinFactoryMock.makeCoins().shuffled()
         let savedOrder = coins.map(\.id)
-        userDefaultsManager.getObjectReturnValue = [.coinsOrder: savedOrder]
+        userDefaultsManager.getObjectReturnValue = [
+            .isFirstLaunch: false,
+            .coinsOrder: savedOrder
+        ]
         swiftDataManager.fetchResult = coins.map { CoinFactoryMock.makeCoinData(from: $0) }
         let marketData = MarketDataFactoryMock.makeMarketData(for: coins)
         coinScannerService.getMarketDataResult = .success(marketData)

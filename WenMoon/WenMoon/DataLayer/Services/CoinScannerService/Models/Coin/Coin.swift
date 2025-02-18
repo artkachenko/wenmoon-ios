@@ -14,23 +14,20 @@ protocol CoinProtocol {
     var image: URL? { get }
     var currentPrice: Double? { get }
     var marketCap: Double? { get }
-    var marketCapRank: Int64? { get }
     var priceChangePercentage24H: Double? { get }
-    var circulatingSupply: Double? { get }
-    var ath: Double? { get }
 }
 
 struct Coin: Codable {
-    let id: String
-    let symbol: String
-    let name: String
-    let image: URL?
-    let currentPrice: Double?
-    let marketCap: Double?
-    let marketCapRank: Int64?
-    let priceChangePercentage24H: Double?
-    let circulatingSupply: Double?
-    let ath: Double?
+    var id: String
+    var symbol: String
+    var name: String
+    var image: URL?
+    var currentPrice: Double?
+    var marketCap: Double?
+    var marketCapRank: Int64?
+    var priceChangePercentage24H: Double?
+    var circulatingSupply: Double?
+    var ath: Double?
 }
 
 extension Coin: Hashable {}

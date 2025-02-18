@@ -39,24 +39,41 @@ struct CoinDetailsFactoryMock {
         )
     }
     
-    static func makeMarketData() -> CoinDetails.MarketData {
-        CoinDetails.MarketData(
-            marketCapRank: .random(in: 1...10_000),
-            fullyDilutedValuation: .random(in: 100_000...100_000_000_000),
-            totalVolume: .random(in: 100_000...100_000_000_000),
-            high24H: .random(in: 0.01...100_000),
-            low24H: .random(in: 0.01...100_000),
-            marketCapChange24H: .random(in: -1_000_000_000...1_000_000_000),
-            marketCapChangePercentage24H: .random(in: -99...99),
-            circulatingSupply: .random(in: 100_000...100_000_000_000),
-            totalSupply:  .random(in: 100_000...100_000_000_000),
-            maxSupply: .random(in: 100_000...100_000_000_000),
-            ath: .random(in: 0.01...100_000),
-            athChangePercentage: .random(in: -99...0),
-            athDate: "2013-07-06T00:00:00Z",
-            atl: .random(in: 0.01...100_000),
-            atlChangePercentage: .random(in: 0...99),
-            atlDate: "2013-07-06T00:00:00Z"
+    static func makeMarketData(
+        marketCapRank: Int64? = .random(in: 1...10_000),
+        fullyDilutedValuation: Double? = .random(in: 100_000...100_000_000_000),
+        totalVolume: Double? = .random(in: 100_000...100_000_000_000),
+        high24H: Double? = .random(in: 0.01...100_000),
+        low24H: Double? = .random(in: 0.01...100_000),
+        marketCapChange24H: Double? = .random(in: -1_000_000_000...1_000_000_000),
+        marketCapChangePercentage24H: Double? = .random(in: -99...99),
+        circulatingSupply: Double? = .random(in: 100_000...100_000_000_000),
+        totalSupply: Double? = .random(in: 100_000...100_000_000_000),
+        maxSupply: Double? = .random(in: 100_000...100_000_000_000),
+        ath: Double? = .random(in: 0.01...100_000),
+        athChangePercentage: Double? = .random(in: -99...0),
+        athDate: String? = "2013-07-06T00:00:00Z",
+        atl: Double? = .random(in: 0.01...100_000),
+        atlChangePercentage: Double? = .random(in: 0...99),
+        atlDate: String? = "2013-07-06T00:00:00Z"
+    ) -> CoinDetails.MarketData {
+        .init(
+            marketCapRank: marketCapRank,
+            fullyDilutedValuation: fullyDilutedValuation,
+            totalVolume: totalVolume,
+            high24H: high24H,
+            low24H: low24H,
+            marketCapChange24H: marketCapChange24H,
+            marketCapChangePercentage24H: marketCapChangePercentage24H,
+            circulatingSupply: circulatingSupply,
+            totalSupply: totalSupply,
+            maxSupply: maxSupply,
+            ath: ath,
+            athChangePercentage: athChangePercentage,
+            athDate: athDate,
+            atl: atl,
+            atlChangePercentage: atlChangePercentage,
+            atlDate: atlDate
         )
     }
     

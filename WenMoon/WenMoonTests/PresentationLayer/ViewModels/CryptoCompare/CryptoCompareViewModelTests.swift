@@ -11,29 +11,73 @@ import XCTest
 class CryptoCompareViewModelTests: XCTestCase {
     // MARK: - Properties
     var viewModel: CryptoCompareViewModel!
+    var coinScannerService: CoinScannerServiceMock!
     
-    var coinToBeCompared: Coin!
-    var coinToCompareWith: Coin!
+    var coinA: Coin!
+    var coinB: Coin!
     
     // MARK: - Setup
     override func setUp() {
         super.setUp()
-        viewModel = CryptoCompareViewModel()
+        coinScannerService = CoinScannerServiceMock()
+        viewModel = CryptoCompareViewModel(coinScannerService: coinScannerService)
     }
     
     override func tearDown() {
         viewModel = nil
+        coinScannerService = nil
         super.tearDown()
     }
     
     // MARK: - Tests
+    func testUpdateCoinIfNeeded_noUpdateRequired() async {
+        // Setup
+        let coin = CoinFactoryMock.makeCoin()
+
+        // Action
+        let updatedCoin = await viewModel.updateCoinIfNeeded(coin)
+
+        // Assertions
+        XCTAssertEqual(updatedCoin.circulatingSupply, coin.circulatingSupply)
+        XCTAssertEqual(updatedCoin.ath, coin.ath)
+    }
+
+    func testUpdateCoinIfNeeded_updateRequired_success() async {
+        // Setup
+        let coin = CoinFactoryMock.makeCoin(circulatingSupply: nil, ath: nil)
+        let marketData = CoinDetailsFactoryMock.makeMarketData(circulatingSupply: 21_000_000, ath: 110_000)
+        let response = CoinDetailsFactoryMock.makeCoinDetails(marketData: marketData)
+        coinScannerService.getCoinDetailsResult = .success(response)
+
+        // Action
+        let updatedCoin = await viewModel.updateCoinIfNeeded(coin)
+
+        // Assertions
+        XCTAssertEqual(updatedCoin.circulatingSupply, marketData.circulatingSupply)
+        XCTAssertEqual(updatedCoin.ath, marketData.ath)
+    }
+
+    func testUpdateCoinIfNeeded_updateRequired_apiError() async {
+        // Setup
+        let coin = CoinFactoryMock.makeCoin(circulatingSupply: nil, ath: nil)
+        let error = ErrorFactoryMock.makeAPIError()
+        coinScannerService.getCoinDetailsResult = .failure(error)
+
+        // Action
+        let updatedCoin = await viewModel.updateCoinIfNeeded(coin)
+
+        // Assertions
+        XCTAssertNil(updatedCoin.circulatingSupply)
+        XCTAssertNil(updatedCoin.ath)
+    }
+    
     func testCalculatePrice_now_success() {
         // Setup
-        coinToBeCompared = CoinFactoryMock.makeCoin(circulatingSupply: 1_000)
-        coinToCompareWith = CoinFactoryMock.makeCoin(marketCap: 100_000)
+        coinA = CoinFactoryMock.makeCoin(circulatingSupply: 1_000)
+        coinB = CoinFactoryMock.makeCoin(marketCap: 100_000)
         
         // Action
-        let price = viewModel.calculatePrice(for: coinToBeCompared, coinToCompareWith: coinToCompareWith, option: .now)
+        let price = viewModel.calculatePrice(for: coinA, coinB: coinB, option: .now)
         
         // Assertions
         XCTAssertEqual(price, 100)
@@ -41,11 +85,11 @@ class CryptoCompareViewModelTests: XCTestCase {
     
     func testCalculatePrice_now_missingMarketCap() {
         // Setup
-        coinToBeCompared = CoinFactoryMock.makeCoin(circulatingSupply: 1_000)
-        coinToCompareWith = CoinFactoryMock.makeCoin(marketCap: nil)
+        coinA = CoinFactoryMock.makeCoin(circulatingSupply: 1_000)
+        coinB = CoinFactoryMock.makeCoin(marketCap: nil)
         
         // Action
-        let price = viewModel.calculatePrice(for: coinToBeCompared, coinToCompareWith: coinToCompareWith, option: .now)
+        let price = viewModel.calculatePrice(for: coinA, coinB: coinB, option: .now)
         
         // Assertions
         XCTAssertNil(price)
@@ -53,11 +97,11 @@ class CryptoCompareViewModelTests: XCTestCase {
     
     func testCalculatePrice_ath_success() {
         // Setup
-        coinToBeCompared = CoinFactoryMock.makeCoin(circulatingSupply: 500)
-        coinToCompareWith = CoinFactoryMock.makeCoin(circulatingSupply: 1_000, ath: 200)
+        coinA = CoinFactoryMock.makeCoin(circulatingSupply: 500)
+        coinB = CoinFactoryMock.makeCoin(circulatingSupply: 1_000, ath: 200)
         
         // Action
-        let price = viewModel.calculatePrice(for: coinToBeCompared, coinToCompareWith: coinToCompareWith, option: .ath)
+        let price = viewModel.calculatePrice(for: coinA, coinB: coinB, option: .ath)
         
         // Assertions
         XCTAssertEqual(price, 400)
@@ -65,11 +109,11 @@ class CryptoCompareViewModelTests: XCTestCase {
     
     func testCalculatePrice_ath_missingData() {
         // Setup
-        coinToBeCompared = CoinFactoryMock.makeCoin(circulatingSupply: 500)
-        coinToCompareWith = CoinFactoryMock.makeCoin(circulatingSupply: 1_000, ath: nil)
+        coinA = CoinFactoryMock.makeCoin(circulatingSupply: 500)
+        coinB = CoinFactoryMock.makeCoin(circulatingSupply: 1_000, ath: nil)
         
         // Action
-        let price = viewModel.calculatePrice(for: coinToBeCompared, coinToCompareWith: coinToCompareWith, option: .ath)
+        let price = viewModel.calculatePrice(for: coinA, coinB: coinB, option: .ath)
         
         // Assertions
         XCTAssertNil(price)
@@ -77,11 +121,11 @@ class CryptoCompareViewModelTests: XCTestCase {
     
     func testCalculateMultiplier_success() {
         // Setup
-        coinToBeCompared = CoinFactoryMock.makeCoin(currentPrice: 50, circulatingSupply: 1_000)
-        coinToCompareWith = CoinFactoryMock.makeCoin(marketCap: 100_000)
+        coinA = CoinFactoryMock.makeCoin(currentPrice: 50, circulatingSupply: 1_000)
+        coinB = CoinFactoryMock.makeCoin(marketCap: 100_000)
         
         // Action
-        let multiplier = viewModel.calculateMultiplier(for: coinToBeCompared, coinToCompareWith: coinToCompareWith, option: .now)
+        let multiplier = viewModel.calculateMultiplier(for: coinA, coinB: coinB, option: .now)
         
         // Assertions
         XCTAssertEqual(multiplier, 2)
@@ -89,11 +133,11 @@ class CryptoCompareViewModelTests: XCTestCase {
     
     func testCalculateMultiplier_failure() {
         // Setup
-        coinToBeCompared = CoinFactoryMock.makeCoin(currentPrice: nil, circulatingSupply: 1_000)
-        coinToCompareWith = CoinFactoryMock.makeCoin(marketCap: 100_000)
+        coinA = CoinFactoryMock.makeCoin(currentPrice: nil, circulatingSupply: 1_000)
+        coinB = CoinFactoryMock.makeCoin(marketCap: 100_000)
         
         // Action
-        let multiplier = viewModel.calculateMultiplier(for: coinToBeCompared, coinToCompareWith: coinToCompareWith, option: .now)
+        let multiplier = viewModel.calculateMultiplier(for: coinA, coinB: coinB, option: .now)
         
         // Assertions
         XCTAssertNil(multiplier)
@@ -101,7 +145,8 @@ class CryptoCompareViewModelTests: XCTestCase {
     
     func testIsPositiveMultiplier() {
         // Assertions
-        XCTAssertTrue(viewModel.isPositiveMultiplier(2))
-        XCTAssertFalse(viewModel.isPositiveMultiplier(0.5))
+        XCTAssertNil(viewModel.isPositiveMultiplier(.zero))
+        XCTAssertTrue(viewModel.isPositiveMultiplier(2)!)
+        XCTAssertFalse(viewModel.isPositiveMultiplier(0.5)!)
     }
 }
