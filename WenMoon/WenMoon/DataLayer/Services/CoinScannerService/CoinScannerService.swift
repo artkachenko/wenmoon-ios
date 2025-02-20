@@ -13,6 +13,7 @@ protocol CoinScannerService {
     func getChartData(for id: String, on timeframe: String, currency: String) async throws -> [ChartData]
     func searchCoins(by query: String) async throws -> [Coin]
     func getMarketData(for ids: [String]) async throws -> [String: MarketData]
+    func getFearAndGreedIndex() async throws -> FearAndGreedIndex
     func getGlobalCryptoMarketData() async throws -> GlobalCryptoMarketData
     func getGlobalMarketData() async throws -> GlobalMarketData
 }
@@ -66,6 +67,15 @@ final class CoinScannerServiceImpl: BaseBackendService, CoinScannerService {
             )
             let marketData = try decoder.decode([String: MarketData].self, from: data)
             return marketData
+        } catch {
+            throw mapToAPIError(error)
+        }
+    }
+    
+    func getFearAndGreedIndex() async throws -> FearAndGreedIndex {
+        do {
+            let data = try await httpClient.get(path: "fear-and-greed")
+            return try decoder.decode(FearAndGreedIndex.self, from: data)
         } catch {
             throw mapToAPIError(error)
         }

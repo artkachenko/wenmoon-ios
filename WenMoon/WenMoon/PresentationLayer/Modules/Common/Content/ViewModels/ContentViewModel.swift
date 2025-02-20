@@ -12,7 +12,11 @@ final class ContentViewModel: BaseViewModel {
     private let coinScannerService: CoinScannerService
     
     @Published var startScreenIndex: Int = .zero
-    @Published private(set) var globalMarketItems: [GlobalMarketItem] = []
+    @Published private(set) var globalMarketDataItems: [GlobalMarketDataItem] = []
+    
+    var isAllMarketDataItemsFetched: Bool {
+        globalMarketDataItems.count == 6
+    }
     
     // MARK: - Initializers
     convenience init() {
@@ -30,70 +34,66 @@ final class ContentViewModel: BaseViewModel {
     }
     
     @MainActor
-    func fetchGlobalCryptoMarketData() async {
+    func fetchAllGlobalMarketData() async {
         do {
-            let globalCryptoMarketData = try await coinScannerService.getGlobalCryptoMarketData()
-            let btcDominance = globalCryptoMarketData.marketCapPercentage["btc"] ?? .zero
-            let ethDominance = globalCryptoMarketData.marketCapPercentage["eth"] ?? .zero
-            let othersDominance = 100 - (btcDominance + ethDominance)
+            globalMarketDataItems.removeAll()
             
-            let items = [
-                GlobalMarketItem(
-                    type: .btcDominance,
-                    value: btcDominance.formattedAsPercentage(includePlusSign: false)
-                ),
-                GlobalMarketItem(
-                    type: .ethDominance,
-                    value: ethDominance.formattedAsPercentage(includePlusSign: false)
-                ),
-                GlobalMarketItem(
-                    type: .othersDominance,
-                    value: othersDominance.formattedAsPercentage(includePlusSign: false)
-                )
-            ]
-            let newItems = items.filter { !globalMarketItems.contains($0) }
-            globalMarketItems.append(contentsOf: newItems)
-        } catch {
-            setError(error)
-        }
-    }
-    
-    @MainActor
-    func fetchGlobalMarketData() async {
-        do {
-            let globalMarketData = try await coinScannerService.getGlobalMarketData()
-            let items = [
-                GlobalMarketItem(
+            async let fearAndGreedTask = coinScannerService.getFearAndGreedIndex()
+            async let cryptoMarketTask = coinScannerService.getGlobalCryptoMarketData()
+            async let globalMarketTask = coinScannerService.getGlobalMarketData()
+            
+            let (fearAndGreedIndex, globalCryptoMarketData, globalMarketData) = try await (
+                fearAndGreedTask,
+                cryptoMarketTask,
+                globalMarketTask
+            )
+            
+            guard let fearAndGreedData = fearAndGreedIndex.data.first else { return }
+            let fearAndGreedItem = GlobalMarketDataItem(
+                type: .fearAndGreedIndex,
+                value: "\(fearAndGreedData.value) \(fearAndGreedData.valueClassification)"
+            )
+            
+            guard let btcDominance = globalCryptoMarketData.marketCapPercentage["btc"] else { return }
+            let btcDominanceItem = GlobalMarketDataItem(
+                type: .btcDominance,
+                value: btcDominance.formattedAsPercentage(includePlusSign: false)
+            )
+            
+            let marketItems = [
+                GlobalMarketDataItem(
                     type: .cpi,
                     value: globalMarketData.cpiPercentage.formattedAsPercentage(includePlusSign: false)
                 ),
-                GlobalMarketItem(
+                GlobalMarketDataItem(
                     type: .nextCPI,
                     value: globalMarketData.nextCPIDate.formatted(as: .dateOnly)
                 ),
-                GlobalMarketItem(
+                GlobalMarketDataItem(
                     type: .interestRate,
                     value: globalMarketData.interestRatePercentage.formattedAsPercentage(includePlusSign: false)
                 ),
-                GlobalMarketItem(
+                GlobalMarketDataItem(
                     type: .nextFOMCMeeting,
                     value: globalMarketData.nextFOMCMeetingDate.formatted(as: .dateOnly)
                 )
             ]
-            let newItems = items.filter { !globalMarketItems.contains($0) }
-            globalMarketItems.append(contentsOf: newItems)
+            
+            let allItems = [fearAndGreedItem, btcDominanceItem] + marketItems
+            let newItems = allItems.filter { !globalMarketDataItems.contains($0) }
+            globalMarketDataItems.append(contentsOf: newItems)
         } catch {
             setError(error)
+            globalMarketDataItems.removeAll()
         }
     }
 }
 
-struct GlobalMarketItem: Hashable {
+struct GlobalMarketDataItem: Hashable {
     // MARK: - Nested Types
     enum ItemType: CaseIterable {
+        case fearAndGreedIndex
         case btcDominance
-        case ethDominance
-        case othersDominance
         case cpi
         case nextCPI
         case interestRate
@@ -101,12 +101,11 @@ struct GlobalMarketItem: Hashable {
         
         var title: String {
             switch self {
-            case .btcDominance: return "BTC.D:"
-            case .ethDominance: return "ETH.D:"
-            case .othersDominance: return "OTHERS.D:"
+            case .fearAndGreedIndex: return "Fear/Greed:"
+            case .btcDominance: return "BTC Dom:"
             case .cpi: return "CPI:"
             case .nextCPI: return "Next CPI:"
-            case .interestRate: return "Interest Rate:"
+            case .interestRate: return "Int. Rate:"
             case .nextFOMCMeeting: return "Next FOMC:"
             }
         }

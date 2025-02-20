@@ -27,50 +27,10 @@ class ContentViewModelTests: XCTestCase {
     }
     
     // MARK: - Tests
-    // Global Crypto Market Data
-    func testFetchGlobalCryptoMarketData_success() async throws {
+    func testFetchAllGlobalMarketData_success() async throws {
         // Setup
-        let globalCryptoMarketData = GlobalCryptoMarketData(
-            marketCapPercentage: ["btc": 56.5, "eth": 12.8, "others": 30.7]
-        )
-        coinScannerService.getGlobalCryptoMarketDataResult = .success(globalCryptoMarketData)
-        
-        // Action
-        await viewModel.fetchGlobalCryptoMarketData()
-        
-        // Assertions
-        let expectedItems = [
-            GlobalMarketItem(type: .btcDominance, value: "56,5 %"),
-            GlobalMarketItem(type: .ethDominance, value: "12,8 %"),
-            GlobalMarketItem(type: .othersDominance, value: "30,7 %")
-        ]
-        
-        for (index, expectedItem) in expectedItems.enumerated() {
-            let item = viewModel.globalMarketItems[index]
-            XCTAssertEqual(item.type, expectedItem.type)
-            XCTAssertEqual(item.value, expectedItem.value)
-        }
-        
-        XCTAssertNil(viewModel.errorMessage)
-    }
-    
-    func testFetchGlobalCryptoMarketData_apiError() async throws {
-        // Setup
-        let error = ErrorFactoryMock.makeAPIError()
-        coinScannerService.getGlobalCryptoMarketDataResult = .failure(error)
-        
-        // Action
-        await viewModel.fetchGlobalCryptoMarketData()
-        
-        // Assertions
-        XCTAssertTrue(viewModel.globalMarketItems.isEmpty)
-        XCTAssertNotNil(viewModel.errorMessage)
-        XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
-    }
-    
-    // Global Market Data
-    func testFetchGlobalMarketData_success() async throws {
-        // Setup
+        let fearAndGreedIndex = FearAndGreedIndex(data: [.init(value: "75", valueClassification: "Greed")])
+        let globalCryptoMarketData = GlobalCryptoMarketData(marketCapPercentage: ["btc": 56.5, "eth": 12.8, "usdt": 2.63])
         let dateFormatter = ISO8601DateFormatter()
         let globalMarketData = GlobalMarketData(
             cpiPercentage: 2.7,
@@ -78,39 +38,100 @@ class ContentViewModelTests: XCTestCase {
             interestRatePercentage: 4.5,
             nextFOMCMeetingDate: dateFormatter.date(from: "2025-02-01T00:00:00Z")!
         )
+        coinScannerService.getFearAndGreedIndexResult = .success(fearAndGreedIndex)
+        coinScannerService.getGlobalCryptoMarketDataResult = .success(globalCryptoMarketData)
         coinScannerService.getGlobalMarketDataResult = .success(globalMarketData)
         
         // Action
-        await viewModel.fetchGlobalMarketData()
+        await viewModel.fetchAllGlobalMarketData()
         
         // Assertions
         let expectedItems = [
-            GlobalMarketItem(type: .cpi, value: "2,7 %"),
-            GlobalMarketItem(type: .nextCPI, value: "1 Jan 2025"),
-            GlobalMarketItem(type: .interestRate, value: "4,5 %"),
-            GlobalMarketItem(type: .nextFOMCMeeting, value: "1 Feb 2025")
+            GlobalMarketDataItem(type: .fearAndGreedIndex, value: "75 Greed"),
+            GlobalMarketDataItem(type: .btcDominance, value: "56,5 %"),
+            GlobalMarketDataItem(type: .cpi, value: "2,7 %"),
+            GlobalMarketDataItem(type: .nextCPI, value: "1 Jan 2025"),
+            GlobalMarketDataItem(type: .interestRate, value: "4,5 %"),
+            GlobalMarketDataItem(type: .nextFOMCMeeting, value: "1 Feb 2025")
         ]
-        
-        for (index, expectedItem) in expectedItems.enumerated() {
-            let item = viewModel.globalMarketItems[index]
-            XCTAssertEqual(item.type, expectedItem.type)
-            XCTAssertEqual(item.value, expectedItem.value)
-        }
-        
+        assertGlobalMarketItemsEqual(viewModel.globalMarketDataItems, expectedItems)
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testFetchGlobalMarketData_apiError() async throws {
+    func testFetchAllGlobalMarketData_apiError() async throws {
         // Setup
         let error = ErrorFactoryMock.makeAPIError()
-        coinScannerService.getGlobalMarketDataResult = .failure(error)
+        let fearAndGreedIndex = FearAndGreedIndex(data: [.init(value: "75", valueClassification: "Greed")])
+        let globalMarketData = GlobalMarketData(
+            cpiPercentage: 2.7,
+            nextCPIDate: Date(),
+            interestRatePercentage: 4.5,
+            nextFOMCMeetingDate: Date()
+        )
+        coinScannerService.getFearAndGreedIndexResult = .success(fearAndGreedIndex)
+        coinScannerService.getGlobalCryptoMarketDataResult = .failure(error)
+        coinScannerService.getGlobalMarketDataResult = .success(globalMarketData)
         
         // Action
-        await viewModel.fetchGlobalMarketData()
+        await viewModel.fetchAllGlobalMarketData()
         
         // Assertions
-        XCTAssertTrue(viewModel.globalMarketItems.isEmpty)
+        XCTAssertTrue(viewModel.globalMarketDataItems.isEmpty)
         XCTAssertNotNil(viewModel.errorMessage)
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
+    }
+    
+    func testFetchAllGlobalMarketData_missingFearAndGreedData() async throws {
+        // Setup
+        let fearAndGreedIndex = FearAndGreedIndex(data: [])
+        let globalCryptoMarketData = GlobalCryptoMarketData(marketCapPercentage: ["btc": 56.5])
+        let globalMarketData = GlobalMarketData(
+            cpiPercentage: 2.7,
+            nextCPIDate: Date(),
+            interestRatePercentage: 4.5,
+            nextFOMCMeetingDate: Date()
+        )
+        coinScannerService.getFearAndGreedIndexResult = .success(fearAndGreedIndex)
+        coinScannerService.getGlobalCryptoMarketDataResult = .success(globalCryptoMarketData)
+        coinScannerService.getGlobalMarketDataResult = .success(globalMarketData)
+        
+        // Action
+        await viewModel.fetchAllGlobalMarketData()
+        
+        // Assertions
+        XCTAssertTrue(viewModel.globalMarketDataItems.isEmpty)
+        XCTAssertNil(viewModel.errorMessage)
+    }
+    
+    func testFetchAllGlobalMarketData_missingBTCDominance() async throws {
+        // Setup
+        let fearAndGreedIndex = FearAndGreedIndex(data: [.init(value: "75", valueClassification: "Greed")])
+        let globalCryptoMarketData = GlobalCryptoMarketData(marketCapPercentage: ["eth": 12.8])
+        let globalMarketData = GlobalMarketData(
+            cpiPercentage: 2.7,
+            nextCPIDate: Date(),
+            interestRatePercentage: 4.5,
+            nextFOMCMeetingDate: Date()
+        )
+        coinScannerService.getFearAndGreedIndexResult = .success(fearAndGreedIndex)
+        coinScannerService.getGlobalCryptoMarketDataResult = .success(globalCryptoMarketData)
+        coinScannerService.getGlobalMarketDataResult = .success(globalMarketData)
+        
+        // Action
+        await viewModel.fetchAllGlobalMarketData()
+        
+        // Assertions
+        XCTAssertTrue(viewModel.globalMarketDataItems.isEmpty)
+        XCTAssertNil(viewModel.errorMessage)
+    }
+    
+    // MARK: - Helpers
+    private func assertGlobalMarketItemsEqual(_ actual: [GlobalMarketDataItem], _ expected: [GlobalMarketDataItem]) {
+        XCTAssertEqual(actual.count, expected.count)
+        for (index, expectedItem) in expected.enumerated() {
+            let item = actual[index]
+            XCTAssertEqual(item.type, expectedItem.type)
+            XCTAssertEqual(item.value, expectedItem.value)
+        }
     }
 }

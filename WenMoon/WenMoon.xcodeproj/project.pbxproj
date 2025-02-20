@@ -29,6 +29,7 @@
 		198655092D32DD6200216097 /* PortfolioFactoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 198655082D32DD6200216097 /* PortfolioFactoryMock.swift */; };
 		198655102D32E08D00216097 /* AddTransactionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1986550F2D32E08D00216097 /* AddTransactionViewModelTests.swift */; };
 		198655122D32E4A700216097 /* PortfolioViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 198655112D32E4A700216097 /* PortfolioViewModelTests.swift */; };
+		19A28BA92D6662E400753251 /* FearAndGreedIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A28BA82D6662E400753251 /* FearAndGreedIndex.swift */; };
 		19AF13032D53C37B00FDCD90 /* CoinDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AF13022D53C37B00FDCD90 /* CoinDetails.swift */; };
 		D21A57BE2CCA65AB00AC2D13 /* MarketData+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21A57BD2CCA65AB00AC2D13 /* MarketData+Assertions.swift */; };
 		D21A57C12CCAA8BC00AC2D13 /* ErrorFactoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21A57C02CCAA8BC00AC2D13 /* ErrorFactoryMock.swift */; };
@@ -157,6 +158,7 @@
 		198655082D32DD6200216097 /* PortfolioFactoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioFactoryMock.swift; sourceTree = "<group>"; };
 		1986550F2D32E08D00216097 /* AddTransactionViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTransactionViewModelTests.swift; sourceTree = "<group>"; };
 		198655112D32E4A700216097 /* PortfolioViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioViewModelTests.swift; sourceTree = "<group>"; };
+		19A28BA82D6662E400753251 /* FearAndGreedIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FearAndGreedIndex.swift; sourceTree = "<group>"; };
 		19AF13022D53C37B00FDCD90 /* CoinDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinDetails.swift; sourceTree = "<group>"; };
 		D21A57BD2CCA65AB00AC2D13 /* MarketData+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MarketData+Assertions.swift"; sourceTree = "<group>"; };
 		D21A57C02CCAA8BC00AC2D13 /* ErrorFactoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorFactoryMock.swift; sourceTree = "<group>"; };
@@ -1001,6 +1003,7 @@
 				194212B22D5FB2FC008DE753 /* CoinDetails */,
 				D2ADB8F62CE5FD1E004DA208 /* Coin */,
 				D2ADB8F32CE5FCD3004DA208 /* Chart */,
+				19A28BA82D6662E400753251 /* FearAndGreedIndex.swift */,
 				D28C184D2D0B26F000291920 /* GlobalCryptoMarketData.swift */,
 				D28C184F2D0B270000291920 /* GlobalMarketData.swift */,
 			);
@@ -1226,6 +1229,7 @@
 				D220D7552CF0B47F004C8EAB /* SelectionView.swift in Sources */,
 				D22D339D2CB92ABC007997DD /* SwiftDataManager.swift in Sources */,
 				194212B82D5FB3E2008DE753 /* CoinDetails+Ticker.swift in Sources */,
+				19A28BA92D6662E400753251 /* FearAndGreedIndex.swift in Sources */,
 				D226A5082D1F3A64008FB901 /* AddTransactionView.swift in Sources */,
 				D28C18502D0B270000291920 /* GlobalMarketData.swift in Sources */,
 				D28558492CF8B43C0023A2D5 /* PriceAlertsView.swift in Sources */,

@@ -15,6 +15,7 @@ class CoinScannerServiceMock: CoinScannerService {
     var getChartDataResult: Result<[ChartData], APIError>!
     var searchCoinsByQueryResult: Result<[Coin], APIError>!
     var getMarketDataResult: Result<[String: MarketData], APIError>!
+    var getFearAndGreedIndexResult: Result<FearAndGreedIndex, APIError>!
     var getGlobalCryptoMarketDataResult: Result<GlobalCryptoMarketData, APIError>!
     var getGlobalMarketDataResult: Result<GlobalMarketData, APIError>!
     
@@ -75,6 +76,18 @@ class CoinScannerServiceMock: CoinScannerService {
             throw error
         case .none:
             XCTFail("getMarketDataResult not set")
+            throw APIError.unknown(response: URLResponse())
+        }
+    }
+    
+    func getFearAndGreedIndex() async throws -> FearAndGreedIndex {
+        switch getFearAndGreedIndexResult {
+        case .success(let index):
+            return index
+        case .failure(let error):
+            throw error
+        case .none:
+            XCTFail("getFearAndGreedIndexResult not set")
             throw APIError.unknown(response: URLResponse())
         }
     }
