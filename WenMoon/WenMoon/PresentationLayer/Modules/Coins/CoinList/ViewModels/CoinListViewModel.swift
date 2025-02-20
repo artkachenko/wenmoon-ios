@@ -83,7 +83,6 @@ final class CoinListViewModel: BaseViewModel {
         
         await fetchMarketData()
         await fetchPriceAlerts()
-        triggerImpactFeedback()
     }
     
     /// Fetch latest market data for the coins.
@@ -225,6 +224,7 @@ final class CoinListViewModel: BaseViewModel {
             coins.append(newCoin)
         }
         insert(newCoin)
+        sortCoins()
         saveCoinsOrder()
     }
     

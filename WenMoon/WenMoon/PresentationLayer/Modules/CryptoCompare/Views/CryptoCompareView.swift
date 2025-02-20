@@ -10,14 +10,14 @@ import SwiftUI
 struct CryptoCompareView: View {
     // MARK: - Properties
     @StateObject private var viewModel = CryptoCompareViewModel()
-
+    
     @State private var selectedPriceOption: PriceOption = .now
     @State private var coinA: Coin?
     @State private var coinB: Coin?
-
+    
     @State private var cachedImage1: Image?
     @State private var cachedImage2: Image?
-
+    
     @State private var isSelectingFirstCoin = true
     @State private var showCoinSelectionView = false
     
@@ -61,10 +61,8 @@ struct CryptoCompareView: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                    .background(Color.gray.opacity(0.3))
-                    .cornerRadius(8)
                     .padding(.horizontal)
-
+                    
                     VStack(spacing: 8) {
                         HStack(spacing: .zero) {
                             Text(symbolA)
@@ -81,19 +79,19 @@ struct CryptoCompareView: View {
                         }
                         .font(.footnote)
                         .foregroundColor(.gray)
-
+                        
                         let price = viewModel.calculatePrice(
                             for: coinA,
                             coinB: coinB,
                             option: selectedPriceOption
                         ) ?? .zero
-
+                        
                         let multiplier = viewModel.calculateMultiplier(
                             for: coinA,
                             coinB: coinB,
                             option: selectedPriceOption
                         ) ?? .zero
-
+                        
                         HStack {
                             Text(price.formattedAsCurrency())
                                 .font(.title2)
@@ -175,6 +173,7 @@ struct CryptoCompareView: View {
                 .padding(.leading, 8)
             }
         }
+        .animation(.easeInOut(duration: 0.2), value: coin.wrappedValue != nil)
     }
     
     @ViewBuilder
@@ -194,7 +193,7 @@ struct CryptoCompareView: View {
                 Spacer()
                 
                 Text(coin.currentPrice.formattedAsCurrency())
-                    .font(.headline)
+                    .font(.subheadline).bold()
                     .foregroundColor(.white)
             } else {
                 Circle()
@@ -208,11 +207,10 @@ struct CryptoCompareView: View {
                 Spacer()
             }
         }
-        .padding(.vertical, 12)
-        .padding(.horizontal, 16)
-        .background(Color.gray.opacity(0.2))
-        .cornerRadius(12)
-        .animation(.easeInOut(duration: 0.2), value: coin != nil)
+        .padding(.vertical)
+        .padding(.horizontal, 20)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(36)
     }
     
     // MARK: - Helper Methods

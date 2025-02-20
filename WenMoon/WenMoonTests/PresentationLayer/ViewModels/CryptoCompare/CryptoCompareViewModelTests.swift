@@ -144,9 +144,28 @@ class CryptoCompareViewModelTests: XCTestCase {
     }
     
     func testIsPositiveMultiplier() {
-        // Assertions
+        // Non-finite values
+        XCTAssertNil(viewModel.isPositiveMultiplier(.infinity))
+        XCTAssertNil(viewModel.isPositiveMultiplier(-.infinity))
+        XCTAssertNil(viewModel.isPositiveMultiplier(.nan))
+
+        // Values close to zero (within tolerance of 0.001)
         XCTAssertNil(viewModel.isPositiveMultiplier(.zero))
+        XCTAssertNil(viewModel.isPositiveMultiplier(0.0005))
+        XCTAssertNil(viewModel.isPositiveMultiplier(-0.0005))
+        
+        // Values close to one (within tolerance of 0.001)
+        XCTAssertNil(viewModel.isPositiveMultiplier(1))
+        XCTAssertNil(viewModel.isPositiveMultiplier(1.0005))
+        XCTAssertNil(viewModel.isPositiveMultiplier(0.9995))
+
+        // Positive multipliers (greater than 1, outside tolerance)
         XCTAssertTrue(viewModel.isPositiveMultiplier(2)!)
+        XCTAssertTrue(viewModel.isPositiveMultiplier(1.002)!)
+
+        // Negative or less-than-1 multipliers (outside tolerance)
         XCTAssertFalse(viewModel.isPositiveMultiplier(0.5)!)
+        XCTAssertFalse(viewModel.isPositiveMultiplier(-1)!)
+        XCTAssertFalse(viewModel.isPositiveMultiplier(0.002)!)
     }
 }

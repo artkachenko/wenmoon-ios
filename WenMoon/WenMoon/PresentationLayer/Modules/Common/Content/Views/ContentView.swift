@@ -10,8 +10,6 @@ import SwiftUI
 struct ContentView: View {
     // MARK: - Properties
     @StateObject private var contentViewModel = ContentViewModel()
-    @StateObject private var coinListViewModel = CoinListViewModel()
-    @StateObject private var portfolioViewModel = PortfolioViewModel()
     @StateObject private var coinSelectionViewModel = CoinSelectionViewModel()
     
     @State private var scrollMarqueeText = false
@@ -46,11 +44,8 @@ struct ContentView: View {
                     .tag(4)
             }
         }
-        .environmentObject(coinListViewModel)
-        .environmentObject(portfolioViewModel)
         .environmentObject(coinSelectionViewModel)
         .task {
-            await fetchCoinsAndPortfolios()
             await fetchGlobalMarketDataItems()
         }
         .onAppear {
@@ -71,11 +66,6 @@ struct ContentView: View {
     }
     
     // MARK: - Helpers
-    private func fetchCoinsAndPortfolios() async {
-        await coinListViewModel.fetchCoins()
-        portfolioViewModel.fetchPortfolios()
-    }
-    
     private func fetchGlobalMarketDataItems() async {
         await contentViewModel.fetchAllGlobalMarketData()
         await MainActor.run {

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PortfolioView: View {
     // MARK: - Properties
-    @EnvironmentObject private var viewModel: PortfolioViewModel
+    @StateObject private var viewModel = PortfolioViewModel()
     
     @State private var showAddTransactionView = false
     
@@ -52,6 +52,9 @@ struct PortfolioView: View {
                 .presentationDetents([.medium])
                 .presentationCornerRadius(36)
             }
+        }
+        .onAppear {
+            viewModel.fetchPortfolios()
         }
     }
     
@@ -173,6 +176,7 @@ struct PortfolioView: View {
             } label: {
                 Image("trash")
             }
+            .tint(.wmRed)
         }
         .padding(.vertical)
         .padding(.horizontal, 20)
@@ -193,6 +197,7 @@ struct PortfolioView: View {
                                 } label: {
                                     Image("trash")
                                 }
+                                .tint(.wmRed)
                                 
                                 Button {
                                     swipedTransaction = transaction.copy()

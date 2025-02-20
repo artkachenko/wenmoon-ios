@@ -37,6 +37,7 @@ final class CoinSelectionViewModel: BaseViewModel {
         super.init(swiftDataManager: swiftDataManager)
         
         $searchText
+            .dropFirst()
             .debounce(for: .milliseconds(500), scheduler: RunLoop.main)
             .removeDuplicates()
             .sink { [weak self] query in

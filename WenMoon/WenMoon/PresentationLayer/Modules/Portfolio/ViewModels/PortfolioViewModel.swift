@@ -132,6 +132,7 @@ final class PortfolioViewModel: BaseViewModel {
         return groupedTransactions.compactMap { coinID, transactions in
             guard let coinID,
                   let coin = fetchCoin(by: coinID) else {
+                selectedPortfolio.transactions.removeAll(where: { $0.coinID == coinID })
                 return nil
             }
             return CoinTransactions(coin: coin, transactions: transactions)

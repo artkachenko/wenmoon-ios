@@ -9,13 +9,14 @@ import SwiftUI
 
 struct CoinListView: View {
     // MARK: - Properties
-    @EnvironmentObject private var viewModel: CoinListViewModel
+    @StateObject private var viewModel = CoinListViewModel()
     
     @State private var selectedCoin: CoinData?
     @State private var swipedCoin: CoinData?
     
     @State private var showCoinSelectionView = false
     @State private var showAuthAlert = false
+    @State private var viewDidLoad = false
     
     // MARK: - Body
     var body: some View {
@@ -57,8 +58,7 @@ struct CoinListView: View {
                         .listStyle(.plain)
                         .refreshable {
                             Task {
-                                await viewModel.fetchMarketData()
-                                await viewModel.fetchPriceAlerts()
+                                await viewModel.fetchCoins()
                             }
                         }
                     }
@@ -106,6 +106,14 @@ struct CoinListView: View {
             if let priceAlertID = notification.userInfo?["priceAlertID"] as? String {
                 viewModel.toggleOffPriceAlert(for: priceAlertID)
             }
+        }
+        .task {
+            guard !viewDidLoad else { return }
+            
+            await viewModel.fetchCoins()
+            viewModel.triggerImpactFeedback()
+            
+            viewDidLoad = true
         }
     }
     

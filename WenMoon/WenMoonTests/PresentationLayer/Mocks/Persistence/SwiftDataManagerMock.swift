@@ -33,6 +33,7 @@ final class SwiftDataManagerMock: SwiftDataManager {
     func insert<T: PersistentModel>(_ model: T) throws {
         insertMethodCalled = true
         insertedModel = model
+        fetchResult.append(model)
         try save()
     }
     
