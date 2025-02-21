@@ -93,18 +93,19 @@ struct AddTransactionView: View {
             
             Spacer()
         }
-        .contentShape(Rectangle())
+        .background(
+            Color.clear
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    isTextFieldFocused = false
+                }
+        )
         .sheet(isPresented: $showCoinSelectionView) {
             CoinSelectionView(mode: .selection, didSelectCoin: { selectedCoin in
                 transaction.coinID = selectedCoin.id
                 self.selectedCoin = selectedCoin
             })
         }
-        .simultaneousGesture(
-            TapGesture().onEnded {
-                isTextFieldFocused = false
-            }
-        )
     }
     
     // MARK: - Subviews
