@@ -68,7 +68,7 @@ struct CoinDetailsView: View {
                     
                     Spacer()
                     
-                    HStack(spacing: 24) {
+                    HStack(spacing: 32) {
                         Button(action: {
                             guard viewModel.userID != nil else {
                                 showAuthAlert = true
@@ -76,20 +76,20 @@ struct CoinDetailsView: View {
                             }
                             showPriceAlertsView = true
                         }) {
-                            Image(systemName: "bell.fill")
+                            Image(systemName: "alarm")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 16, height: 16)
+                                .frame(width: 20, height: 20)
                                 .foregroundColor(coin.priceAlerts.isEmpty ? .gray : .white)
                         }
                         
                         Button(action: {
                             dismiss()
                         }) {
-                            Image(systemName: "xmark")
+                            Image(systemName: "xmark.circle.fill")
                                 .resizable()
-                                .frame(width: 12, height: 12)
-                                .foregroundColor(.white)
+                                .frame(width: 20, height: 20)
+                                .foregroundColor(.gray)
                         }
                     }
                 }

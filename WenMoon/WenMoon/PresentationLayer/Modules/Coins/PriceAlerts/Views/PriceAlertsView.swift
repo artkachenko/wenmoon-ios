@@ -38,10 +38,10 @@ struct PriceAlertsView: View {
                         Button(action: {
                             dismiss()
                         }) {
-                            Image(systemName: "xmark")
+                            Image(systemName: "xmark.circle.fill")
                                 .resizable()
-                                .frame(width: 12, height: 12)
-                                .foregroundColor(.white)
+                                .frame(width: 20, height: 20)
+                                .foregroundColor(.gray)
                         }
                     }
                     .padding(24)
