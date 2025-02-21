@@ -44,7 +44,7 @@ class AccountViewModelTests: XCTestCase {
     }
     
     // MARK: - Tests
-    func testSignOut_success() async {
+    func testSignOut_success() {
         // Setup
         firebaseAuthService.signOutResult = .success(())
         viewModel.loginState = .signedIn()
@@ -56,7 +56,7 @@ class AccountViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.loginState == .signedOut)
     }
 
-    func testSignOut_failure() async {
+    func testSignOut_failure() {
         // Setup
         let expectedUserID = "expectedUserID"
         viewModel.loginState = .signedIn(expectedUserID)
@@ -78,7 +78,7 @@ class AccountViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, "An unknown error occurred: \(error.localizedDescription)")
     }
 
-    func testFetchAuthStateWhenUserIsSignedIn() async {
+    func testFetchAuthStateWhenUserIsSignedIn() {
         // Action
         let expectedUserID = "expectedUserID"
         viewModel.fetchAuthState()

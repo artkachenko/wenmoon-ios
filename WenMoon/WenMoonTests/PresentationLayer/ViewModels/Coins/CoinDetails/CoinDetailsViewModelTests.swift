@@ -31,7 +31,7 @@ class CoinDetailsViewModelTests: XCTestCase {
     
     // MARK: - Tests
     // Coin Details
-    func testFetchCoinDetails_success() async throws {
+    func testFetchCoinDetails_success() async {
         // Setup
         let coinDetails = CoinDetailsFactoryMock.makeCoinDetails()
         coinScannerService.getCoinDetailsResult = .success(coinDetails)
@@ -44,7 +44,7 @@ class CoinDetailsViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
 
-    func testFetchCoinDetails_failure() async throws {
+    func testFetchCoinDetails_failure() async {
         // Setup
         let error = ErrorFactoryMock.makeAPIError()
         coinScannerService.getCoinDetailsResult = .failure(error)
@@ -58,7 +58,7 @@ class CoinDetailsViewModelTests: XCTestCase {
     }
     
     // Chart Data
-    func testFetchChartData_success() async throws {
+    func testFetchChartData_success() async {
         // Setup
         let chartData = ChartDataFactoryMock.makeChartData()
         coinScannerService.getChartDataResult = .success(chartData)
@@ -71,7 +71,7 @@ class CoinDetailsViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testFetchChartData_usesCache() async throws {
+    func testFetchChartData_usesCache() async {
         // Setup
         let cachedChartData = ChartDataFactoryMock.makeChartDataForTimeframes()
         viewModel.chartDataCache = cachedChartData
@@ -90,7 +90,7 @@ class CoinDetailsViewModelTests: XCTestCase {
         assertChartDataEqual(viewModel.chartData, cachedChartData[.yearToDate]!)
     }
     
-    func testFetchChartData_emptyResponse() async throws {
+    func testFetchChartData_emptyResponse() async {
         // Setup
         coinScannerService.getChartDataResult = .success([])
         
@@ -102,7 +102,7 @@ class CoinDetailsViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testFetchChartData_invalidParameterError() async throws {
+    func testFetchChartData_invalidParameterError() async {
         // Setup
         let error = ErrorFactoryMock.makeInvalidParameterError()
         coinScannerService.getChartDataResult = .failure(error)

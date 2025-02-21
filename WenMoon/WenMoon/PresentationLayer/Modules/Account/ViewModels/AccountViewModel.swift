@@ -11,11 +11,6 @@ import FirebaseAuth
 
 final class AccountViewModel: BaseViewModel {
     // MARK: - Nested Types
-    enum LoginState: Equatable {
-        case signedIn(_ userID: String? = nil)
-        case signedOut
-    }
-    
     enum CommunityLinks: CaseIterable {
         case x, telegram, reddit
         
@@ -44,7 +39,6 @@ final class AccountViewModel: BaseViewModel {
     private let twitterSignInService: TwitterSignInService
     
     @Published var settings: [Setting] = []
-    @Published var loginState: LoginState = .signedOut
     @Published var communityLinks = CommunityLinks.allCases
     
     @Published private(set) var isGoogleAuthInProgress = false
@@ -120,15 +114,6 @@ final class AccountViewModel: BaseViewModel {
         }
         
         triggerImpactFeedback()
-    }
-    
-    func signOut() {
-        do {
-            try firebaseAuthService.signOut()
-            loginState = .signedOut
-        } catch {
-            setError(error)
-        }
     }
     
     func fetchAuthState() {

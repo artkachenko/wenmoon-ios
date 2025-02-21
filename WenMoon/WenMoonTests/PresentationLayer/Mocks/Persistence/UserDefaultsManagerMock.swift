@@ -36,7 +36,7 @@ class UserDefaultsManagerMock: UserDefaultsManager {
         return getObjectReturnValue[key] as? T
     }
     
-    func removeObject(forKey key: String) {
+    func removeObject(forKey key: UserDefaultsKey) {
         removeObjectCalled = true
     }
 }

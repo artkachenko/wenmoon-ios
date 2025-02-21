@@ -35,6 +35,7 @@ final class CoinListViewModel: BaseViewModel {
         coinScannerService: CoinScannerService,
         priceAlertService: PriceAlertService,
         firebaseAuthService: FirebaseAuthService? = nil,
+        appLaunchManager: AppLaunchManager? = nil,
         userDefaultsManager: UserDefaultsManager? = nil,
         swiftDataManager: SwiftDataManager? = nil
     ) {
@@ -42,6 +43,7 @@ final class CoinListViewModel: BaseViewModel {
         self.priceAlertService = priceAlertService
         super.init(
             firebaseAuthService: firebaseAuthService,
+            appLaunchManager: appLaunchManager,
             userDefaultsManager: userDefaultsManager,
             swiftDataManager: swiftDataManager
         )

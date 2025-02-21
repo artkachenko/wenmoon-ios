@@ -50,6 +50,7 @@ struct ContentView: View {
         }
         .onAppear {
             contentViewModel.fetchStartScreen()
+            contentViewModel.signOutUserIfNeeded()
         }
     }
     

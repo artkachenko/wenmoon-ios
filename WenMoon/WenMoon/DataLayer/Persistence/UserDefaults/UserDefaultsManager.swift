@@ -10,7 +10,7 @@ import Foundation
 protocol UserDefaultsManager {
     func setObject<T: Encodable>(_ object: T, forKey key: UserDefaultsKey) throws
     func getObject<T: Decodable>(forKey key: UserDefaultsKey, objectType: T.Type) throws -> T?
-    func removeObject(forKey key: String)
+    func removeObject(forKey key: UserDefaultsKey)
 }
 
 final class UserDefaultsManagerImpl: UserDefaultsManager {
@@ -39,8 +39,8 @@ final class UserDefaultsManagerImpl: UserDefaultsManager {
         }
     }
     
-    func removeObject(forKey key: String) {
-        userDefaults.removeObject(forKey: key)
+    func removeObject(forKey key: UserDefaultsKey) {
+        userDefaults.removeObject(forKey: key.value)
     }
 }
 

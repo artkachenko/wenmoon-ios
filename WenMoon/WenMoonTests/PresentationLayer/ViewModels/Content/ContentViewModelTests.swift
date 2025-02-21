@@ -11,13 +11,22 @@ import XCTest
 class ContentViewModelTests: XCTestCase {
     // MARK: - Properties
     var viewModel: ContentViewModel!
+    
     var coinScannerService: CoinScannerServiceMock!
+    var firebaseAuthService: FirebaseAuthServiceMock!
+    var appLaunchManager: AppLaunchManagerMock!
     
     // MARK: - Setup
     override func setUp() {
         super.setUp()
         coinScannerService = CoinScannerServiceMock()
-        viewModel = ContentViewModel(coinScannerService: coinScannerService)
+        firebaseAuthService = FirebaseAuthServiceMock()
+        appLaunchManager = AppLaunchManagerMock()
+        viewModel = ContentViewModel(
+            coinScannerService: coinScannerService,
+            firebaseAuthService: firebaseAuthService,
+            appLaunchManager: appLaunchManager
+        )
     }
     
     override func tearDown() {
@@ -27,7 +36,7 @@ class ContentViewModelTests: XCTestCase {
     }
     
     // MARK: - Tests
-    func testFetchAllGlobalMarketData_success() async throws {
+    func testFetchAllGlobalMarketData_success() async {
         // Setup
         let fearAndGreedIndex = FearAndGreedIndex(data: [.init(value: "75", valueClassification: "Greed")])
         let globalCryptoMarketData = GlobalCryptoMarketData(marketCapPercentage: ["btc": 56.5, "eth": 12.8, "usdt": 2.63])
@@ -58,7 +67,7 @@ class ContentViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testFetchAllGlobalMarketData_apiError() async throws {
+    func testFetchAllGlobalMarketData_apiError() async {
         // Setup
         let error = ErrorFactoryMock.makeAPIError()
         let fearAndGreedIndex = FearAndGreedIndex(data: [.init(value: "75", valueClassification: "Greed")])
@@ -81,7 +90,7 @@ class ContentViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
-    func testFetchAllGlobalMarketData_missingFearAndGreedData() async throws {
+    func testFetchAllGlobalMarketData_missingFearAndGreedData() async {
         // Setup
         let fearAndGreedIndex = FearAndGreedIndex(data: [])
         let globalCryptoMarketData = GlobalCryptoMarketData(marketCapPercentage: ["btc": 56.5])
@@ -103,7 +112,7 @@ class ContentViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testFetchAllGlobalMarketData_missingBTCDominance() async throws {
+    func testFetchAllGlobalMarketData_missingBTCDominance() async {
         // Setup
         let fearAndGreedIndex = FearAndGreedIndex(data: [.init(value: "75", valueClassification: "Greed")])
         let globalCryptoMarketData = GlobalCryptoMarketData(marketCapPercentage: ["eth": 12.8])
@@ -123,6 +132,32 @@ class ContentViewModelTests: XCTestCase {
         // Assertions
         XCTAssertTrue(viewModel.globalMarketDataItems.isEmpty)
         XCTAssertNil(viewModel.errorMessage)
+    }
+    
+    func testSignOutUserIfNeeded_isFirstLaunch() {
+        // Setup
+        viewModel.loginState = .signedIn("test-id")
+        firebaseAuthService.signOutResult = .success(())
+        
+        // Action
+        viewModel.signOutUserIfNeeded()
+        
+        // Assertions
+        XCTAssertEqual(viewModel.loginState, .signedOut)
+    }
+    
+    func testSignOutUserIfNeeded_isNotFirstLaunch() {
+        // Setup
+        let userID = "test-id"
+        viewModel.loginState = .signedIn(userID)
+        firebaseAuthService.signOutResult = .success(())
+        appLaunchManager.isFirstLaunch = false
+        
+        // Action
+        viewModel.signOutUserIfNeeded()
+        
+        // Assertions
+        XCTAssertEqual(viewModel.loginState, .signedIn(userID))
     }
     
     // MARK: - Helpers

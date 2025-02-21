@@ -9,11 +9,19 @@ import UIKit
 import SwiftData
 
 class BaseViewModel: ObservableObject {
+    // MARK: - Nested Types
+    enum LoginState: Equatable {
+        case signedIn(_ userID: String? = nil)
+        case signedOut
+    }
+    
     // MARK: - Properties
+    @Published var loginState: LoginState = .signedOut
     @Published var errorMessage: String?
     @Published var isLoading = false
     
     private(set) var firebaseAuthService: FirebaseAuthService
+    private(set) var appLaunchManager: AppLaunchManager
     private(set) var userDefaultsManager: UserDefaultsManager
     private(set) var swiftDataManager: SwiftDataManager?
     
@@ -21,26 +29,24 @@ class BaseViewModel: ObservableObject {
         firebaseAuthService.userID
     }
     
+    var isFirstLaunch: Bool {
+        appLaunchManager.isFirstLaunch
+    }
+    
     var deviceToken: String? {
         let deviceToken = try? userDefaultsManager.getObject(forKey: .deviceToken, objectType: String.self)
         return deviceToken
     }
     
-    var isFirstLaunch: Bool {
-        let isFirstLaunch = (try? userDefaultsManager.getObject(forKey: .isFirstLaunch, objectType: Bool.self)) ?? true
-        if isFirstLaunch {
-            try? userDefaultsManager.setObject(false, forKey: .isFirstLaunch)
-        }
-        return isFirstLaunch
-    }
-    
     // MARK: - Initializers
     init(
         firebaseAuthService: FirebaseAuthService? = nil,
+        appLaunchManager: AppLaunchManager? = nil,
         userDefaultsManager: UserDefaultsManager? = nil,
         swiftDataManager: SwiftDataManager? = nil
     ) {
         self.firebaseAuthService = firebaseAuthService ?? FirebaseAuthServiceImpl()
+        self.appLaunchManager = appLaunchManager ?? AppLaunchManagerImpl()
         self.userDefaultsManager = userDefaultsManager ?? UserDefaultsManagerImpl()
         
         if let swiftDataManager {
@@ -54,6 +60,15 @@ class BaseViewModel: ObservableObject {
     }
     
     // MARK: - Internal Methods
+    func signOut() {
+        do {
+            try firebaseAuthService.signOut()
+            loginState = .signedOut
+        } catch {
+            setError(error)
+        }
+    }
+    
     func fetch<T: PersistentModel>(_ descriptor: FetchDescriptor<T>) -> [T] {
         do {
             return try swiftDataManager?.fetch(descriptor) ?? []

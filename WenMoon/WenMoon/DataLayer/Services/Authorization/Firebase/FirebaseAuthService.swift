@@ -34,7 +34,8 @@ final class FirebaseAuthServiceImpl: FirebaseAuthService {
     }
     
     var userID: String? {
-        auth.currentUser?.displayName
+        print(auth.currentUser?.uid)
+        return auth.currentUser?.displayName
     }
     
     func signIn(with credential: AuthCredential, completion: @escaping (AuthDataResult?, Error?) -> Void) {

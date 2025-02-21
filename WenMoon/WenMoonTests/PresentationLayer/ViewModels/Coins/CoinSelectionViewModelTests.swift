@@ -31,7 +31,7 @@ class CoinSelectionViewModelTests: XCTestCase {
     
     // MARK: - Tests
     // Fetch Coins
-    func testFetchCoins_success() async throws {
+    func testFetchCoins_success() async {
         // Setup
         let coins = CoinFactoryMock.makeCoins()
         service.getCoinsAtPageResult = .success(coins)
@@ -44,7 +44,7 @@ class CoinSelectionViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testFetchCoins_nextPage() async throws {
+    func testFetchCoins_nextPage() async {
         // Setup
         let firstPageCoins = CoinFactoryMock.makeCoins()
         let secondPageCoins = CoinFactoryMock.makeCoins(at: 2)
@@ -61,7 +61,7 @@ class CoinSelectionViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testFetchCoins_usesCache() async throws {
+    func testFetchCoins_usesCache() async {
         // Setup
         let cachedCoins = CoinFactoryMock.makeCoins()
         viewModel.coinsCache[1] = cachedCoins
@@ -73,7 +73,7 @@ class CoinSelectionViewModelTests: XCTestCase {
         assertCoinsEqual(viewModel.coins, cachedCoins)
     }
     
-    func testFetchCoins_networkError() async throws {
+    func testFetchCoins_networkError() async {
         // Setup
         let error = ErrorFactoryMock.makeNoNetworkConnectionError()
         service.getCoinsAtPageResult = .failure(error)
@@ -87,7 +87,7 @@ class CoinSelectionViewModelTests: XCTestCase {
     }
     
     // Search Coins
-    func testSearchCoinsByQuery_success() async throws {
+    func testSearchCoinsByQuery_success() async {
         // Setup
         let coins = CoinFactoryMock.makeCoins()
         service.searchCoinsByQueryResult = .success(coins)
@@ -100,7 +100,7 @@ class CoinSelectionViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testSearchCoinsByQuery_emptyResult() async throws {
+    func testSearchCoinsByQuery_emptyResult() async {
         // Setup
         service.searchCoinsByQueryResult = .success([])
         
@@ -112,7 +112,7 @@ class CoinSelectionViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testSearchCoins_usesCache() async throws {
+    func testSearchCoins_usesCache() async {
         // Setup
         let cachedCoins = CoinFactoryMock.makeCoins()
         viewModel.searchCoinsCache[""] = cachedCoins
@@ -125,7 +125,7 @@ class CoinSelectionViewModelTests: XCTestCase {
         assertCoinsEqual(viewModel.coins, cachedCoins)
     }
     
-    func testSearchCoins_cachesResult() async throws {
+    func testSearchCoins_cachesResult() async {
         // Setup
         let coins = CoinFactoryMock.makeCoins()
         service.searchCoinsByQueryResult = .success(coins)
@@ -137,7 +137,7 @@ class CoinSelectionViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.searchCoinsCache[""], coins)
     }
     
-    func testSearchCoinsByQuery_decodingError() async throws {
+    func testSearchCoinsByQuery_decodingError() async {
         // Setup
         let error = ErrorFactoryMock.makeFailedToDecodeResponseError()
         service.searchCoinsByQueryResult = .failure(error)
@@ -150,7 +150,7 @@ class CoinSelectionViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
-    func testHandleSearchInput_emptyQuery() async throws {
+    func testHandleSearchInput_emptyQuery() async {
         // Setup
         let initialCoins = CoinFactoryMock.makeCoins()
         service.getCoinsAtPageResult = .success(initialCoins)
@@ -164,7 +164,7 @@ class CoinSelectionViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testFetchSavedCoins_success() async throws {
+    func testFetchSavedCoins_success() {
         // Setup
         let mockCoins = CoinFactoryMock.makeCoinsData()
         swiftDataManager.fetchResult = mockCoins
@@ -178,7 +178,7 @@ class CoinSelectionViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testFetchSavedCoins_fetchError() async throws {
+    func testFetchSavedCoins_fetchError() {
         // Setup
         let error: SwiftDataError = .failedToFetchModels
         swiftDataManager.swiftDataError = error

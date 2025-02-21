@@ -45,7 +45,7 @@ class PriceAlertsViewModelTests: XCTestCase {
     }
     
     // MARK: - Tests
-    func testCreatePriceAlert_success() async throws {
+    func testCreatePriceAlert_success() async {
         // Setup
         userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
         let coin = CoinFactoryMock.makeCoinData()
@@ -61,7 +61,7 @@ class PriceAlertsViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testCreatePriceAlert_encodingError() async throws {
+    func testCreatePriceAlert_encodingError() async {
         // Setup
         userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
         let coin = CoinFactoryMock.makeCoinData()
@@ -78,7 +78,7 @@ class PriceAlertsViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
-    func testDeletePriceAlert_success() async throws {
+    func testDeletePriceAlert_success() async {
         // Setup
         userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
         let coin = CoinFactoryMock.makeCoinData()
@@ -95,7 +95,7 @@ class PriceAlertsViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testDeletePriceAlert_apiError() async throws {
+    func testDeletePriceAlert_apiError() async {
         // Setup
         userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
         let coin = CoinFactoryMock.makeCoinData()
@@ -114,7 +114,7 @@ class PriceAlertsViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
-    func testShouldDisableCreateButton() async {
+    func testShouldDisableCreateButton() {
         // Setup
         let coin = CoinData()
         let priceAlerts = PriceAlertFactoryMock.makePriceAlerts()
