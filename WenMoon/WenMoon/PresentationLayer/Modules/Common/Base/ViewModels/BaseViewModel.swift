@@ -9,28 +9,16 @@ import UIKit
 import SwiftData
 
 class BaseViewModel: ObservableObject {
-    // MARK: - Nested Types
-    enum LoginState: Equatable {
-        case signedIn(_ userID: String? = nil)
-        case signedOut
-    }
-    
     // MARK: - Properties
-    @Published var loginState: LoginState = .signedOut
     @Published var errorMessage: String?
     @Published var isLoading = false
     
-    private(set) var firebaseAuthService: FirebaseAuthService
-    private(set) var appLaunchManager: AppLaunchManager
+    private(set) var appLaunchProvider: AppLaunchProvider
     private(set) var userDefaultsManager: UserDefaultsManager
     private(set) var swiftDataManager: SwiftDataManager?
     
-    var userID: String? {
-        firebaseAuthService.userID
-    }
-    
     var isFirstLaunch: Bool {
-        appLaunchManager.isFirstLaunch
+        appLaunchProvider.isFirstLaunch
     }
     
     var deviceToken: String? {
@@ -40,13 +28,11 @@ class BaseViewModel: ObservableObject {
     
     // MARK: - Initializers
     init(
-        firebaseAuthService: FirebaseAuthService? = nil,
-        appLaunchManager: AppLaunchManager? = nil,
+        appLaunchProvider: AppLaunchProvider? = nil,
         userDefaultsManager: UserDefaultsManager? = nil,
         swiftDataManager: SwiftDataManager? = nil
     ) {
-        self.firebaseAuthService = firebaseAuthService ?? FirebaseAuthServiceImpl()
-        self.appLaunchManager = appLaunchManager ?? AppLaunchManagerImpl()
+        self.appLaunchProvider = appLaunchProvider ?? DefaultAppLaunchManager()
         self.userDefaultsManager = userDefaultsManager ?? UserDefaultsManagerImpl()
         
         if let swiftDataManager {
@@ -60,15 +46,6 @@ class BaseViewModel: ObservableObject {
     }
     
     // MARK: - Internal Methods
-    func signOut() {
-        do {
-            try firebaseAuthService.signOut()
-            loginState = .signedOut
-        } catch {
-            setError(error)
-        }
-    }
-    
     func fetch<T: PersistentModel>(_ descriptor: FetchDescriptor<T>) -> [T] {
         do {
             return try swiftDataManager?.fetch(descriptor) ?? []
@@ -120,7 +97,7 @@ class BaseViewModel: ObservableObject {
             errorMessage = "An unknown error occurred: \(error.localizedDescription)"
         }
     }
-
+    
     func setErrorMessage(_ message: String) {
         errorMessage = message
     }

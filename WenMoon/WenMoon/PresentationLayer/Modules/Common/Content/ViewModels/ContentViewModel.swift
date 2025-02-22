@@ -25,11 +25,10 @@ final class ContentViewModel: BaseViewModel {
     
     init(
         coinScannerService: CoinScannerService,
-        firebaseAuthService: FirebaseAuthService? = nil,
-        appLaunchManager: AppLaunchManager? = nil
+        appLaunchProvider: AppLaunchProvider? = nil
     ) {
         self.coinScannerService = coinScannerService
-        super.init(firebaseAuthService: firebaseAuthService, appLaunchManager: appLaunchManager)
+        super.init(appLaunchProvider: appLaunchProvider)
     }
     
     // MARK: - Internal Methods
@@ -90,11 +89,6 @@ final class ContentViewModel: BaseViewModel {
             setError(error)
             globalMarketDataItems.removeAll()
         }
-    }
-    
-    func signOutUserIfNeeded() {
-        guard isFirstLaunch else { return }
-        signOut()
     }
 }
 

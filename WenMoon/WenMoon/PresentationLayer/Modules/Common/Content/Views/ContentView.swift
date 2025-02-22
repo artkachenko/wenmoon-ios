@@ -11,8 +11,10 @@ struct ContentView: View {
     // MARK: - Properties
     @StateObject private var contentViewModel = ContentViewModel()
     @StateObject private var coinSelectionViewModel = CoinSelectionViewModel()
+    @StateObject private var accountViewModel = AccountViewModel()
     
     @State private var scrollMarqueeText = false
+    @State private var viewDidLoad = false
     
     // MARK: - Body
     var body: some View {
@@ -45,12 +47,19 @@ struct ContentView: View {
             }
         }
         .environmentObject(coinSelectionViewModel)
-        .task {
-            await fetchGlobalMarketDataItems()
-        }
+        .environmentObject(accountViewModel)
         .onAppear {
+            guard !viewDidLoad else { return }
+            
             contentViewModel.fetchStartScreen()
-            contentViewModel.signOutUserIfNeeded()
+            accountViewModel.signOutUserIfNeeded()
+            
+            Task {
+                await accountViewModel.fetchAccount()
+                await fetchGlobalMarketDataItems()
+            }
+            
+            viewDidLoad = true
         }
     }
     

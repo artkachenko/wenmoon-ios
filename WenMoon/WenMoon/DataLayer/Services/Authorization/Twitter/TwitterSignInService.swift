@@ -8,7 +8,7 @@
 import FirebaseAuth
 
 protocol TwitterSignInService {
-    func signIn(completion: @escaping (AuthCredential?, Error?) -> Void)
+    func signIn() async throws -> AuthCredential?
 }
 
 final class TwitterSignInServiceImpl: TwitterSignInService {
@@ -19,15 +19,23 @@ final class TwitterSignInServiceImpl: TwitterSignInService {
     convenience init() {
         self.init(twitterProvider: OAuthProvider(providerID: "twitter.com"))
     }
-
+    
     init(twitterProvider: OAuthProvider) {
         self.twitterProvider = twitterProvider
     }
-
+    
     // MARK: - TwitterSignInService
-    func signIn(completion: @escaping (AuthCredential?, Error?) -> Void) {
-        twitterProvider.getCredentialWith(nil) { credential, error in
-            completion(credential, error)
+    func signIn() async throws -> AuthCredential? {
+        try await withCheckedThrowingContinuation { continuation in
+            twitterProvider.getCredentialWith(nil) { credential, error in
+                guard (error == nil) else {
+                    continuation.resume(throwing: error!)
+                    return
+                }
+                
+                let credential = (credential == nil) ? nil : credential
+                continuation.resume(returning: credential)
+            }
         }
     }
 }

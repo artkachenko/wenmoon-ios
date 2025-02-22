@@ -13,19 +13,16 @@ class ContentViewModelTests: XCTestCase {
     var viewModel: ContentViewModel!
     
     var coinScannerService: CoinScannerServiceMock!
-    var firebaseAuthService: FirebaseAuthServiceMock!
-    var appLaunchManager: AppLaunchManagerMock!
+    var appLaunchProvider: AppLaunchProviderMock!
     
     // MARK: - Setup
     override func setUp() {
         super.setUp()
         coinScannerService = CoinScannerServiceMock()
-        firebaseAuthService = FirebaseAuthServiceMock()
-        appLaunchManager = AppLaunchManagerMock()
+        appLaunchProvider = AppLaunchProviderMock()
         viewModel = ContentViewModel(
             coinScannerService: coinScannerService,
-            firebaseAuthService: firebaseAuthService,
-            appLaunchManager: appLaunchManager
+            appLaunchProvider: appLaunchProvider
         )
     }
     
@@ -132,32 +129,6 @@ class ContentViewModelTests: XCTestCase {
         // Assertions
         XCTAssertTrue(viewModel.globalMarketDataItems.isEmpty)
         XCTAssertNil(viewModel.errorMessage)
-    }
-    
-    func testSignOutUserIfNeeded_isFirstLaunch() {
-        // Setup
-        viewModel.loginState = .signedIn("test-id")
-        firebaseAuthService.signOutResult = .success(())
-        
-        // Action
-        viewModel.signOutUserIfNeeded()
-        
-        // Assertions
-        XCTAssertEqual(viewModel.loginState, .signedOut)
-    }
-    
-    func testSignOutUserIfNeeded_isNotFirstLaunch() {
-        // Setup
-        let userID = "test-id"
-        viewModel.loginState = .signedIn(userID)
-        firebaseAuthService.signOutResult = .success(())
-        appLaunchManager.isFirstLaunch = false
-        
-        // Action
-        viewModel.signOutUserIfNeeded()
-        
-        // Assertions
-        XCTAssertEqual(viewModel.loginState, .signedIn(userID))
     }
     
     // MARK: - Helpers

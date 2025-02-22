@@ -12,7 +12,8 @@ struct CoinDetailsView: View {
     // MARK: - Properties
     @Environment(\.dismiss) private var dismiss
     
-    @StateObject private var viewModel: CoinDetailsViewModel
+    @EnvironmentObject private var accountViewModel: AccountViewModel
+    @StateObject private var coinDetailsViewModel: CoinDetailsViewModel
     
     @State private var selectedPrice: String
     @State private var selectedDate = String()
@@ -23,21 +24,21 @@ struct CoinDetailsView: View {
     @State private var showPriceAlertsView = false
     @State private var showAuthAlert = false
     
-    private var coin: CoinData { viewModel.coin }
-    private var coinDetails: CoinDetails { viewModel.coinDetails }
-    private var marketData: CoinDetails.MarketData { viewModel.coinDetails.marketData }
-    private var chartData: [ChartData] { viewModel.chartData }
-    private var isLoading: Bool { viewModel.isLoading }
+    private var coin: CoinData { coinDetailsViewModel.coin }
+    private var coinDetails: CoinDetails { coinDetailsViewModel.coinDetails }
+    private var marketData: CoinDetails.MarketData { coinDetailsViewModel.coinDetails.marketData }
+    private var chartData: [ChartData] { coinDetailsViewModel.chartData }
+    private var isLoading: Bool { coinDetailsViewModel.isLoading }
     
     // MARK: - Initializers
     init(coin: CoinData) {
-        _viewModel = StateObject(wrappedValue: CoinDetailsViewModel(coin: coin))
+        _coinDetailsViewModel = StateObject(wrappedValue: CoinDetailsViewModel(coin: coin))
         selectedPrice = coin.currentPrice.formattedAsCurrency()
     }
     
     // MARK: - Body
     var body: some View {
-        BaseView(errorMessage: $viewModel.errorMessage) {
+        BaseView(errorMessage: $coinDetailsViewModel.errorMessage) {
             VStack(spacing: 8) {
                 HStack(alignment: .top, spacing: 12) {
                     CoinImageView(
@@ -70,7 +71,7 @@ struct CoinDetailsView: View {
                     
                     HStack(spacing: 32) {
                         Button(action: {
-                            guard viewModel.userID != nil else {
+                            guard (accountViewModel.account != nil) else {
                                 showAuthAlert = true
                                 return
                             }
@@ -125,7 +126,7 @@ struct CoinDetailsView: View {
                         VStack(spacing: 24) {
                             Button(action: {
                                 showMarketsView = true
-                                viewModel.triggerImpactFeedback()
+                                coinDetailsViewModel.triggerImpactFeedback()
                             }) {
                                 Text("Buy")
                                     .frame(maxWidth: .infinity)
@@ -177,11 +178,11 @@ struct CoinDetailsView: View {
         }
         .onChange(of: selectedTimeframe) { _, timeframe in
             Task {
-                await viewModel.fetchChartData(on: timeframe)
+                await coinDetailsViewModel.fetchChartData(on: timeframe)
             }
         }
         .onChange(of: selectedPrice) {
-            viewModel.triggerSelectionFeedback()
+            coinDetailsViewModel.triggerSelectionFeedback()
         }
         .sheet(isPresented: $showMarketsView) {
             let tickers = coinDetails.tickers
@@ -202,8 +203,8 @@ struct CoinDetailsView: View {
             )
         }
         .task {
-            await viewModel.fetchChartData(on: selectedTimeframe)
-            await viewModel.fetchCoinDetails()
+            await coinDetailsViewModel.fetchChartData(on: selectedTimeframe)
+            await coinDetailsViewModel.fetchCoinDetails()
         }
     }
     
@@ -216,7 +217,7 @@ struct CoinDetailsView: View {
         let priceRange = minPrice...maxPrice
         
         Chart {
-            let chartColor: Color = viewModel.isPriceChangeNegative ? .wmRed : .wmGreen
+            let chartColor: Color = coinDetailsViewModel.isPriceChangeNegative ? .wmRed : .wmGreen
             ForEach(data, id: \.date) { dataPoint in
                 AreaMark(
                     x: .value("Date", dataPoint.date),
@@ -228,8 +229,7 @@ struct CoinDetailsView: View {
                     LinearGradient(
                         gradient: Gradient(colors: [
                             chartColor.opacity(0.5),
-                            chartColor.opacity(0.25),
-                            chartColor.opacity(0)
+                            chartColor.opacity(.zero)
                         ]),
                         startPoint: .top,
                         endPoint: .bottom

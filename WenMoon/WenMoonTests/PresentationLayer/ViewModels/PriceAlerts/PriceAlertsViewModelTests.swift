@@ -13,7 +13,6 @@ class PriceAlertsViewModelTests: XCTestCase {
     var viewModel: PriceAlertsViewModel!
     
     var priceAlertService: PriceAlertServiceMock!
-    var firebaseAuthService: FirebaseAuthServiceMock!
     var userDefaultsManager: UserDefaultsManagerMock!
     
     var deviceToken: String!
@@ -22,13 +21,11 @@ class PriceAlertsViewModelTests: XCTestCase {
     override func setUp() {
         super.setUp()
         priceAlertService = PriceAlertServiceMock()
-        firebaseAuthService = FirebaseAuthServiceMock()
         userDefaultsManager = UserDefaultsManagerMock()
         
         viewModel = PriceAlertsViewModel(
             coin: CoinData(),
             priceAlertService: priceAlertService,
-            firebaseAuthService: firebaseAuthService,
             userDefaultsManager: userDefaultsManager
         )
         
@@ -38,7 +35,6 @@ class PriceAlertsViewModelTests: XCTestCase {
     override func tearDown() {
         viewModel = nil
         priceAlertService = nil
-        firebaseAuthService = nil
         userDefaultsManager = nil
         deviceToken = nil
         super.tearDown()
@@ -48,13 +44,15 @@ class PriceAlertsViewModelTests: XCTestCase {
     func testCreatePriceAlert_success() async {
         // Setup
         userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
+        
         let coin = CoinFactoryMock.makeCoinData()
         viewModel.coin = coin
+        
         let priceAlert = PriceAlertFactoryMock.makePriceAlert()
         priceAlertService.createPriceAlertResult = .success(priceAlert)
         
         // Action
-        await viewModel.createPriceAlert(targetPrice: 70_000)
+        await viewModel.createPriceAlert(for: AccountFactoryMock.makeAccount(), targetPrice: 70_000)
         
         // Assertions
         assertCoinHasAlert(viewModel.coin, priceAlert)
@@ -64,13 +62,15 @@ class PriceAlertsViewModelTests: XCTestCase {
     func testCreatePriceAlert_encodingError() async {
         // Setup
         userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
+        
         let coin = CoinFactoryMock.makeCoinData()
         viewModel.coin = coin
+        
         let error = ErrorFactoryMock.makeFailedToEncodeBodyError()
         priceAlertService.createPriceAlertResult = .failure(error)
         
         // Action
-        await viewModel.createPriceAlert(targetPrice: 70_000)
+        await viewModel.createPriceAlert(for: AccountFactoryMock.makeAccount(), targetPrice: 70_000)
         
         // Assertions
         assertCoinHasNoAlert(coin)
@@ -81,14 +81,17 @@ class PriceAlertsViewModelTests: XCTestCase {
     func testDeletePriceAlert_success() async {
         // Setup
         userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
+        
         let coin = CoinFactoryMock.makeCoinData()
         viewModel.coin = coin
+        
         let priceAlert = PriceAlertFactoryMock.makePriceAlert()
         coin.priceAlerts.append(priceAlert)
+        
         priceAlertService.deletePriceAlertResult = .success(priceAlert)
         
         // Action
-        await viewModel.deletePriceAlert(priceAlert)
+        await viewModel.deletePriceAlert(priceAlert, for: AccountFactoryMock.makeAccount())
         
         // Assertions
         assertCoinHasNoAlert(viewModel.coin)
@@ -98,15 +101,18 @@ class PriceAlertsViewModelTests: XCTestCase {
     func testDeletePriceAlert_apiError() async {
         // Setup
         userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
+        
         let coin = CoinFactoryMock.makeCoinData()
         viewModel.coin = coin
+        
         let priceAlert = PriceAlertFactoryMock.makePriceAlert()
         coin.priceAlerts.append(priceAlert)
+        
         let error = ErrorFactoryMock.makeAPIError()
         priceAlertService.deletePriceAlertResult = .failure(error)
         
         // Action
-        await viewModel.deletePriceAlert(priceAlert)
+        await viewModel.deletePriceAlert(priceAlert, for: AccountFactoryMock.makeAccount())
         
         // Assertions
         assertCoinHasAlert(viewModel.coin, priceAlert)

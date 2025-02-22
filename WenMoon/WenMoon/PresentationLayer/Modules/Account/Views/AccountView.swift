@@ -9,10 +9,10 @@ import SwiftUI
 
 struct AccountView: View {
     // MARK: - Properties
-    @StateObject private var viewModel = AccountViewModel()
+    @EnvironmentObject private var viewModel: AccountViewModel
     
     @State private var selectedSetting: Setting!
-    @State private var showSignOutConfirmation = false
+    @State private var showDeleteAccountConfirmation = false
     
     // MARK: - Body
     var body: some View {
@@ -55,21 +55,22 @@ struct AccountView: View {
             .presentationDetents([.fraction(0.45)])
             .presentationCornerRadius(36)
         }
-        .alert(isPresented: $showSignOutConfirmation) {
+        .alert(isPresented: $showDeleteAccountConfirmation) {
             Alert(
-                title: Text("Logging off?"),
-                message: Text("Take your time! Everything will be here when you return."),
-                primaryButton: .destructive(Text("Sign Out")) {
-                    viewModel.signOut()
+                title: Text("Delete Account?"),
+                message: Text("This action is permanent and cannot be undone. All your synced data, including your watchlist, transactions, and price alerts, will be erased."),
+                primaryButton: .destructive(Text("Delete Account")) {
+                    Task {
+                        await viewModel.deleteAccount()
+                    }
                 },
-                secondaryButton: .cancel(Text("Stay Logged In"))
+                secondaryButton: .cancel(Text("Cancel"))
             )
         }
-        .onChange(of: viewModel.loginState) {
+        .onChange(of: viewModel.account) {
             viewModel.fetchSettings()
         }
         .onAppear {
-            viewModel.fetchAuthState()
             viewModel.fetchSettings()
         }
     }
@@ -84,9 +85,22 @@ struct AccountView: View {
                 .scaledToFit()
                 .frame(width: 48, height: 48)
             
-            if case .signedIn(let userID) = viewModel.loginState {
-                Text(userID ?? "User")
-                    .font(.headline)
+            if let account = viewModel.account {
+                HStack(spacing: 16) {
+                    Text(account.username)
+                        .font(.headline)
+                    
+                    Button(action: {
+                        viewModel.signOut()
+                        viewModel.triggerImpactFeedback()
+                    }) {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                    }
+                }
+                .padding(.leading, 20)
             } else {
                 Text("Sign into your account")
                     .font(.headline)
@@ -99,7 +113,9 @@ struct AccountView: View {
                 
                 HStack(spacing: 16) {
                     Button(action: {
-                        viewModel.signInWithGoogle()
+                        Task {
+                            await viewModel.signInWithGoogle()
+                        }
                     }) {
                         ZStack {
                             if viewModel.isGoogleAuthInProgress {
@@ -116,7 +132,9 @@ struct AccountView: View {
                         .cornerRadius(12)
                     }
                     Button(action: {
-                        viewModel.signInWithTwitter()
+                        Task {
+                            await viewModel.signInWithTwitter()
+                        }
                     }) {
                         ZStack {
                             if viewModel.isTwitterAuthInProgress {
@@ -164,20 +182,20 @@ struct AccountView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 12, height: 12)
-                .foregroundColor(setting.type == .signOut ? .wmRed : .gray)
+                .foregroundColor(setting.type == .deleteAccount ? .wmRed : .gray)
         }
         .padding(.vertical, 8)
         .contentShape(Rectangle())
         .onTapGesture {
-            if settingType == .signOut {
-                showSignOutConfirmation = true
+            if settingType == .deleteAccount {
+                showDeleteAccountConfirmation = true
                 viewModel.triggerImpactFeedback()
             } else {
                 selectedSetting = setting
             }
         }
         .disabled(settingType == .privacyPolicy)
-        .foregroundColor(settingType == .signOut ? .wmRed : .primary)
+        .foregroundColor(settingType == .deleteAccount ? .wmRed : .primary)
     }
     
     // MARK: - Helper Methods

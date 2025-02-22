@@ -9,7 +9,8 @@ import SwiftUI
 
 struct CoinListView: View {
     // MARK: - Properties
-    @StateObject private var viewModel = CoinListViewModel()
+    @EnvironmentObject private var accountViewModel: AccountViewModel
+    @StateObject private var coinListViewModel = CoinListViewModel()
     
     @State private var selectedCoin: CoinData?
     @State private var swipedCoin: CoinData?
@@ -20,18 +21,18 @@ struct CoinListView: View {
     
     // MARK: - Body
     var body: some View {
-        BaseView(errorMessage: $viewModel.errorMessage) {
+        BaseView(errorMessage: $coinListViewModel.errorMessage) {
             NavigationStack {
                 VStack {
-                    let coins = viewModel.coins
+                    let coins = coinListViewModel.coins
                     if coins.isEmpty {
                         Spacer()
                         PlaceholderView(text: "No coins added yet")
                         Spacer()
                     } else {
                         List {
-                            let pinnedCoins = viewModel.pinnedCoins
-                            let unpinnedCoins = viewModel.unpinnedCoins
+                            let pinnedCoins = coinListViewModel.pinnedCoins
+                            let unpinnedCoins = coinListViewModel.unpinnedCoins
                             
                             if !pinnedCoins.isEmpty {
                                 Section(header: Text("Pinned")) {
@@ -58,7 +59,7 @@ struct CoinListView: View {
                         .listStyle(.plain)
                         .refreshable {
                             Task {
-                                await viewModel.fetchCoins()
+                                await fetchCoinsAndPriceAlerts()
                             }
                         }
                     }
@@ -104,14 +105,14 @@ struct CoinListView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .targetPriceReached)) { notification in
             if let priceAlertID = notification.userInfo?["priceAlertID"] as? String {
-                viewModel.toggleOffPriceAlert(for: priceAlertID)
+                coinListViewModel.toggleOffPriceAlert(for: priceAlertID)
             }
         }
         .task {
             guard !viewDidLoad else { return }
             
-            await viewModel.fetchCoins()
-            viewModel.triggerImpactFeedback()
+            await fetchCoinsAndPriceAlerts()
+            coinListViewModel.triggerImpactFeedback()
             
             viewDidLoad = true
         }
@@ -180,7 +181,7 @@ struct CoinListView: View {
             Button(role: .destructive) {
                 Task {
                     try await Task.sleep(for: .milliseconds(200))
-                    await viewModel.deleteCoin(coin.id)
+                    await coinListViewModel.deleteCoin(coin.id)
                 }
             } label: {
                 Image(systemName: "heart.slash.fill")
@@ -188,7 +189,7 @@ struct CoinListView: View {
             .tint(.wmPink)
             
             Button {
-                guard viewModel.userID != nil else {
+                guard (accountViewModel.account != nil) else {
                     showAuthAlert = true
                     return
                 }
@@ -199,7 +200,7 @@ struct CoinListView: View {
             .tint(.blue)
             
             Button {
-                coin.isPinned ? viewModel.unpinCoin(coin) : viewModel.pinCoin(coin)
+                coin.isPinned ? coinListViewModel.unpinCoin(coin) : coinListViewModel.pinCoin(coin)
             } label: {
                 Image(systemName: coin.isPinned ? "pin.slash.fill" : "pin.fill")
             }
@@ -208,38 +209,43 @@ struct CoinListView: View {
     }
     
     // MARK: - Private Methods
+    private func fetchCoinsAndPriceAlerts() async {
+        await coinListViewModel.fetchCoins()
+        await coinListViewModel.fetchPriceAlerts(for: accountViewModel.account)
+    }
+    
     private func deletePinnedCoin(at offsets: IndexSet) {
-        let pinnedCoins = viewModel.pinnedCoins
+        let pinnedCoins = coinListViewModel.pinnedCoins
         for index in offsets {
             Task {
-                await viewModel.deleteCoin(pinnedCoins[index].id)
+                await coinListViewModel.deleteCoin(pinnedCoins[index].id)
             }
         }
     }
     
     private func deleteUnpinnedCoin(at offsets: IndexSet) {
-        let unpinnedCoins = viewModel.unpinnedCoins
+        let unpinnedCoins = coinListViewModel.unpinnedCoins
         for index in offsets {
             Task {
-                await viewModel.deleteCoin(unpinnedCoins[index].id)
+                await coinListViewModel.deleteCoin(unpinnedCoins[index].id)
             }
         }
     }
     
     private func movePinnedCoin(from source: IndexSet, to destination: Int) {
-        viewModel.moveCoin(from: source, to: destination, isPinned: true)
+        coinListViewModel.moveCoin(from: source, to: destination, isPinned: true)
     }
     
     private func moveUnpinnedCoin(from source: IndexSet, to destination: Int) {
-        viewModel.moveCoin(from: source, to: destination, isPinned: false)
+        coinListViewModel.moveCoin(from: source, to: destination, isPinned: false)
     }
     
     private func handleCoinSelection(coin: Coin, shouldAdd: Bool) {
         Task {
             if shouldAdd {
-                await viewModel.saveCoin(coin)
+                await coinListViewModel.saveCoin(coin)
             } else {
-                await viewModel.deleteCoin(coin.id)
+                await coinListViewModel.deleteCoin(coin.id)
             }
         }
     }

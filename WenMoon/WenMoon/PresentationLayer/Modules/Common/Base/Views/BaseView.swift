@@ -13,7 +13,7 @@ struct BaseView<Content: View>: View {
     
     @State private var showErrorAlert = false
     
-    let content: Content
+    private let content: Content
     
     // MARK: - Initializers
     init(errorMessage: Binding<String?>, @ViewBuilder content: () -> Content) {

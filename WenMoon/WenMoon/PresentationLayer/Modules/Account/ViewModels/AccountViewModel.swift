@@ -11,6 +11,11 @@ import FirebaseAuth
 
 final class AccountViewModel: BaseViewModel {
     // MARK: - Nested Types
+    enum AuthState {
+        case authenticated(_ account: Account?)
+        case unauthenticated
+    }
+    
     enum CommunityLinks: CaseIterable {
         case x, telegram, reddit
         
@@ -35,37 +40,104 @@ final class AccountViewModel: BaseViewModel {
     }
     
     // MARK: - Properties
+    private let firebaseAuthService: FirebaseAuthService
     private let googleSignInService: GoogleSignInService
     private let twitterSignInService: TwitterSignInService
+    private let accountService: AccountService
     
+    @Published var authState: AuthState = .unauthenticated
     @Published var settings: [Setting] = []
     @Published var communityLinks = CommunityLinks.allCases
     
     @Published private(set) var isGoogleAuthInProgress = false
     @Published private(set) var isTwitterAuthInProgress = false
     
+    var account: Account? {
+        if case .authenticated(let account) = authState {
+            return account
+        }
+        return nil
+    }
+    
     // MARK: - Initializers
     convenience init() {
         self.init(
+            firebaseAuthService: FirebaseAuthServiceImpl(),
             googleSignInService: GoogleSignInServiceImpl(),
-            twitterSignInService: TwitterSignInServiceImpl()
+            twitterSignInService: TwitterSignInServiceImpl(),
+            accountService: AccountServiceImpl()
         )
     }
     
     init(
+        firebaseAuthService: FirebaseAuthService,
         googleSignInService: GoogleSignInService,
         twitterSignInService: TwitterSignInService,
-        firebaseAuthService: FirebaseAuthService? = nil,
+        accountService: AccountService,
+        appLaunchProvider: AppLaunchProvider? = nil,
         userDefaultsManager: UserDefaultsManager? = nil
     ) {
+        self.firebaseAuthService = firebaseAuthService
         self.googleSignInService = googleSignInService
         self.twitterSignInService = twitterSignInService
-        super.init(firebaseAuthService: firebaseAuthService, userDefaultsManager: userDefaultsManager)
+        self.accountService = accountService
+        super.init(appLaunchProvider: appLaunchProvider, userDefaultsManager: userDefaultsManager)
     }
     
     // MARK: - Authentication
-    func signInWithGoogle() {
+    @MainActor
+    func fetchAccount(authToken: String? = nil) async {
+        do {
+            guard firebaseAuthService.userID != nil else {
+                let error: AuthError = .userNotSignedIn
+                setError(error)
+                return
+            }
+            
+            let token: String
+            if let authToken {
+                token = authToken
+            } else if let authToken = await fetchAuthToken() {
+                token = authToken
+            } else {
+                signOut()
+                return
+            }
+            
+            let account = try await accountService.getAccount(authToken: token)
+            authState = .authenticated(account)
+        } catch {
+            let error: AuthError = .failedToFetchAccount
+            setError(error)
+            signOut()
+        }
+    }
+    
+    @MainActor
+    func deleteAccount() async {
+        do {
+            guard firebaseAuthService.userID != nil else {
+                let error: AuthError = .userNotSignedIn
+                setError(error)
+                return
+            }
+            
+            guard let authToken = await fetchAuthToken() else { return }
+            
+            try await accountService.deleteAccount(authToken: authToken)
+            signOut()
+        } catch {
+            let error: AuthError = .failedToDeleteAccount
+            setError(error)
+        }
+    }
+    
+    @MainActor
+    func signInWithGoogle() async {
         isGoogleAuthInProgress = true
+        defer { isGoogleAuthInProgress = false }
+        
+        triggerImpactFeedback()
         
         guard
             let clientID = firebaseAuthService.clientID,
@@ -75,52 +147,57 @@ final class AccountViewModel: BaseViewModel {
         }
         
         googleSignInService.configure(clientID: clientID)
-        googleSignInService.signIn(withPresenting: rootViewController) { [weak self] result, error in
+        
+        do {
+            let signInResult = try await googleSignInService.signIn(withPresenting: rootViewController)
+            
             guard
-                let self,
-                let user = result?.user,
-                let idToken = user.idToken?.tokenString,
-                error == nil
+                let user = signInResult?.user,
+                let idToken = user.idToken?.tokenString
             else {
-                self?.isGoogleAuthInProgress = false
                 return
             }
             
-            let credential = googleSignInService.credential(withIDToken: idToken, accessToken: user.accessToken.tokenString)
-            signIn(with: credential) {
-                self.isGoogleAuthInProgress = false
-            }
+            let credential = googleSignInService.credential(
+                withIDToken: idToken,
+                accessToken: user.accessToken.tokenString
+            )
+            
+            await signIn(with: credential)
+        } catch {
+            let error: AuthError = .failedToSignIn
+            setError(error)
         }
-        
-        triggerImpactFeedback()
     }
     
-    func signInWithTwitter() {
+    @MainActor
+    func signInWithTwitter() async {
         isTwitterAuthInProgress = true
-        
-        twitterSignInService.signIn { [weak self] credential, error in
-            guard
-                let self,
-                let credential,
-                error == nil
-            else {
-                self?.isTwitterAuthInProgress = false
-                return
-            }
-            
-            signIn(with: credential) {
-                self.isTwitterAuthInProgress = false
-            }
-        }
+        defer { isTwitterAuthInProgress = false }
         
         triggerImpactFeedback()
+        
+        do {
+            guard let credential = try await twitterSignInService.signIn() else { return }
+            await signIn(with: credential)
+        } catch {
+            let error: AuthError = .failedToSignIn
+            setError(error)
+        }
     }
     
-    func fetchAuthState() {
-        if let userID = firebaseAuthService.userID {
-            loginState = .signedIn(userID)
-        } else {
-            loginState = .signedOut
+    func signOutUserIfNeeded() {
+        guard isFirstLaunch else { return }
+        signOut()
+    }
+    
+    func signOut() {
+        do {
+            try firebaseAuthService.signOut()
+            authState = .unauthenticated
+        } catch {
+            let error: AuthError = .failedToSignOut
+            setError(error)
         }
     }
     
@@ -133,8 +210,8 @@ final class AccountViewModel: BaseViewModel {
             Setting(type: .privacyPolicy)
         ]
         
-        if case .signedIn = loginState {
-            settings.append(Setting(type: .signOut))
+        if account != nil {
+            settings.append(Setting(type: .deleteAccount))
         }
     }
     
@@ -154,15 +231,36 @@ final class AccountViewModel: BaseViewModel {
     }
     
     // MARK: - Private Methods
-    private func signIn(with credential: AuthCredential, completion: @escaping (() -> Void)) {
-        firebaseAuthService.signIn(with: credential) { [weak self] authResult, error in
-            if let error {
-                self?.setError(error)
-            } else {
-                self?.loginState = .signedIn(authResult?.user.displayName)
+    @MainActor
+    private func signIn(with credential: AuthCredential) async {
+        do {
+            guard let result = try await firebaseAuthService.signIn(with: credential) else {
+                let error: AuthError = .unknownError
+                setError(error)
+                return
             }
-            completion()
+            
+            guard let authToken = try? await result.user.getIDToken() else {
+                let error: AuthError = .failedToFetchFirebaseToken
+                setError(error)
+                return
+            }
+            
+            await fetchAccount(authToken: authToken)
+        } catch {
+            let error: AuthError = .failedToSignIn
+            setError(error)
         }
+    }
+    
+    @MainActor
+    private func fetchAuthToken() async -> String? {
+        guard let token = try? await firebaseAuthService.getIDToken() else {
+            let error: AuthError = .failedToFetchFirebaseToken
+            setError(error)
+            return nil
+        }
+        return token
     }
     
     private func getSavedSetting(of type: Setting.SettingType) -> Int {
@@ -186,7 +284,7 @@ extension Setting {
         case language
         case currency
         case privacyPolicy
-        case signOut
+        case deleteAccount
         
         var title: String {
             switch self {
@@ -198,8 +296,8 @@ extension Setting {
                 return "Currency"
             case .privacyPolicy:
                 return "Privacy Policy"
-            case .signOut:
-                return "Sign Out"
+            case .deleteAccount:
+                return "Delete Account"
             }
         }
         
@@ -213,8 +311,8 @@ extension Setting {
                 return "dollarsign.circle"
             case .privacyPolicy:
                 return "doc.text"
-            case .signOut:
-                return "rectangle.portrait.and.arrow.right"
+            case .deleteAccount:
+                return "person.slash.fill"
             }
         }
         

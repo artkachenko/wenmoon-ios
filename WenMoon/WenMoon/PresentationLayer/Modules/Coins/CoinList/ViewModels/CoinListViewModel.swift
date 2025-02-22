@@ -34,16 +34,14 @@ final class CoinListViewModel: BaseViewModel {
     init(
         coinScannerService: CoinScannerService,
         priceAlertService: PriceAlertService,
-        firebaseAuthService: FirebaseAuthService? = nil,
-        appLaunchManager: AppLaunchManager? = nil,
+        appLaunchProvider: AppLaunchProvider? = nil,
         userDefaultsManager: UserDefaultsManager? = nil,
         swiftDataManager: SwiftDataManager? = nil
     ) {
         self.coinScannerService = coinScannerService
         self.priceAlertService = priceAlertService
         super.init(
-            firebaseAuthService: firebaseAuthService,
-            appLaunchManager: appLaunchManager,
+            appLaunchProvider: appLaunchProvider,
             userDefaultsManager: userDefaultsManager,
             swiftDataManager: swiftDataManager
         )
@@ -84,7 +82,6 @@ final class CoinListViewModel: BaseViewModel {
         }
         
         await fetchMarketData()
-        await fetchPriceAlerts()
     }
     
     /// Fetch latest market data for the coins.
@@ -111,9 +108,8 @@ final class CoinListViewModel: BaseViewModel {
     
     /// Fetch price alerts for the coins.
     @MainActor
-    func fetchPriceAlerts() async {
-        guard let userID, let deviceToken, !coins.isEmpty else {
-            // If critical user info is missing, clear all price alerts.
+    func fetchPriceAlerts(for account: Account?) async {
+        guard let account, let deviceToken, !coins.isEmpty else {
             coins = coins.map { coin in
                 let updatedCoin = coin
                 updatedCoin.priceAlerts = []
@@ -123,7 +119,7 @@ final class CoinListViewModel: BaseViewModel {
         }
         
         do {
-            let priceAlerts = try await priceAlertService.getPriceAlerts(userID: userID, deviceToken: deviceToken)
+            let priceAlerts = try await priceAlertService.getPriceAlerts(username: account.username, deviceToken: deviceToken)
             for (index, coin) in coins.enumerated() {
                 let matchingPriceAlerts = priceAlerts.filter { $0.id.contains(coin.id) }
                 coins[index].priceAlerts = matchingPriceAlerts

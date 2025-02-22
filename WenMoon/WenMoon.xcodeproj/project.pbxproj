@@ -31,8 +31,14 @@
 		198655122D32E4A700216097 /* PortfolioViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 198655112D32E4A700216097 /* PortfolioViewModelTests.swift */; };
 		19A28BA92D6662E400753251 /* FearAndGreedIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19A28BA82D6662E400753251 /* FearAndGreedIndex.swift */; };
 		19AF13032D53C37B00FDCD90 /* CoinDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19AF13022D53C37B00FDCD90 /* CoinDetails.swift */; };
-		19F254E92D67D373001867CC /* AppLaunchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F254E82D67D373001867CC /* AppLaunchManager.swift */; };
-		19F254EB2D68938D001867CC /* AppLaunchManagerMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F254EA2D68938D001867CC /* AppLaunchManagerMock.swift */; };
+		19F254E92D67D373001867CC /* AppLaunchProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F254E82D67D373001867CC /* AppLaunchProvider.swift */; };
+		19F254EB2D68938D001867CC /* AppLaunchProviderMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F254EA2D68938D001867CC /* AppLaunchProviderMock.swift */; };
+		19F254ED2D68E7FF001867CC /* AccountService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F254EC2D68E7FF001867CC /* AccountService.swift */; };
+		19F254EF2D69074C001867CC /* AuthError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F254EE2D69074C001867CC /* AuthError.swift */; };
+		19F254F52D69EFF5001867CC /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F254F42D69EFF5001867CC /* Account.swift */; };
+		19F254F92D69F783001867CC /* AccountServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F254F82D69F783001867CC /* AccountServiceMock.swift */; };
+		19F254FC2D6A28BF001867CC /* AccountFactoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F254FB2D6A28BF001867CC /* AccountFactoryMock.swift */; };
+		19F255032D6A2B79001867CC /* AccountServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F255022D6A2B79001867CC /* AccountServiceTests.swift */; };
 		D21A57BE2CCA65AB00AC2D13 /* MarketData+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21A57BD2CCA65AB00AC2D13 /* MarketData+Assertions.swift */; };
 		D21A57C12CCAA8BC00AC2D13 /* ErrorFactoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21A57C02CCAA8BC00AC2D13 /* ErrorFactoryMock.swift */; };
 		D21A57C32CCAAB9400AC2D13 /* Error+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21A57C22CCAAB9400AC2D13 /* Error+Assertions.swift */; };
@@ -162,8 +168,14 @@
 		198655112D32E4A700216097 /* PortfolioViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioViewModelTests.swift; sourceTree = "<group>"; };
 		19A28BA82D6662E400753251 /* FearAndGreedIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FearAndGreedIndex.swift; sourceTree = "<group>"; };
 		19AF13022D53C37B00FDCD90 /* CoinDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinDetails.swift; sourceTree = "<group>"; };
-		19F254E82D67D373001867CC /* AppLaunchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchManager.swift; sourceTree = "<group>"; };
-		19F254EA2D68938D001867CC /* AppLaunchManagerMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchManagerMock.swift; sourceTree = "<group>"; };
+		19F254E82D67D373001867CC /* AppLaunchProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchProvider.swift; sourceTree = "<group>"; };
+		19F254EA2D68938D001867CC /* AppLaunchProviderMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchProviderMock.swift; sourceTree = "<group>"; };
+		19F254EC2D68E7FF001867CC /* AccountService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountService.swift; sourceTree = "<group>"; };
+		19F254EE2D69074C001867CC /* AuthError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthError.swift; sourceTree = "<group>"; };
+		19F254F42D69EFF5001867CC /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
+		19F254F82D69F783001867CC /* AccountServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountServiceMock.swift; sourceTree = "<group>"; };
+		19F254FB2D6A28BF001867CC /* AccountFactoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountFactoryMock.swift; sourceTree = "<group>"; };
+		19F255022D6A2B79001867CC /* AccountServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountServiceTests.swift; sourceTree = "<group>"; };
 		D21A57BD2CCA65AB00AC2D13 /* MarketData+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MarketData+Assertions.swift"; sourceTree = "<group>"; };
 		D21A57C02CCAA8BC00AC2D13 /* ErrorFactoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorFactoryMock.swift; sourceTree = "<group>"; };
 		D21A57C22CCAAB9400AC2D13 /* Error+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Error+Assertions.swift"; sourceTree = "<group>"; };
@@ -410,13 +422,94 @@
 			path = Account;
 			sourceTree = "<group>";
 		};
-		19F254E72D67D366001867CC /* Helpers */ = {
+		19F254F02D6907A2001867CC /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				FA07AC2E29F93282008F6484 /* Extensions */,
-				19F254E82D67D373001867CC /* AppLaunchManager.swift */,
+				19F254FD2D6A29D8001867CC /* Errors */,
+				19F254F42D69EFF5001867CC /* Account.swift */,
 			);
-			path = Helpers;
+			path = Models;
+			sourceTree = "<group>";
+		};
+		19F254F32D69EBBB001867CC /* Account */ = {
+			isa = PBXGroup;
+			children = (
+				19F254EC2D68E7FF001867CC /* AccountService.swift */,
+			);
+			path = Account;
+			sourceTree = "<group>";
+		};
+		19F254FA2D6A28B0001867CC /* Account */ = {
+			isa = PBXGroup;
+			children = (
+				19F254FB2D6A28BF001867CC /* AccountFactoryMock.swift */,
+			);
+			path = Account;
+			sourceTree = "<group>";
+		};
+		19F254FD2D6A29D8001867CC /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				19F254EE2D69074C001867CC /* AuthError.swift */,
+			);
+			path = Errors;
+			sourceTree = "<group>";
+		};
+		19F254FE2D6A2A06001867CC /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				D22D339F2CB9342A007997DD /* SwiftDataError.swift */,
+			);
+			path = Errors;
+			sourceTree = "<group>";
+		};
+		19F254FF2D6A2A12001867CC /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				19F255002D6A2A1A001867CC /* Errors */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		19F255002D6A2A1A001867CC /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				FA8A08912A1CFD130083B8DB /* UserDefaultsError.swift */,
+			);
+			path = Errors;
+			sourceTree = "<group>";
+		};
+		19F255012D6A2A5E001867CC /* Errors */ = {
+			isa = PBXGroup;
+			children = (
+				D22D33A22CB958A5007997DD /* DescriptiveError.swift */,
+				FAB3623729F4514B00A88050 /* APIError.swift */,
+			);
+			path = Errors;
+			sourceTree = "<group>";
+		};
+		19F255042D6A2BAD001867CC /* AccountService */ = {
+			isa = PBXGroup;
+			children = (
+				19F255022D6A2B79001867CC /* AccountServiceTests.swift */,
+			);
+			path = AccountService;
+			sourceTree = "<group>";
+		};
+		19F255052D6A2BBA001867CC /* CoinScannerService */ = {
+			isa = PBXGroup;
+			children = (
+				FAB3625229F4549800A88050 /* CoinScannerServiceTests.swift */,
+			);
+			path = CoinScannerService;
+			sourceTree = "<group>";
+		};
+		19F255062D6A2BCA001867CC /* PriceAlertService */ = {
+			isa = PBXGroup;
+			children = (
+				D2F6DD632CC650D4009EF857 /* PriceAlertServiceTests.swift */,
+			);
+			path = PriceAlertService;
 			sourceTree = "<group>";
 		};
 		D21A57BF2CCAA7FB00AC2D13 /* MarketData */ = {
@@ -493,6 +586,8 @@
 		D220D7562CF4DC06004C8EAB /* Authorization */ = {
 			isa = PBXGroup;
 			children = (
+				19F254F02D6907A2001867CC /* Models */,
+				19F254F32D69EBBB001867CC /* Account */,
 				D220D7572CF4DC0E004C8EAB /* Firebase */,
 				D220D7582CF4DC14004C8EAB /* Google */,
 				D220D7592CF4DC19004C8EAB /* Twitter */,
@@ -529,7 +624,6 @@
 			children = (
 				D22D33972CB9270C007997DD /* Models */,
 				D22D339C2CB92ABC007997DD /* SwiftDataManager.swift */,
-				D22D339F2CB9342A007997DD /* SwiftDataError.swift */,
 			);
 			path = SwiftData;
 			sourceTree = "<group>";
@@ -537,6 +631,7 @@
 		D22D33972CB9270C007997DD /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				19F254FE2D6A2A06001867CC /* Errors */,
 				1961B51D2D343F4A00D0CEBC /* Portfolio */,
 				D22D33982CB92721007997DD /* CoinData.swift */,
 			);
@@ -546,6 +641,7 @@
 		D275F5912CC972FE00EB4560 /* Persistence */ = {
 			isa = PBXGroup;
 			children = (
+				19F254E82D67D373001867CC /* AppLaunchProvider.swift */,
 				FA8A088E2A1CFCF20083B8DB /* UserDefaults */,
 				D22D33962CB92707007997DD /* SwiftData */,
 			);
@@ -611,6 +707,7 @@
 		D2D0F9EF2CC2E15100712717 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				19F254FA2D6A28B0001867CC /* Account */,
 				D2F6DD652CC65123009EF857 /* Coin */,
 				196CE76F2D552B5B0084712E /* CoinDetails */,
 				D2EFF9192CE23A82004AA5A5 /* ChartData */,
@@ -636,6 +733,7 @@
 				D2D7957C2CFDF91100950125 /* GoogleSignInServiceMock.swift */,
 				D2D7957E2CFDF91B00950125 /* TwitterSignInServiceMock.swift */,
 				D2D795762CFDC6AE00950125 /* FirebaseAuthServiceMock.swift */,
+				19F254F82D69F783001867CC /* AccountServiceMock.swift */,
 			);
 			path = Authorization;
 			sourceTree = "<group>";
@@ -788,6 +886,7 @@
 		D2F6DD6D2CC68EB2009EF857 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				D2D795752CFDC69100950125 /* Authorization */,
 				FAB3625E29F4595D00A88050 /* CoinScannerServiceMock.swift */,
 				D2F6DD6B2CC682C3009EF857 /* PriceAlertServiceMock.swift */,
 			);
@@ -797,7 +896,7 @@
 		D2F6DD6E2CC68EBA009EF857 /* Persistence */ = {
 			isa = PBXGroup;
 			children = (
-				19F254EA2D68938D001867CC /* AppLaunchManagerMock.swift */,
+				19F254EA2D68938D001867CC /* AppLaunchProviderMock.swift */,
 				FAA83CC72A3B6E37001DEE1E /* UserDefaultsManagerMock.swift */,
 				FACB39AD29FABBC800AA613E /* SwiftDataManagerMock.swift */,
 			);
@@ -832,8 +931,8 @@
 		FA8A088E2A1CFCF20083B8DB /* UserDefaults */ = {
 			isa = PBXGroup;
 			children = (
+				19F254FF2D6A2A12001867CC /* Models */,
 				FA8A088F2A1CFD040083B8DB /* UserDefaultsManager.swift */,
-				FA8A08912A1CFD130083B8DB /* UserDefaultsError.swift */,
 			);
 			path = UserDefaults;
 			sourceTree = "<group>";
@@ -885,7 +984,7 @@
 		FAB361F529F447DB00A88050 /* WenMoon */ = {
 			isa = PBXGroup;
 			children = (
-				19F254E72D67D366001867CC /* Helpers */,
+				FA07AC2E29F93282008F6484 /* Extensions */,
 				FAB3622629F447F400A88050 /* Application */,
 				FAB3622829F4482B00A88050 /* DataLayer */,
 				FAB3622B29F4485500A88050 /* PresentationLayer */,
@@ -928,7 +1027,6 @@
 		FAB3622829F4482B00A88050 /* DataLayer */ = {
 			isa = PBXGroup;
 			children = (
-				D22D33A22CB958A5007997DD /* DescriptiveError.swift */,
 				FAB3623229F4510D00A88050 /* Base */,
 				FAB3624129F453A400A88050 /* Services */,
 				D275F5912CC972FE00EB4560 /* Persistence */,
@@ -995,8 +1093,8 @@
 		FAB3623429F4512900A88050 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				19F255012D6A2A5E001867CC /* Errors */,
 				FAB3623529F4513B00A88050 /* HTTPRequest.swift */,
-				FAB3623729F4514B00A88050 /* APIError.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1044,8 +1142,9 @@
 		FAB3625129F4548300A88050 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				FAB3625229F4549800A88050 /* CoinScannerServiceTests.swift */,
-				D2F6DD632CC650D4009EF857 /* PriceAlertServiceTests.swift */,
+				19F255042D6A2BAD001867CC /* AccountService */,
+				19F255052D6A2BBA001867CC /* CoinScannerService */,
+				19F255062D6A2BCA001867CC /* PriceAlertService */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -1087,7 +1186,6 @@
 		FAB3625D29F4593A00A88050 /* Mocks */ = {
 			isa = PBXGroup;
 			children = (
-				D2D795752CFDC69100950125 /* Authorization */,
 				D2F6DD6D2CC68EB2009EF857 /* Services */,
 				D2F6DD6E2CC68EBA009EF857 /* Persistence */,
 			);
@@ -1267,7 +1365,8 @@
 				D22D33A02CB9342A007997DD /* SwiftDataError.swift in Sources */,
 				FAB3624729F453DD00A88050 /* CoinSearchResult.swift in Sources */,
 				194212A72D5BB250008DE753 /* LinksView.swift in Sources */,
-				19F254E92D67D373001867CC /* AppLaunchManager.swift in Sources */,
+				19F254EF2D69074C001867CC /* AuthError.swift in Sources */,
+				19F254E92D67D373001867CC /* AppLaunchProvider.swift in Sources */,
 				D226A50A2D1F3A83008FB901 /* AddTransactionViewModel.swift in Sources */,
 				FA8A088D2A1CFAF90083B8DB /* PriceAlert.swift in Sources */,
 				D220D71F2CEC8BD4004C8EAB /* ContentView.swift in Sources */,
@@ -1284,6 +1383,7 @@
 				FA07AC3029F93292008F6484 /* Double+Extensions.swift in Sources */,
 				194212A52D5A4930008DE753 /* String+Extensions.swift in Sources */,
 				1961B51F2D34407600D0CEBC /* PlaceholderView.swift in Sources */,
+				19F254F52D69EFF5001867CC /* Account.swift in Sources */,
 				D2D795742CFA292600950125 /* UnderlinedTextFieldStyle.swift in Sources */,
 				D2EFF90C2CDD111C004AA5A5 /* CoinDetailsViewModel.swift in Sources */,
 				D2EFF9162CDE4C88004AA5A5 /* Date+Extensions.swift in Sources */,
@@ -1291,6 +1391,7 @@
 				D26389762D1DE440003DDF84 /* Portfolio.swift in Sources */,
 				D2D7958C2D02071E00950125 /* PortfolioView.swift in Sources */,
 				D2ADB8F52CE5FCF2004DA208 /* Currency.swift in Sources */,
+				19F254ED2D68E7FF001867CC /* AccountService.swift in Sources */,
 				FAB3624A29F453FC00A88050 /* CoinScannerService.swift in Sources */,
 				FAB3623C29F4517800A88050 /* BaseBackendService.swift in Sources */,
 				D220D74B2CECFF16004C8EAB /* UIApplication+Extensions.swift in Sources */,
@@ -1321,11 +1422,13 @@
 				D21A57BE2CCA65AB00AC2D13 /* MarketData+Assertions.swift in Sources */,
 				FAB3625329F4549800A88050 /* CoinScannerServiceTests.swift in Sources */,
 				FAB3627529F469E700A88050 /* CoinListViewModelTests.swift in Sources */,
+				19F254FC2D6A28BF001867CC /* AccountFactoryMock.swift in Sources */,
 				D2F6DD6A2CC65216009EF857 /* PriceAlert+Assertions.swift in Sources */,
 				196CE7712D552B6B0084712E /* CoinDetailsFactoryMock.swift in Sources */,
-				19F254EB2D68938D001867CC /* AppLaunchManagerMock.swift in Sources */,
+				19F254EB2D68938D001867CC /* AppLaunchProviderMock.swift in Sources */,
 				1961B5262D37C1C600D0CEBC /* ContentViewModelTests.swift in Sources */,
 				D2EFF91D2CE23DD0004AA5A5 /* ChartData+Assertions.swift in Sources */,
+				19F254F92D69F783001867CC /* AccountServiceMock.swift in Sources */,
 				FAB3625F29F4595D00A88050 /* CoinScannerServiceMock.swift in Sources */,
 				D21A57C32CCAAB9400AC2D13 /* Error+Assertions.swift in Sources */,
 				D2D795772CFDC6AE00950125 /* FirebaseAuthServiceMock.swift in Sources */,
@@ -1341,6 +1444,7 @@
 				198655092D32DD6200216097 /* PortfolioFactoryMock.swift in Sources */,
 				D2F6DD642CC650D4009EF857 /* PriceAlertServiceTests.swift in Sources */,
 				194212BA2D5FBAE1008DE753 /* CoinMarketsViewModelTests.swift in Sources */,
+				19F255032D6A2B79001867CC /* AccountServiceTests.swift in Sources */,
 				D2D0F9EC2CC2DF3F00712717 /* CoinFactoryMock.swift in Sources */,
 				FAA83CC82A3B6E37001DEE1E /* UserDefaultsManagerMock.swift in Sources */,
 				D2D7957F2CFDF91B00950125 /* TwitterSignInServiceMock.swift in Sources */,

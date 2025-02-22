@@ -23,18 +23,17 @@ final class PriceAlertsViewModel: BaseViewModel {
     init(
         coin: CoinData,
         priceAlertService: PriceAlertService,
-        firebaseAuthService: FirebaseAuthService? = nil,
         userDefaultsManager: UserDefaultsManager? = nil
     ) {
         self.coin = coin
         self.priceAlertService = priceAlertService
-        super.init(firebaseAuthService: firebaseAuthService, userDefaultsManager: userDefaultsManager)
+        super.init(userDefaultsManager: userDefaultsManager)
     }
     
     // MARK: - Internal Methods
     @MainActor
-    func createPriceAlert(targetPrice: Double) async {
-        guard let userID, let deviceToken else {
+    func createPriceAlert(for account: Account?, targetPrice: Double) async {
+        guard let account, let deviceToken else {
             setErrorMessage("User ID, or device token is nil")
             return
         }
@@ -49,7 +48,11 @@ final class PriceAlertsViewModel: BaseViewModel {
                 targetPrice: targetPrice,
                 targetDirection: (coin.currentPrice ?? .zero) < targetPrice ? .above : .below
             )
-            let createdPriceAlert = try await priceAlertService.createPriceAlert(priceAlert, userID: userID, deviceToken: deviceToken)
+            let createdPriceAlert = try await priceAlertService.createPriceAlert(
+                priceAlert,
+                username: account.username,
+                deviceToken: deviceToken
+            )
             coin.priceAlerts.append(createdPriceAlert)
         } catch {
             setError(error)
@@ -59,9 +62,9 @@ final class PriceAlertsViewModel: BaseViewModel {
     }
     
     @MainActor
-    func deletePriceAlert(_ priceAlert: PriceAlert) async {
-        guard let userID, let deviceToken else {
-            setErrorMessage("User ID or device token is nil")
+    func deletePriceAlert(_ priceAlert: PriceAlert, for account: Account?) async {
+        guard let account, let deviceToken else {
+            setErrorMessage("User ID, or device token is nil")
             return
         }
         
@@ -73,7 +76,11 @@ final class PriceAlertsViewModel: BaseViewModel {
         }
         
         do {
-            let deletedPriceAlert = try await priceAlertService.deletePriceAlert(priceAlert, userID: userID, deviceToken: deviceToken)
+            let deletedPriceAlert = try await priceAlertService.deletePriceAlert(
+                priceAlert,
+                username: account.username,
+                deviceToken: deviceToken
+            )
             if let index = coin.priceAlerts.firstIndex(where: { $0.id == deletedPriceAlert.id }) {
                 coin.priceAlerts.remove(at: index)
             }
