@@ -14,15 +14,15 @@ class TwitterSignInServiceMock: TwitterSignInService {
     var signInResult: Result<FirebaseAuth.AuthCredential, Error>!
     
     // MARK: - TwitterSignInService
-    func signIn(completion: @escaping (FirebaseAuth.AuthCredential?, Error?) -> Void) {
+    func signIn() async throws -> AuthCredential? {
         switch signInResult {
-        case .success(let signInResult):
-            completion(signInResult, nil)
+        case .success(let result):
+            return result
         case .failure(let error):
-            completion(nil, error)
+            throw error
         case .none:
             XCTFail("signInResult not set")
-            completion(nil, NSError(domain: "TwitterSignInMock", code: -1, userInfo: [NSLocalizedDescriptionKey: "signInResult not set"]))
+            return nil
         }
     }
 }

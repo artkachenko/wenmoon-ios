@@ -20,15 +20,15 @@ class GoogleSignInServiceMock: GoogleSignInService {
         self.clientID = clientID
     }
     
-    func signIn(withPresenting viewController: UIViewController, completion: @escaping (GIDSignInResult?, Error?) -> Void) {
+    func signIn(withPresenting viewController: UIViewController) async throws -> GIDSignInResult? {
         switch signInResult {
-        case .success(let signInResult):
-            completion(signInResult, nil)
+        case .success(let result):
+            return result
         case .failure(let error):
-            completion(nil, error)
+            throw error
         case .none:
             XCTFail("signInResult not set")
-            completion(nil, NSError(domain: "GoogleSignInMock", code: -1, userInfo: [NSLocalizedDescriptionKey: "signInResult not set"]))
+            return nil
         }
     }
     

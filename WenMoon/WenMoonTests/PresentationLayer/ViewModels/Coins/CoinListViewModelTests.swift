@@ -14,8 +14,7 @@ class CoinListViewModelTests: XCTestCase {
 
     var coinScannerService: CoinScannerServiceMock!
     var priceAlertService: PriceAlertServiceMock!
-    var firebaseAuthService: FirebaseAuthServiceMock!
-    var appLaunchManager: AppLaunchManagerMock!
+    var appLaunchProvider: AppLaunchProviderMock!
     var userDefaultsManager: UserDefaultsManagerMock!
     var swiftDataManager: SwiftDataManagerMock!
 
@@ -26,16 +25,14 @@ class CoinListViewModelTests: XCTestCase {
         super.setUp()
         coinScannerService = CoinScannerServiceMock()
         priceAlertService = PriceAlertServiceMock()
-        firebaseAuthService = FirebaseAuthServiceMock()
-        appLaunchManager = AppLaunchManagerMock()
+        appLaunchProvider = AppLaunchProviderMock()
         userDefaultsManager = UserDefaultsManagerMock()
         swiftDataManager = SwiftDataManagerMock()
         
         viewModel = CoinListViewModel(
             coinScannerService: coinScannerService,
             priceAlertService: priceAlertService,
-            firebaseAuthService: firebaseAuthService,
-            appLaunchManager: appLaunchManager,
+            appLaunchProvider: appLaunchProvider,
             userDefaultsManager: userDefaultsManager,
             swiftDataManager: swiftDataManager
         )
@@ -47,6 +44,8 @@ class CoinListViewModelTests: XCTestCase {
         viewModel = nil
         coinScannerService = nil
         priceAlertService = nil
+        appLaunchProvider = nil
+        userDefaultsManager = nil
         swiftDataManager = nil
         deviceToken = nil
         super.tearDown()
@@ -70,7 +69,7 @@ class CoinListViewModelTests: XCTestCase {
     
     func testFetchCoins_success() async {
         // Setup
-        appLaunchManager.isFirstLaunch = false
+        appLaunchProvider.isFirstLaunch = false
         let coins = CoinFactoryMock.makeCoins()
         swiftDataManager.fetchResult = coins.map { CoinFactoryMock.makeCoinData(from: $0) }
         let marketData = MarketDataFactoryMock.makeMarketData(for: coins)
@@ -87,7 +86,7 @@ class CoinListViewModelTests: XCTestCase {
     
     func testFetchCoins_fetchError() async {
         // Setup
-        appLaunchManager.isFirstLaunch = false
+        appLaunchProvider.isFirstLaunch = false
         let error: SwiftDataError = .failedToFetchModels
         swiftDataManager.swiftDataError = error
         
@@ -101,7 +100,7 @@ class CoinListViewModelTests: XCTestCase {
     
     func testFetchCoins_emptyResult() async {
         // Setup
-        appLaunchManager.isFirstLaunch = false
+        appLaunchProvider.isFirstLaunch = false
         
         // Action
         await viewModel.fetchCoins()
@@ -115,7 +114,7 @@ class CoinListViewModelTests: XCTestCase {
         // Setup
         let coins = CoinFactoryMock.makeCoins().shuffled()
         let savedOrder = coins.map(\.id)
-        appLaunchManager.isFirstLaunch = false
+        appLaunchProvider.isFirstLaunch = false
         userDefaultsManager.getObjectReturnValue = [.coinsOrder: savedOrder]
         swiftDataManager.fetchResult = coins.map { CoinFactoryMock.makeCoinData(from: $0) }
         let marketData = MarketDataFactoryMock.makeMarketData(for: coins)
@@ -276,13 +275,15 @@ class CoinListViewModelTests: XCTestCase {
     func testFetchPriceAlerts_success() async {
         // Setup
         userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
+        
         let coin = CoinFactoryMock.makeCoinData()
         viewModel.coins.append(coin)
+        
         let priceAlerts = PriceAlertFactoryMock.makePriceAlerts()
         priceAlertService.getPriceAlertsResult = .success(priceAlerts)
         
         // Action
-        await viewModel.fetchPriceAlerts()
+        await viewModel.fetchPriceAlerts(for: AccountFactoryMock.makeAccount())
         
         // Assertions
         let priceAlert = priceAlerts.first(where: { $0.id == coin.id })!
@@ -291,7 +292,7 @@ class CoinListViewModelTests: XCTestCase {
         
         // Test after alerts are cleared
         priceAlertService.getPriceAlertsResult = .success([])
-        await viewModel.fetchPriceAlerts()
+        await viewModel.fetchPriceAlerts(for: AccountFactoryMock.makeAccount())
         
         assertCoinHasNoAlert(viewModel.coins.first!)
         XCTAssertNil(viewModel.errorMessage)
@@ -300,13 +301,15 @@ class CoinListViewModelTests: XCTestCase {
     func testFetchPriceAlerts_invalidEndpoint() async {
         // Setup
         userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
+        
         let coin = CoinFactoryMock.makeCoinData()
         viewModel.coins.append(coin)
+        
         let error = ErrorFactoryMock.makeInvalidEndpointError()
         priceAlertService.getPriceAlertsResult = .failure(error)
         
         // Action
-        await viewModel.fetchPriceAlerts()
+        await viewModel.fetchPriceAlerts(for: AccountFactoryMock.makeAccount())
         
         // Assertions
         XCTAssertNotNil(viewModel.errorMessage)

@@ -7,32 +7,32 @@
 
 import Foundation
 
-// MARK: - AppLaunchManager
-protocol AppLaunchManager {
+// MARK: - AppLaunchProvider
+protocol AppLaunchProvider {
     var isFirstLaunch: Bool { get }
     func reset()
 }
 
-// MARK: - AppLaunchManagerImpl
-final class AppLaunchManagerImpl: AppLaunchManager {
-    private let manager: AppLaunchManager
+// MARK: - DefaultAppLaunchManager
+final class DefaultAppLaunchManager: AppLaunchProvider {
+    private let provider: AppLaunchProvider
     
     var isFirstLaunch: Bool {
-        manager.isFirstLaunch
+        provider.isFirstLaunch
     }
     
-    init(manager: AppLaunchManager = AppLaunchManagerSingleton.shared) {
-        self.manager = manager
+    init(provider: AppLaunchProvider = AppLaunchStore.shared) {
+        self.provider = provider
     }
     
     func reset() {
-        manager.reset()
+        provider.reset()
     }
 }
 
-// MARK: - AppLaunchManagerSingleton
-final class AppLaunchManagerSingleton: AppLaunchManager {
-    static let shared = AppLaunchManagerSingleton()
+// MARK: - AppLaunchStore (Singleton)
+final class AppLaunchStore: AppLaunchProvider {
+    static let shared = AppLaunchStore()
     
     private let userDefaultsManager: UserDefaultsManager
     private(set) var isFirstLaunch: Bool

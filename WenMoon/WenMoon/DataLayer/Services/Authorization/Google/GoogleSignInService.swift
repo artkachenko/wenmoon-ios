@@ -10,7 +10,7 @@ import GoogleSignIn
 
 protocol GoogleSignInService {
     func configure(clientID: String)
-    func signIn(withPresenting viewController: UIViewController, completion: @escaping (GIDSignInResult?, Error?) -> Void)
+    func signIn(withPresenting viewController: UIViewController) async throws -> GIDSignInResult?
     func credential(withIDToken idToken: String, accessToken: String) -> AuthCredential
 }
 
@@ -21,8 +21,19 @@ final class GoogleSignInServiceImpl: GoogleSignInService {
         GIDSignIn.sharedInstance.configuration = config
     }
     
-    func signIn(withPresenting viewController: UIViewController, completion: @escaping (GIDSignInResult?, Error?) -> Void) {
-        GIDSignIn.sharedInstance.signIn(withPresenting: viewController, completion: completion)
+    @MainActor
+    func signIn(withPresenting viewController: UIViewController) async throws -> GIDSignInResult? {
+        try await withCheckedThrowingContinuation { continuation in
+            GIDSignIn.sharedInstance.signIn(withPresenting: viewController) { result, error in
+                guard (error == nil) else {
+                    continuation.resume(throwing: error!)
+                    return
+                }
+                
+                let result = (result == nil) ? nil : result
+                continuation.resume(returning: result)
+            }
+        }
     }
     
     func credential(withIDToken idToken: String, accessToken: String) -> AuthCredential {

@@ -10,23 +10,26 @@ import SwiftUI
 struct PriceAlertsView: View {
     // MARK: - Properties
     @Environment(\.dismiss) var dismiss
-
-    @StateObject private var viewModel: PriceAlertsViewModel
+    
+    @EnvironmentObject private var accountViewModel: AccountViewModel
+    @StateObject private var priceAlertsViewModel: PriceAlertsViewModel
 
     @FocusState private var isTextFieldFocused: Bool
 
     @State private var targetPrice: Double?
+    
+    private var coin: CoinData { priceAlertsViewModel.coin }
 
     // MARK: - Initializers
     init(coin: CoinData) {
-        _viewModel = StateObject(wrappedValue: PriceAlertsViewModel(coin: coin))
+        _priceAlertsViewModel = StateObject(wrappedValue: PriceAlertsViewModel(coin: coin))
     }
     
     // MARK: - Body
     var body: some View {
-        BaseView(errorMessage: $viewModel.errorMessage) {
+        BaseView(errorMessage: $priceAlertsViewModel.errorMessage) {
             VStack(spacing: .zero) {
-                let priceAlerts = viewModel.coin.priceAlerts
+                let priceAlerts = coin.priceAlerts
                 
                 ZStack {
                     Text("Price Alerts")
@@ -51,7 +54,7 @@ struct PriceAlertsView: View {
                 VStack(spacing: .zero) {
                     HStack(spacing: .zero) {
                         if let targetPrice {
-                            let targetDirection = viewModel.getTargetDirection(for: targetPrice)
+                            let targetDirection = priceAlertsViewModel.getTargetDirection(for: targetPrice)
                             Image(targetDirection.iconName)
                                 .resizable()
                                 .scaledToFit()
@@ -73,14 +76,14 @@ struct PriceAlertsView: View {
                     .padding(.bottom, 32)
                     
                     ZStack {
-                        if viewModel.isCreatingPriceAlert {
+                        if priceAlertsViewModel.isCreatingPriceAlert {
                             ProgressView()
                         } else {
-                            let isCreateButtonDisabled = viewModel.shouldDisableCreateButton(targetPrice: targetPrice)
+                            let isCreateButtonDisabled = priceAlertsViewModel.shouldDisableCreateButton(targetPrice: targetPrice)
                             Button(action: {
                                 if let targetPrice {
                                     Task {
-                                        await viewModel.createPriceAlert(targetPrice: targetPrice)
+                                        await priceAlertsViewModel.createPriceAlert(for: accountViewModel.account, targetPrice: targetPrice)
                                     }
                                 }
                             }) {
@@ -126,7 +129,7 @@ struct PriceAlertsView: View {
             }
         )
         .onAppear {
-            targetPrice = viewModel.coin.currentPrice
+            targetPrice = coin.currentPrice
         }
     }
     
@@ -138,7 +141,7 @@ struct PriceAlertsView: View {
                     .font(.body)
                 
                 HStack(spacing: 8) {
-                    let targetDirection = viewModel.getTargetDirection(for: priceAlert.targetPrice)
+                    let targetDirection = priceAlertsViewModel.getTargetDirection(for: priceAlert.targetPrice)
                     Image(targetDirection.iconName)
                         .resizable()
                         .scaledToFit()
@@ -153,12 +156,12 @@ struct PriceAlertsView: View {
             
             Spacer()
             
-            if viewModel.deletingPriceAlertIDs.contains(priceAlert.id) {
+            if priceAlertsViewModel.deletingPriceAlertIDs.contains(priceAlert.id) {
                 ProgressView()
             } else {
                 Button(action: {
                     Task {
-                        await viewModel.deletePriceAlert(priceAlert)
+                        await priceAlertsViewModel.deletePriceAlert(priceAlert, for: accountViewModel.account)
                     }
                 }) {
                     Image("trash")

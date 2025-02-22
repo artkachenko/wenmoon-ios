@@ -13,83 +13,130 @@ class AccountViewModelTests: XCTestCase {
     // MARK: - Properties
     var viewModel: AccountViewModel!
     
+    var firebaseAuthService: FirebaseAuthServiceMock!
     var googleSignInService: GoogleSignInServiceMock!
     var twitterSignInService: TwitterSignInServiceMock!
-    var firebaseAuthService: FirebaseAuthServiceMock!
+    var authStateManager: AuthStateManagerMock!
+    var appLaunchProvider: AppLaunchProviderMock!
     var userDefaultsManager: UserDefaultsManagerMock!
     
     // MARK: - Setup
     override func setUp() {
         super.setUp()
+        firebaseAuthService = FirebaseAuthServiceMock()
         googleSignInService = GoogleSignInServiceMock()
         twitterSignInService = TwitterSignInServiceMock()
-        firebaseAuthService = FirebaseAuthServiceMock()
+        authStateManager = AuthStateManagerMock()
+        appLaunchProvider = AppLaunchProviderMock()
         userDefaultsManager = UserDefaultsManagerMock()
         
         viewModel = AccountViewModel(
+            firebaseAuthService: firebaseAuthService,
             googleSignInService: googleSignInService,
             twitterSignInService: twitterSignInService,
-            firebaseAuthService: firebaseAuthService,
+            authStateManager: authStateManager,
+            appLaunchProvider: appLaunchProvider,
             userDefaultsManager: userDefaultsManager
         )
     }
     
     override func tearDown() {
         viewModel = nil
+        firebaseAuthService = nil
         googleSignInService = nil
         twitterSignInService = nil
-        firebaseAuthService = nil
+        authStateManager = nil
+        appLaunchProvider = nil
         userDefaultsManager = nil
         super.tearDown()
     }
     
     // MARK: - Tests
+    func testFetchAccount_success() async {
+        // Setup
+        let account = AccountFactoryMock.makeAccount()
+        authStateManager.fetchAccountResult = .success(account)
+        
+        // Action
+        await viewModel.fetchAccount()
+        
+        // Assertions
+        XCTAssertTrue(viewModel.isAuthenticated)
+        XCTAssertEqual(viewModel.account, account)
+    }
+    
+    func testFetchAccount_failure() async {
+        // Setup
+        let error: AuthError = .failedToFetchFirebaseToken
+        authStateManager.fetchAccountResult = .failure(error)
+        
+        // Action
+        await viewModel.fetchAccount()
+        
+        // Assertions
+        XCTAssertFalse(viewModel.isAuthenticated)
+        XCTAssertNil(viewModel.account)
+        XCTAssertNotNil(viewModel.errorMessage)
+        XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
+    }
+    
+    func testSignOutUserIfNeeded_isFirstLaunch() {
+        // Setup
+        authStateManager.authState = .authenticated(AccountFactoryMock.makeAccount())
+        authStateManager.signOutResult = .success(())
+        
+        // Action
+        viewModel.signOutUserIfNeeded()
+        
+        // Assertions
+        XCTAssertFalse(viewModel.isAuthenticated)
+        XCTAssertNil(viewModel.account)
+    }
+    
+    func testSignOutUserIfNeeded_isNotFirstLaunch() {
+        // Setup
+        let account = AccountFactoryMock.makeAccount()
+        authStateManager.authState = .authenticated(account)
+        appLaunchProvider.isFirstLaunch = false
+        
+        // Action
+        viewModel.signOutUserIfNeeded()
+        
+        // Assertions
+        XCTAssertTrue(viewModel.isAuthenticated)
+        XCTAssertEqual(viewModel.account, account)
+    }
+    
     func testSignOut_success() {
         // Setup
-        firebaseAuthService.signOutResult = .success(())
-        viewModel.loginState = .signedIn()
+        authStateManager.authState = .authenticated(AccountFactoryMock.makeAccount())
+        authStateManager.signOutResult = .success(())
         
         // Action
         viewModel.signOut()
         
         // Assertions
-        XCTAssertTrue(viewModel.loginState == .signedOut)
+        XCTAssertFalse(viewModel.isAuthenticated)
+        XCTAssertNil(viewModel.account)
+        XCTAssertNil(viewModel.errorMessage)
     }
 
     func testSignOut_failure() {
         // Setup
-        let expectedUserID = "expectedUserID"
-        viewModel.loginState = .signedIn(expectedUserID)
-        let error = NSError(domain: "TestErrorDomain", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to sign out"])
-        firebaseAuthService.signOutResult = .failure(error)
+        let account = AccountFactoryMock.makeAccount()
+        authStateManager.authState = .authenticated(account)
+        
+        let error: AuthError = .failedToSignOut
+        authStateManager.signOutResult = .failure(error)
         
         // Action
         viewModel.signOut()
         
         // Assertions
-        switch viewModel.loginState {
-        case .signedIn(let userID):
-            XCTAssertEqual(userID, expectedUserID)
-        case .signedOut:
-            XCTFail("User should not be signed out on sign out failure")
-        }
-        
+        XCTAssertTrue(viewModel.isAuthenticated)
+        XCTAssertEqual(viewModel.account, account)
         XCTAssertNotNil(viewModel.errorMessage)
-        XCTAssertEqual(viewModel.errorMessage, "An unknown error occurred: \(error.localizedDescription)")
-    }
-
-    func testFetchAuthStateWhenUserIsSignedIn() {
-        // Action
-        let expectedUserID = "expectedUserID"
-        viewModel.fetchAuthState()
-        
-        // Assertions
-        switch viewModel.loginState {
-        case .signedIn(let userID):
-            XCTAssertEqual(userID, expectedUserID)
-        case .signedOut:
-            XCTFail("User should be signed in after fetchAuthState")
-        }
+        XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
     func testFetchSettings() {

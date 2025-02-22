@@ -11,22 +11,23 @@ import FirebaseAuth
 
 class FirebaseAuthServiceMock: FirebaseAuthService {
     // MARK: - Properties
-    var clientID: String? { "expectedClientID" }
-    var userID: String? { "expectedUserID" }
+    var clientID: String? { "test-client-id" }
+    var userID: String? { "test-user-id" }
     
     var signInResult: Result<AuthDataResult, Error>!
     var signOutResult: Result<Void, Error>!
+    var idTokenResult: Result<String, Error>!
     
     // MARK: - FirebaseAuthService
-    func signIn(with credential: AuthCredential, completion: @escaping (AuthDataResult?, Error?) -> Void) {
+    func signIn(with credential: AuthCredential) async throws -> AuthDataResult? {
         switch signInResult {
-        case .success(let authDataResult):
-            completion(authDataResult, nil)
+        case .success(let result):
+            return result
         case .failure(let error):
-            completion(nil, error)
+            throw error
         case .none:
             XCTFail("signInResult not set")
-            completion(nil, NSError(domain: "FirebaseAuthMock", code: -1, userInfo: [NSLocalizedDescriptionKey: "signInResult not set"]))
+            return nil
         }
     }
     
@@ -38,7 +39,18 @@ class FirebaseAuthServiceMock: FirebaseAuthService {
             throw error
         case .none:
             XCTFail("signOutResult not set")
-            throw NSError(domain: "FirebaseAuthMock", code: -2, userInfo: [NSLocalizedDescriptionKey: "signOutResult not set"])
+        }
+    }
+    
+    func getIDToken() async throws -> String? {
+        switch idTokenResult {
+        case .success(let result):
+            return result
+        case .failure(let error):
+            throw error
+        case .none:
+            XCTFail("idTokenResult not set")
+            return nil
         }
     }
 }

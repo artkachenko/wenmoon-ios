@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AccountView: View {
     // MARK: - Properties
-    @StateObject private var viewModel = AccountViewModel()
+    @EnvironmentObject private var viewModel: AccountViewModel
     
     @State private var selectedSetting: Setting!
     @State private var showSignOutConfirmation = false
@@ -65,11 +65,10 @@ struct AccountView: View {
                 secondaryButton: .cancel(Text("Stay Logged In"))
             )
         }
-        .onChange(of: viewModel.loginState) {
+        .onChange(of: viewModel.isAuthenticated) {
             viewModel.fetchSettings()
         }
         .onAppear {
-            viewModel.fetchAuthState()
             viewModel.fetchSettings()
         }
     }
@@ -84,8 +83,8 @@ struct AccountView: View {
                 .scaledToFit()
                 .frame(width: 48, height: 48)
             
-            if case .signedIn(let userID) = viewModel.loginState {
-                Text(userID ?? "User")
+            if let account = viewModel.account {
+                Text(account.username)
                     .font(.headline)
             } else {
                 Text("Sign into your account")
@@ -99,7 +98,9 @@ struct AccountView: View {
                 
                 HStack(spacing: 16) {
                     Button(action: {
-                        viewModel.signInWithGoogle()
+                        Task {
+                            await viewModel.signInWithGoogle()
+                        }
                     }) {
                         ZStack {
                             if viewModel.isGoogleAuthInProgress {
@@ -116,7 +117,9 @@ struct AccountView: View {
                         .cornerRadius(12)
                     }
                     Button(action: {
-                        viewModel.signInWithTwitter()
+                        Task {
+                            await viewModel.signInWithTwitter()
+                        }
                     }) {
                         ZStack {
                             if viewModel.isTwitterAuthInProgress {

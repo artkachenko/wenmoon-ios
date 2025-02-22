@@ -12,7 +12,7 @@ class PriceAlertServiceTests: XCTestCase {
     // MARK: - Properties
     var service: PriceAlertService!
     var httpClient: HTTPClientMock!
-    var userID: String!
+    var username: String!
     var deviceToken: String!
     
     // MARK: - Setup
@@ -20,14 +20,14 @@ class PriceAlertServiceTests: XCTestCase {
         super.setUp()
         httpClient = HTTPClientMock()
         service = PriceAlertServiceImpl(httpClient: httpClient)
-        userID = "expectedUserID"
-        deviceToken = "expectedDeviceToken"
+        username = "test-username"
+        deviceToken = "test-device-token"
     }
     
     override func tearDown() {
         service = nil
         httpClient = nil
-        userID = nil
+        username = nil
         deviceToken = nil
         super.tearDown()
     }
@@ -40,7 +40,7 @@ class PriceAlertServiceTests: XCTestCase {
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
         
         // Action
-        let priceAlerts = try await service.getPriceAlerts(userID: userID, deviceToken: deviceToken)
+        let priceAlerts = try await service.getPriceAlerts(username: username, deviceToken: deviceToken)
         
         // Assertions
         assertPriceAlertsEqual(priceAlerts, response)
@@ -52,7 +52,7 @@ class PriceAlertServiceTests: XCTestCase {
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
         
         // Action
-        let priceAlerts = try await service.getPriceAlerts(userID: userID, deviceToken: deviceToken)
+        let priceAlerts = try await service.getPriceAlerts(username: username, deviceToken: deviceToken)
         
         // Assertions
         XCTAssertTrue(priceAlerts.isEmpty)
@@ -66,7 +66,7 @@ class PriceAlertServiceTests: XCTestCase {
         // Action & Assertions
         await assertFailure(
             for: { [weak self] in
-                try await self!.service.getPriceAlerts(userID: self!.userID, deviceToken: self!.deviceToken)
+                try await self!.service.getPriceAlerts(username: self!.username, deviceToken: self!.deviceToken)
             },
             expectedError: error
         )
@@ -79,7 +79,11 @@ class PriceAlertServiceTests: XCTestCase {
         httpClient.postResponse = .success(try! httpClient.encoder.encode(response))
         
         // Action
-        let priceAlert = try await service.createPriceAlert(PriceAlertFactoryMock.makePriceAlert(), userID: userID, deviceToken: deviceToken)
+        let priceAlert = try await service.createPriceAlert(
+            PriceAlertFactoryMock.makePriceAlert(),
+            username: username,
+            deviceToken: deviceToken
+        )
         
         // Assertions
         assertPriceAlertsEqual([priceAlert], [response])
@@ -93,7 +97,11 @@ class PriceAlertServiceTests: XCTestCase {
         // Action & Assertions
         await assertFailure(
             for: { [weak self] in
-                try await self!.service.createPriceAlert(PriceAlertFactoryMock.makePriceAlert(), userID: self!.userID, deviceToken: self!.deviceToken)
+                try await self!.service.createPriceAlert(
+                    PriceAlertFactoryMock.makePriceAlert(),
+                    username: self!.username,
+                    deviceToken: self!.deviceToken
+                )
             },
             expectedError: error
         )
@@ -106,7 +114,11 @@ class PriceAlertServiceTests: XCTestCase {
         httpClient.deleteResponse = .success(try! httpClient.encoder.encode(response))
         
         // Action
-        let priceAlert = try await service.deletePriceAlert(PriceAlertFactoryMock.makePriceAlert(), userID: userID, deviceToken: deviceToken)
+        let priceAlert = try await service.deletePriceAlert(
+            PriceAlertFactoryMock.makePriceAlert(),
+            username: username,
+            deviceToken: deviceToken
+        )
         
         // Assertions
         assertPriceAlertsEqual([priceAlert], [response])
@@ -120,7 +132,11 @@ class PriceAlertServiceTests: XCTestCase {
         // Action & Assertions
         await assertFailure(
             for: { [weak self] in
-                try await self!.service.deletePriceAlert(PriceAlertFactoryMock.makePriceAlert(), userID: self!.userID, deviceToken: self!.deviceToken)
+                try await self!.service.deletePriceAlert(
+                    PriceAlertFactoryMock.makePriceAlert(),
+                    username: self!.username,
+                    deviceToken: self!.deviceToken
+                )
             },
             expectedError: error
         )
