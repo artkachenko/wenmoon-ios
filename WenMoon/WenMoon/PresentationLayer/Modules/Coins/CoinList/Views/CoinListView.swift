@@ -19,12 +19,13 @@ struct CoinListView: View {
     @State private var showAuthAlert = false
     @State private var viewDidLoad = false
     
+    private var coins: [CoinData] { coinListViewModel.coins }
+    
     // MARK: - Body
     var body: some View {
         BaseView(errorMessage: $coinListViewModel.errorMessage) {
             NavigationStack {
                 VStack {
-                    let coins = coinListViewModel.coins
                     if coins.isEmpty {
                         Spacer()
                         PlaceholderView(text: "No coins added yet")
@@ -64,6 +65,7 @@ struct CoinListView: View {
                         }
                     }
                 }
+                .animation(.easeInOut, value: coins)
                 .navigationTitle("Coins")
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
@@ -131,11 +133,11 @@ struct CoinListView: View {
                     )
                     
                     if !coin.priceAlerts.isEmpty {
-                        Image(systemName: "bell.fill")
+                        Image("bell.fill")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 16, height: 16)
-                            .foregroundColor(.lightGray)
+                            .foregroundColor(.softGray)
                             .padding(4)
                             .background(Color(.systemBackground))
                             .clipShape(Circle())
@@ -166,7 +168,7 @@ struct CoinListView: View {
                     Text(coin.priceChangePercentage24H.formattedAsPercentage())
                         .font(.caption2).bold()
                 }
-                .foregroundColor(isPriceChangeNegative ? .wmRed : .wmGreen)
+                .foregroundColor(isPriceChangeNegative ? .neonPink : .neonGreen)
             }
             
             Text(coin.currentPrice.formattedAsCurrency())
@@ -177,17 +179,25 @@ struct CoinListView: View {
         .onTapGesture {
             selectedCoin = coin
         }
-        .swipeActions {
+        .swipeActions(edge: .trailing) {
             Button(role: .destructive) {
                 Task {
                     try await Task.sleep(for: .milliseconds(200))
                     await coinListViewModel.deleteCoin(coin.id)
                 }
             } label: {
-                Image(systemName: "heart.slash.fill")
+                Image("trash")
             }
-            .tint(.wmPink)
+            .tint(.neonPink)
             
+            Button {
+                coin.isPinned ? coinListViewModel.unpinCoin(coin) : coinListViewModel.pinCoin(coin)
+            } label: {
+                Image(systemName: coin.isPinned ? "pin.slash.fill" : "pin.fill")
+            }
+            .tint(.neonCyan)
+        }
+        .swipeActions(edge: .leading) {
             Button {
                 guard (accountViewModel.account != nil) else {
                     showAuthAlert = true
@@ -195,16 +205,9 @@ struct CoinListView: View {
                 }
                 swipedCoin = coin
             } label: {
-                Image(systemName: "bell.fill")
+                Image("bell.add.fill")
             }
-            .tint(.blue)
-            
-            Button {
-                coin.isPinned ? coinListViewModel.unpinCoin(coin) : coinListViewModel.pinCoin(coin)
-            } label: {
-                Image(systemName: coin.isPinned ? "pin.slash.fill" : "pin.fill")
-            }
-            .tint(.indigo)
+            .tint(.neonYellow)
         }
     }
     

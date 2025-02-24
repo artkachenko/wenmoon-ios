@@ -43,11 +43,12 @@ struct PriceAlertsView: View {
                         }) {
                             Image(systemName: "xmark.circle.fill")
                                 .resizable()
-                                .frame(width: 20, height: 20)
-                                .foregroundColor(.gray)
+                                .frame(width: 28, height: 28)
+                                .foregroundStyle(.white, Color(.systemGray5))
                         }
                     }
-                    .padding(24)
+                    .padding(.vertical, 24)
+                    .padding(.horizontal, 16)
                 }
                 .padding(.bottom, 16)
                 
@@ -121,6 +122,7 @@ struct PriceAlertsView: View {
                 }
                 .animation(.easeInOut, value: priceAlerts)
             }
+            .background(Color.obsidian)
         }
         .contentShape(Rectangle())
         .simultaneousGesture(
@@ -146,7 +148,7 @@ struct PriceAlertsView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 16, height: 16)
-                        .foregroundColor(.wmPink)
+                        .foregroundColor(.neonPink)
                     
                     Text(priceAlert.targetPrice.formattedAsCurrency())
                         .font(.subheadline)

@@ -24,6 +24,8 @@ struct CoinSelectionView: View {
     private let didToggleCoin: ((Coin, Bool) -> Void)?
     private let didSelectCoin: ((Coin) -> Void)?
     
+    private var coins: [Coin] { viewModel.coins }
+    
     // MARK: - Initializers
     init(
         mode: Mode = .toggle,
@@ -42,7 +44,7 @@ struct CoinSelectionView: View {
                 ZStack {
                     ScrollView {
                         LazyVStack {
-                            ForEach(viewModel.coins, id: \.self) { coin in
+                            ForEach(coins, id: \.self) { coin in
                                 Divider()
                                 makeCoinView(coin)
                                     .task {
@@ -54,6 +56,7 @@ struct CoinSelectionView: View {
                                 ProgressView()
                             }
                         }
+                        .animation(.easeInOut, value: coins)
                         .scrollBounceBehavior(.basedOnSize)
                     }
                     
@@ -61,10 +64,11 @@ struct CoinSelectionView: View {
                         ProgressView()
                     }
                     
-                    if viewModel.isInSearchMode && viewModel.coins.isEmpty {
+                    if viewModel.isInSearchMode && coins.isEmpty {
                         PlaceholderView(text: "No coins found")
                     }
                 }
+                .background(Color.obsidian)
                 .navigationTitle(mode == .toggle ? "Select Coins" : "Select Coin")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -128,7 +132,7 @@ struct CoinSelectionView: View {
                             viewModel.toggleSaveState(for: coin)
                         }
                     ))
-                    .tint(.wmPink)
+                    .tint(.neonGreen)
                     .scaleEffect(0.9)
                     .padding(.trailing, -16)
                 } else if mode == .selection {

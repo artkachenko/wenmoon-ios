@@ -46,6 +46,7 @@ struct ContentView: View {
                     .tag(4)
             }
         }
+        .tint(.neonBlue)
         .environmentObject(coinSelectionViewModel)
         .environmentObject(accountViewModel)
         .onAppear {
@@ -69,7 +70,7 @@ struct ContentView: View {
         HStack(spacing: 4) {
             Text(item.type.title)
                 .font(.footnote)
-                .foregroundColor(.lightGray)
+                .foregroundColor(.softGray)
             Text(item.value)
                 .font(.footnote).bold()
         }

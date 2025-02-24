@@ -33,7 +33,7 @@ struct PortfolioView: View {
                     await viewModel.addTransaction(newTransaction, coin)
                 }
             })
-            .presentationDetents([.medium])
+            .presentationDetents([.medium, .large])
             .presentationCornerRadius(36)
         }
         .sheet(item: $swipedTransaction, onDismiss: {
@@ -49,7 +49,7 @@ struct PortfolioView: View {
                         viewModel.editTransaction(updatedTransaction)
                     }
                 )
-                .presentationDetents([.medium])
+                .presentationDetents([.medium, .large])
                 .presentationCornerRadius(36)
             }
         }
@@ -64,20 +64,23 @@ struct PortfolioView: View {
         VStack(spacing: 8) {
             Text(viewModel.totalValue.formattedAsCurrency())
                 .font(.largeTitle).bold()
-                .foregroundColor(.wmPink)
+                .foregroundColor(.white)
             
             HStack {
-                Text(viewModel.portfolioChangePercentage.formattedAsPercentage())
-                    .font(.footnote).bold()
-                    .foregroundColor(.gray)
-                
-                Text(viewModel.portfolioChangeValue.formattedAsCurrency(includePlusSign: true))
-                    .font(.footnote).bold()
-                    .foregroundColor(.gray)
+                HStack {
+                    Text(viewModel.portfolioChangePercentage.formattedAsPercentage())
+                    Text(viewModel.portfolioChangeValue.formattedAsCurrency(includePlusSign: true))
+                }
+                .font(.footnote).bold()
+                .foregroundColor(viewModel.portfolioChangeColor)
                 
                 Text(viewModel.selectedTimeline.rawValue)
                     .font(.caption)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.softGray)
+                    .padding(.vertical, 3)
+                    .padding(.horizontal, 6)
+                    .background(Color(.systemGray6))
+                    .cornerRadius(6)
             }
             .animation(.easeInOut, value: viewModel.selectedTimeline)
             .onTapGesture {
@@ -118,6 +121,7 @@ struct PortfolioView: View {
                 .refreshable {
                     viewModel.fetchPortfolios()
                 }
+                .tint(.neonBlue)
             }
         }
         .animation(.easeInOut, value: groupedTransactions)
@@ -138,6 +142,7 @@ struct PortfolioView: View {
         .buttonStyle(.borderless)
         .padding(.bottom, 16)
     }
+
     
     @ViewBuilder
     private func makeTransactionsSummaryView(for group: CoinTransactions, isExpanded: Bool) -> some View {
@@ -174,13 +179,13 @@ struct PortfolioView: View {
             Button(role: .destructive) {
                 viewModel.deleteTransactions(for: group.coin.id)
             } label: {
-                Image("trash")
+                Image("trash.fill")
             }
-            .tint(.wmRed)
+            .tint(.clear)
         }
         .padding(.vertical)
         .padding(.horizontal, 20)
-        .background(Color(.secondarySystemBackground))
+        .background(Color(.systemGray6))
         .cornerRadius(36)
     }
     
@@ -188,30 +193,37 @@ struct PortfolioView: View {
     private func makeExpandedTransactionsView(for group: CoinTransactions) -> some View {
         Group {
             ForEach(group.transactions.keys.sorted(by: { $0 > $1 }), id: \.self) { date in
-                Section(date.formatted(as: .dateOnly)) {
-                    ForEach(group.transactions[date] ?? [], id: \.id) { transaction in
+                Text(date.formatted(as: .dateOnly))
+                    .font(.subheadline).bold()
+                    .foregroundColor(.gray)
+                
+                Group {
+                    ForEach(group.transactions[date] ?? [], id: \.self) { transaction in
                         makeTransactionView(group.coin, transaction)
-                            .swipeActions {
+                            .swipeActions(edge: .trailing) {
                                 Button(role: .destructive) {
-                                    viewModel.deleteTransaction(transaction.id)
+                                    withAnimation(.easeInOut) {
+                                        viewModel.deleteTransaction(transaction.id)
+                                    }
                                 } label: {
                                     Image("trash")
                                 }
-                                .tint(.wmRed)
+                                .tint(.neonPink)
                                 
                                 Button {
                                     swipedTransaction = transaction.copy()
                                 } label: {
-                                    Image("pencil")
+                                    Image(systemName: "pencil.and.outline")
                                 }
-                                .tint(.blue)
+                                .tint(.softGray)
                             }
+                        
                     }
                 }
                 .listRowSeparator(.hidden)
-                .listSectionSpacing(16)
             }
         }
+        .listRowSeparator(.visible)
     }
     
     @ViewBuilder

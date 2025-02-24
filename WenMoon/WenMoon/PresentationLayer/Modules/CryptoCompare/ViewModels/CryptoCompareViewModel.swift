@@ -73,14 +73,14 @@ final class CryptoCompareViewModel: BaseViewModel {
     }
     
     func isPositiveMultiplier(_ multiplier: Double) -> Bool? {
-        guard multiplier.isFinite else { return nil }
+        guard multiplier.isFinite, multiplier >= 0 else { return nil }
         
-        let tolerance = 0.001
-        let isCloseToZero = abs(multiplier) <= tolerance
-        let isCloseToOne = abs(multiplier - 1) <= tolerance
-        
+        let tolerance = 0.01
+        let isCloseToZero = multiplier < tolerance
+        let isCloseToOne = abs(multiplier - 1) < tolerance
+
         guard !isCloseToZero && !isCloseToOne else { return nil }
-        
+
         return multiplier > 1
     }
 }

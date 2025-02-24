@@ -21,9 +21,9 @@ extension CoinDetails {
             
             var color: Color {
                 switch self {
-                case .green: return .wmGreen
-                case .yellow: return .wmYellow
-                case .red: return .wmRed
+                case .green: return .neonGreen
+                case .yellow: return .neonYellow
+                case .red: return .neonPink
                 }
             }
         }

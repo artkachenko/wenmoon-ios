@@ -31,45 +31,48 @@ struct SelectionView: View {
                     }) {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(.gray)
+                            .frame(width: 28, height: 28)
+                            .foregroundStyle(.white, Color(.systemGray5))
                     }
                 }
-                .padding(24)
+                .padding(.vertical, 24)
+                .padding(.horizontal, 16)
             }
             
             Spacer()
             
             List(options, id: \.self) { option in
-                HStack(spacing: 12) {
-                    if let imageName = option.imageName {
-                        Image(imageName)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 20, height: 20)
+                let isSelected = (option.value == selectedOption)
+                HStack {
+                    HStack(spacing: 12) {
+                        if let imageName = option.imageName {
+                            Image(imageName)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 20, height: 20)
+                        }
+                        Text(option.title)
                     }
-                    Text(option.title)
+                    .foregroundColor(isSelected ? .white : .gray)
                     
                     Spacer()
                     
-                    if option.value == selectedOption {
+                    if isSelected {
                         Image(systemName: "checkmark")
-                            .foregroundColor(.blue)
+                            .foregroundColor(.neonBlue)
                     }
                 }
+                .listRowBackground(Color.obsidian)
                 .padding(.vertical, 8)
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    if option.isEnabled {
-                        selectedOption = option.value
-                        dismiss()
-                    }
+                    selectedOption = option.value
+                    dismiss()
                 }
-                .disabled(!option.isEnabled)
-                .opacity(option.isEnabled ? 1 : 0.5)
             }
             .listStyle(.plain)
             .scrollBounceBehavior(.basedOnSize)
         }
+        .background(Color.obsidian)
     }
 }

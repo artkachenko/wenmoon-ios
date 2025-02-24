@@ -301,7 +301,7 @@ struct LinkButtonContent: View {
         .foregroundColor(.white)
         .padding(.horizontal, (title == nil) ? 8 : 12)
         .padding(.vertical, 8)
-        .background(Color(.systemGray6))
+        .background(Color(.systemGray5))
         .cornerRadius(16)
         .fixedSize()
     }

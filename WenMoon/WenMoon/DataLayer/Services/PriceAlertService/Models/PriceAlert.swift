@@ -21,8 +21,8 @@ struct PriceAlert: Codable, Hashable {
         
         var color: Color {
             switch self {
-            case .above: return .wmGreen
-            case .below: return .wmRed
+            case .above: return .neonGreen
+            case .below: return .neonPink
             }
         }
     }

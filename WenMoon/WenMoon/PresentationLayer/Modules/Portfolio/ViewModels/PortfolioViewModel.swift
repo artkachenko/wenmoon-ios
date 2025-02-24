@@ -5,7 +5,7 @@
 //  Created by Artur Tkachenko on 05.12.24.
 //
 
-import Foundation
+import SwiftUI
 import SwiftData
 
 final class PortfolioViewModel: BaseViewModel {
@@ -17,11 +17,13 @@ final class PortfolioViewModel: BaseViewModel {
     
     // MARK: - Properties
     @Published private(set) var groupedTransactions: [CoinTransactions] = []
+    
     @Published private(set) var totalValue: Double = .zero
     @Published private(set) var portfolioChange24HValue: Double = .zero
     @Published private(set) var portfolioChange24HPercentage: Double = .zero
     @Published private(set) var portfolioChangeAllTimeValue: Double = .zero
     @Published private(set) var portfolioChangeAllTimePercentage: Double = .zero
+    
     @Published private(set) var selectedTimeline: Timeline = .twentyFourHours
     
     var selectedPortfolio: Portfolio!
@@ -43,6 +45,10 @@ final class PortfolioViewModel: BaseViewModel {
         case .allTime:
             return portfolioChangeAllTimeValue
         }
+    }
+    
+    var portfolioChangeColor: Color {
+        portfolioChangeValue.isNegative ? .neonPink : .neonGreen
     }
     
     // MARK: - Initializers

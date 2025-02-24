@@ -62,44 +62,48 @@ struct AddTransactionView: View {
                     }) {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(.gray)
+                            .frame(width: 28, height: 28)
+                            .foregroundStyle(.white, Color(.systemGray5))
                     }
                 }
-                .padding(24)
+                .padding(.vertical, 24)
+                .padding(.horizontal, 16)
             }
             
-            makeTransactionFormView($transaction)
-            
-            let isAddTransactionButtonDisabled = viewModel.shouldDisableAddTransactionsButton(for: transaction)
-            Button(action: {
-                switch mode {
-                case .add:
-                    didAddTransaction?(transaction, selectedCoin)
-                case .edit:
-                    didEditTransaction?(transaction)
+            VStack {
+                makeTransactionFormView($transaction)
+                
+                let isAddTransactionButtonDisabled = viewModel.shouldDisableAddTransactionsButton(for: transaction)
+                Button(action: {
+                    switch mode {
+                    case .add:
+                        didAddTransaction?(transaction, selectedCoin)
+                    case .edit:
+                        didEditTransaction?(transaction)
+                    }
+                    viewModel.triggerImpactFeedback()
+                    dismiss()
+                }) {
+                    Text(isAddMode ? "Add" : "Edit")
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        .background(isAddTransactionButtonDisabled ? .gray.opacity(0.3) : .white)
+                        .foregroundColor(isAddTransactionButtonDisabled ? .gray : .black)
+                        .cornerRadius(32)
                 }
-                viewModel.triggerImpactFeedback()
-                dismiss()
-            }) {
-                Text(isAddMode ? "Add" : "Edit")
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 16)
-                    .background(isAddTransactionButtonDisabled ? .gray.opacity(0.3) : .white)
-                    .foregroundColor(isAddTransactionButtonDisabled ? .gray : .black)
-                    .cornerRadius(32)
+                .disabled(isAddTransactionButtonDisabled)
+                
+                Spacer()
             }
-            .disabled(isAddTransactionButtonDisabled)
-            
-            Spacer()
+            .background(
+                Color.clear
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        isTextFieldFocused = false
+                    }
+            )
         }
-        .background(
-            Color.clear
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    isTextFieldFocused = false
-                }
-        )
+        .background(Color.obsidian)
         .sheet(isPresented: $showCoinSelectionView) {
             CoinSelectionView(mode: .selection, didSelectCoin: { selectedCoin in
                 transaction.coinID = selectedCoin.id
@@ -123,10 +127,10 @@ struct AddTransactionView: View {
                                 placeholderText: coin.symbol,
                                 size: 36
                             )
-                            .grayscale(isEditMode ? 1 : .zero)
                             
                             Text(coin.symbol.uppercased())
                                 .font(.headline)
+                                .foregroundColor(isEditMode ? nil : .white)
                         }
                     } else {
                         Text("Select Coin")
@@ -141,7 +145,7 @@ struct AddTransactionView: View {
                         .frame(width: 12, height: 12)
                 }
             }
-            .tint(.white)
+            .tint(.neonBlue)
             .font(.headline)
             .disabled(isEditMode)
             

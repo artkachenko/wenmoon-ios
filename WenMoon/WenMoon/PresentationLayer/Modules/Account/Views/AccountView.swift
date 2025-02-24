@@ -12,6 +12,7 @@ struct AccountView: View {
     @EnvironmentObject private var viewModel: AccountViewModel
     
     @State private var selectedSetting: Setting!
+    @State private var showSignOutConfirmation = false
     @State private var showDeleteAccountConfirmation = false
     
     // MARK: - Body
@@ -53,19 +54,31 @@ struct AccountView: View {
                 options: setting.type.options
             )
             .presentationDetents([.fraction(0.45)])
+            .presentationDragIndicator(.visible)
             .presentationCornerRadius(36)
         }
-        .alert(isPresented: $showDeleteAccountConfirmation) {
+        .alert(isPresented: $showSignOutConfirmation) {
             Alert(
-                title: Text("Delete Account?"),
-                message: Text("This action is permanent and cannot be undone. All your synced data, including your watchlist, transactions, and price alerts, will be erased."),
-                primaryButton: .destructive(Text("Delete Account")) {
-                    Task {
-                        await viewModel.deleteAccount()
-                    }
+                title: Text("Logging off?"),
+                message: Text("Take your time! Everything will be here when you return."),
+                primaryButton: .destructive(Text("Sign Out")) {
+                    viewModel.signOut()
                 },
-                secondaryButton: .cancel(Text("Cancel"))
+                secondaryButton: .cancel(Text("Stay Logged In"))
             )
+        }
+        .confirmationDialog(
+            "Account deletion is permanent and will erase all your data, including your watchlist, transactions, and price alerts.",
+            isPresented: $showDeleteAccountConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Delete Account", role: .destructive) {
+                Task {
+                    await viewModel.deleteAccount()
+                }
+            }
+
+            Button("Cancel", role: .cancel) {}
         }
         .onChange(of: viewModel.account) {
             viewModel.fetchSettings()
@@ -91,7 +104,7 @@ struct AccountView: View {
                         .font(.headline)
                     
                     Button(action: {
-                        viewModel.signOut()
+                        showSignOutConfirmation = true
                         viewModel.triggerImpactFeedback()
                     }) {
                         Image(systemName: "rectangle.portrait.and.arrow.right")
@@ -99,6 +112,7 @@ struct AccountView: View {
                             .scaledToFit()
                             .frame(width: 20, height: 20)
                     }
+                    .foregroundColor(.neonBlue)
                 }
                 .padding(.leading, 20)
             } else {
@@ -128,7 +142,7 @@ struct AccountView: View {
                             }
                         }
                         .frame(width: 48, height: 48)
-                        .background(Color(.secondarySystemBackground))
+                        .background(Color(.systemGray6))
                         .cornerRadius(12)
                     }
                     Button(action: {
@@ -147,7 +161,7 @@ struct AccountView: View {
                             }
                         }
                         .frame(width: 48, height: 48)
-                        .background(Color(.secondarySystemBackground))
+                        .background(Color(.systemGray6))
                         .cornerRadius(12)
                     }
                 }
@@ -182,7 +196,7 @@ struct AccountView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 12, height: 12)
-                .foregroundColor(setting.type == .deleteAccount ? .wmRed : .gray)
+                .foregroundColor(setting.type == .deleteAccount ? .neonPink : .gray)
         }
         .padding(.vertical, 8)
         .contentShape(Rectangle())
@@ -195,7 +209,7 @@ struct AccountView: View {
             }
         }
         .disabled(settingType == .privacyPolicy)
-        .foregroundColor(settingType == .deleteAccount ? .wmRed : .primary)
+        .foregroundColor(settingType == .deleteAccount ? .neonPink : .primary)
     }
     
     // MARK: - Helper Methods

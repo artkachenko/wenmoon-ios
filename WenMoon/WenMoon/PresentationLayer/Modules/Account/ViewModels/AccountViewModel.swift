@@ -321,9 +321,9 @@ extension Setting {
             case .startScreen:
                 return StartScreen.allCases.map { SettingOption(title: $0.title, imageName: $0.imageName, value: $0.rawValue) }
             case .language:
-                return Language.allCases.map { SettingOption(title: $0.title, value: $0.rawValue, isEnabled: $0 == .english) }
+                return Language.allCases.map { SettingOption(title: $0.title, value: $0.rawValue) }
             case .currency:
-                return Currency.allCases.map { SettingOption(title: $0.title, value: $0.rawValue, isEnabled: $0 == .usd) }
+                return Currency.allCases.map { SettingOption(title: $0.title, value: $0.rawValue) }
             default:
                 return []
             }
@@ -375,32 +375,20 @@ extension Setting.SettingType {
     
     enum Language: Int, CaseIterable {
         case english
-        case spanish
-        case german
-        case french
         
         var title: String {
             switch self {
             case .english: return "English"
-            case .spanish: return "Spanish"
-            case .german: return "German"
-            case .french: return "French"
             }
         }
     }
     
     enum Currency: Int, CaseIterable {
         case usd
-        case eur
-        case gbp
-        case jpy
         
         var title: String {
             switch self {
             case .usd: return "USD"
-            case .eur: return "EUR"
-            case .gbp: return "GBP"
-            case .jpy: return "JPY"
             }
         }
     }
@@ -410,12 +398,10 @@ struct SettingOption: Hashable {
     let title: String
     let imageName: String?
     let value: Int
-    let isEnabled: Bool
     
-    init(title: String, imageName: String? = nil, value: Int, isEnabled: Bool = true) {
+    init(title: String, imageName: String? = nil, value: Int) {
         self.title = title
         self.imageName = imageName
         self.value = value
-        self.isEnabled = isEnabled
     }
 }

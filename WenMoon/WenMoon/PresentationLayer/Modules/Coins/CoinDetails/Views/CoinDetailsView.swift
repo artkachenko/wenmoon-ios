@@ -69,7 +69,7 @@ struct CoinDetailsView: View {
                     
                     Spacer()
                     
-                    HStack(spacing: 32) {
+                    HStack(spacing: 28) {
                         Button(action: {
                             guard (accountViewModel.account != nil) else {
                                 showAuthAlert = true
@@ -77,7 +77,7 @@ struct CoinDetailsView: View {
                             }
                             showPriceAlertsView = true
                         }) {
-                            Image(systemName: "alarm")
+                            Image("bell.fill")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 20, height: 20)
@@ -89,12 +89,12 @@ struct CoinDetailsView: View {
                         }) {
                             Image(systemName: "xmark.circle.fill")
                                 .resizable()
-                                .frame(width: 20, height: 20)
-                                .foregroundColor(.gray)
+                                .frame(width: 28, height: 28)
+                                .foregroundStyle(.white, Color(.systemGray5))
                         }
                     }
                 }
-                .padding(.horizontal, 24)
+                .padding(.horizontal, 16)
                 
                 ScrollView(showsIndicators: false) {
                     LazyVStack(spacing: 24) {
@@ -154,7 +154,7 @@ struct CoinDetailsView: View {
                                 }
                             }
                             .padding()
-                            .background(Color(.secondarySystemBackground))
+                            .background(Color(.systemGray5))
                             .cornerRadius(12)
                             
                             if let description = coinDetails.description?.htmlStripped, !description.isEmpty {
@@ -174,7 +174,7 @@ struct CoinDetailsView: View {
                 .scrollBounceBehavior(.basedOnSize)
             }
             .padding(.top, 24)
-            .background(Color.black)
+            .background(Color.obsidian)
         }
         .onChange(of: selectedTimeframe) { _, timeframe in
             Task {
@@ -217,7 +217,7 @@ struct CoinDetailsView: View {
         let priceRange = minPrice...maxPrice
         
         Chart {
-            let chartColor: Color = coinDetailsViewModel.isPriceChangeNegative ? .wmRed : .wmGreen
+            let chartColor: Color = coinDetailsViewModel.isPriceChangeNegative ? .neonPink : .neonGreen
             ForEach(data, id: \.date) { dataPoint in
                 AreaMark(
                     x: .value("Date", dataPoint.date),
@@ -228,7 +228,7 @@ struct CoinDetailsView: View {
                 .foregroundStyle(
                     LinearGradient(
                         gradient: Gradient(colors: [
-                            chartColor.opacity(0.5),
+                            chartColor.opacity(0.25),
                             chartColor.opacity(.zero)
                         ]),
                         startPoint: .top,
@@ -301,7 +301,7 @@ struct CoinDetailsView: View {
                         .position(x: selectedXPosition, y: geometry.size.height / 2)
                     
                     Rectangle()
-                        .fill(.black.opacity(0.6))
+                        .fill(Color.obsidian.opacity(0.6))
                         .frame(width: geometry.size.width - selectedXPosition + separatorWidth, height: geometry.size.height + 20)
                         .position(x: selectedXPosition + separatorWidth + (geometry.size.width - selectedXPosition) / 2, y: geometry.size.height / 2)
                 }

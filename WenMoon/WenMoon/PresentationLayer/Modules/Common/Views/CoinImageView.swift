@@ -47,7 +47,6 @@ struct CoinImageView: View {
                 }, placeholder: {
                     ProgressView()
                         .controlSize(.mini)
-                        .tint(.black)
                 })
             } else {
                 Text(placeholderText.prefix(1).uppercased())

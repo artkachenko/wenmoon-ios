@@ -36,6 +36,7 @@ struct CoinMarketsView: View {
                     .scrollBounceBehavior(.basedOnSize)
                 }
             }
+            .background(Color.obsidian)
             .navigationTitle("Markets")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -104,6 +105,7 @@ struct CoinMarketsView: View {
         }
         .padding(.vertical, 6)
         .contentShape(Rectangle())
+        .listRowBackground(Color.obsidian)
         .onTapGesture {
             guard let url = ticker.tradeUrl else { return }
             openURL(url)

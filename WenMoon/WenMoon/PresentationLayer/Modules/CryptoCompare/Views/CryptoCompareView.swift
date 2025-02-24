@@ -97,7 +97,7 @@ struct CryptoCompareView: View {
                                 .font(.title2)
                                 .foregroundColor(.white)
                             
-                            let multiplierColor: Color = viewModel.isPositiveMultiplier(multiplier).map { $0 ? .wmGreen : .wmRed } ?? .gray
+                            let multiplierColor: Color = viewModel.isPositiveMultiplier(multiplier).map { $0 ? .neonGreen : .neonPink } ?? .gray
                             Text(multiplier.formattedAsMultiplier())
                                 .font(.title2)
                                 .foregroundColor(multiplierColor)
@@ -209,7 +209,7 @@ struct CryptoCompareView: View {
         }
         .padding(.vertical)
         .padding(.horizontal, 20)
-        .background(Color(.secondarySystemBackground))
+        .background(Color(.systemGray6))
         .cornerRadius(36)
     }
     

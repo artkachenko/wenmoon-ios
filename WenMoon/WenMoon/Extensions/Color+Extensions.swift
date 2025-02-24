@@ -8,9 +8,11 @@
 import SwiftUI
 
 extension Color {
-    static let lightGray = Color("lightGray")
-    static let wmPink = Color("wmPink")
-    static let wmGreen = Color("wmGreen")
-    static let wmYellow = Color("wmYellow")
-    static let wmRed = Color("wmRed")
+    static let neonBlue = Color("neonBlue")
+    static let neonCyan = Color("neonCyan")
+    static let neonGreen = Color("neonGreen")
+    static let neonPink = Color("neonPink")
+    static let neonYellow = Color("neonYellow")
+    static let obsidian = Color("obsidian")
+    static let softGray = Color("softGray")
 }
