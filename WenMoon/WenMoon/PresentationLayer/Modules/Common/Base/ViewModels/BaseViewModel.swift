@@ -17,13 +17,14 @@ class BaseViewModel: ObservableObject {
     private(set) var userDefaultsManager: UserDefaultsManager
     private(set) var swiftDataManager: SwiftDataManager?
     
+    private var cacheTimers: [Timer] = []
+    
     var isFirstLaunch: Bool {
         appLaunchProvider.isFirstLaunch
     }
     
     var deviceToken: String? {
-        let deviceToken = try? userDefaultsManager.getObject(forKey: .deviceToken, objectType: String.self)
-        return deviceToken
+        try? userDefaultsManager.getObject(forKey: .deviceToken, objectType: String.self)
     }
     
     // MARK: - Initializers
@@ -39,13 +40,38 @@ class BaseViewModel: ObservableObject {
             self.swiftDataManager = swiftDataManager
         } else {
             if let modelContainer = try? ModelContainer(for: CoinData.self, Portfolio.self, Transaction.self) {
-                let swiftDataManager = SwiftDataManagerImpl(modelContainer: modelContainer)
-                self.swiftDataManager = swiftDataManager
+                self.swiftDataManager = SwiftDataManagerImpl(modelContainer: modelContainer)
             }
         }
     }
     
-    // MARK: - Internal Methods
+    deinit {
+        for timer in cacheTimers {
+            timer.invalidate()
+        }
+    }
+    
+    // MARK: - Image Loading
+    @MainActor
+    func loadImage(from url: URL) async -> Data? {
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            return data
+        } catch {
+            setErrorMessage("Error downloading image: \(error.localizedDescription)")
+            return nil
+        }
+    }
+    
+    // MARK: - Cache Handling
+    func startCacheTimer(interval: TimeInterval = 60, completion: @escaping (() -> Void)) {
+        let newCacheTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
+            completion()
+        }
+        cacheTimers.append(newCacheTimer)
+    }
+    
+    // MARK: - SwiftData
     func fetch<T: PersistentModel>(_ descriptor: FetchDescriptor<T>) -> [T] {
         do {
             return try swiftDataManager?.fetch(descriptor) ?? []
@@ -79,17 +105,7 @@ class BaseViewModel: ObservableObject {
         }
     }
     
-    @MainActor
-    func loadImage(from url: URL) async -> Data? {
-        do {
-            let (data, _) = try await URLSession.shared.data(from: url)
-            return data
-        } catch {
-            errorMessage = "Error downloading image: \(error.localizedDescription)"
-            return nil
-        }
-    }
-    
+    // MARK: - Error
     func setError(_ error: Error) {
         if let descriptiveError = error as? DescriptiveError {
             errorMessage = descriptiveError.errorDescription
@@ -102,6 +118,7 @@ class BaseViewModel: ObservableObject {
         errorMessage = message
     }
     
+    // MARK: - Feeback Generator
     func triggerImpactFeedback(_ style: UIImpactFeedbackGenerator.FeedbackStyle = .light) {
         let generator = UIImpactFeedbackGenerator(style: style)
         generator.impactOccurred()

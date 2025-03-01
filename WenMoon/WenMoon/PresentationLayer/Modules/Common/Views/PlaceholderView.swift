@@ -39,7 +39,7 @@ struct PlaceholderView: View {
         self.text = text
         self.style = style
     }
-
+    
     // MARK: - Body
     var body: some View {
         VStack(spacing: 8) {

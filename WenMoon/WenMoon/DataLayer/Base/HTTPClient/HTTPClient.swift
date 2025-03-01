@@ -40,13 +40,13 @@ final class HTTPClientImpl: HTTPClient {
     private(set) var decoder: JSONDecoder
     
     // MARK: - Initializers
-    convenience init(baseURL: URL = API.baseURL, apiKey: String? = API.key) {
+    convenience init(baseURL: URL = API.baseURL, apiKey: String = API.key) {
         self.init(baseURL: baseURL, apiKey: apiKey, session: .shared, encoder: .init(), decoder: .init())
     }
     
     init(
         baseURL: URL,
-        apiKey: String?,
+        apiKey: String,
         session: URLSession,
         encoder: JSONEncoder,
         decoder: JSONDecoder
@@ -86,9 +86,8 @@ final class HTTPClientImpl: HTTPClient {
         urlRequest.httpBody = httpRequest.body
 
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        if let apiKey {
-            urlRequest.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
-        }
+        urlRequest.setValue(apiKey, forHTTPHeaderField: "X-API-Key")
+        
         httpRequest.headers?.forEach { urlRequest.setValue($0.value, forHTTPHeaderField: $0.key) }
 
         printPrettyRequest(urlRequest)

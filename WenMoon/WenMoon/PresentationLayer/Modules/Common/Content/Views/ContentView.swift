@@ -38,8 +38,8 @@ struct ContentView: View {
                 CryptoCompareView()
                     .tabItem { Image("arrows.swap") }
                     .tag(2)
-                EducationView()
-                    .tabItem { Image("books") }
+                NewsView()
+                    .tabItem { Image("news") }
                     .tag(3)
                 AccountView()
                     .tabItem { Image("person") }

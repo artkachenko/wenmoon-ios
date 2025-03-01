@@ -17,8 +17,6 @@ final class CoinListViewModel: BaseViewModel {
     @Published var coins: [CoinData] = []
     @Published var marketData: [String: MarketData] = [:]
     
-    private var cacheTimer: Timer?
-    
     /// Computed properties for coins marked as pinned and not pinned.
     var pinnedCoins: [CoinData] { coins.filter { $0.isPinned } }
     var unpinnedCoins: [CoinData] { coins.filter { !$0.isPinned } }
@@ -45,11 +43,9 @@ final class CoinListViewModel: BaseViewModel {
             userDefaultsManager: userDefaultsManager,
             swiftDataManager: swiftDataManager
         )
-        startCacheTimer()
-    }
-    
-    deinit {
-        cacheTimer?.invalidate()
+        startCacheTimer { [weak self] in
+            self?.clearCacheIfNeeded()
+        }
     }
     
     // MARK: - Internal Methods
@@ -277,13 +273,6 @@ final class CoinListViewModel: BaseViewModel {
                 }
                 return (coin1.marketCap ?? .zero) > (coin2.marketCap ?? .zero)
             }
-        }
-    }
-    
-    /// Starts a timer to clear cached market data periodically.
-    private func startCacheTimer() {
-        cacheTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
-            self?.clearCacheIfNeeded()
         }
     }
     
