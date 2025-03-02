@@ -13,6 +13,27 @@ struct NewsFactoryMock {
         let formatter = DateFormatter()
         formatter.dateFormat = "EEE, dd MMM yyyy HH:mm:ss Z"
         return AllNews(
+            bitcoinmagazine: [
+                News(
+                    title: "BitcoinMag Stablecoins Focus",
+                    description: "Senate discusses stablecoins",
+                    date: formatter.date(from: "Thu, 27 Feb 2025 01:08:37 +0000")!
+                )
+            ],
+            bitcoinist: [
+                News(
+                    title: "Bitcoinist Bitcoin Correlation",
+                    description: "Bitcoin correlates with S&P 500",
+                    date: formatter.date(from: "Fri, 28 Feb 2025 16:00:14 +0000")!
+                )
+            ],
+            cryptopotato: [
+                News(
+                    title: "CryptoPotato Meme Coins",
+                    description: "SEC confirms meme coins not securities",
+                    date: formatter.date(from: "Fri, 28 Feb 2025 15:58:54 +0000")!
+                )
+            ],
             coindesk: [
                 News(
                     title: "CoinDesk Bitcoin Dip",
@@ -30,27 +51,6 @@ struct NewsFactoryMock {
                     title: "CoinTelegraph Bitcoin DCA Zone",
                     description: "Bitcoin hits optimal DCA zone",
                     date: formatter.date(from: "Fri, 28 Feb 2025 16:05:08 +0000")!
-                )
-            ],
-            cryptopotato: [
-                News(
-                    title: "CryptoPotato Meme Coins",
-                    description: "SEC confirms meme coins not securities",
-                    date: formatter.date(from: "Fri, 28 Feb 2025 15:58:54 +0000")!
-                )
-            ],
-            bitcoinmagazine: [
-                News(
-                    title: "BitcoinMag Stablecoins Focus",
-                    description: "Senate discusses stablecoins",
-                    date: formatter.date(from: "Thu, 27 Feb 2025 01:08:37 +0000")!
-                )
-            ],
-            bitcoinist: [
-                News(
-                    title: "Bitcoinist Bitcoin Correlation",
-                    description: "Bitcoin correlates with S&P 500",
-                    date: formatter.date(from: "Fri, 28 Feb 2025 16:00:14 +0000")!
                 )
             ]
         )

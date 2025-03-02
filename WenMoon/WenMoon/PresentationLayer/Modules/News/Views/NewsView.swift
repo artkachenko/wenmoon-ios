@@ -12,6 +12,7 @@ struct NewsView: View {
     @StateObject private var viewModel = NewsViewModel()
     
     @State private var selectedNews: News?
+    @State private var viewDidLoad = false
     
     private var news: [News] { viewModel.news }
     
@@ -50,12 +51,14 @@ struct NewsView: View {
             }
         }
         .sheet(item: $selectedNews) { news in
-            if let url = news.url {
+            if let url = news.url?.safeURL {
                 SFSafariView(url: url)
             }
         }
         .task {
+            guard !viewDidLoad else { return }
             await viewModel.fetchAllNews()
+            viewDidLoad = true
         }
     }
     
@@ -63,7 +66,7 @@ struct NewsView: View {
     @ViewBuilder
     private func makeNewsRow(_ news: News) -> some View {
         HStack(spacing: 16) {
-            if let imageURL = news.thumbnail {
+            if let imageURL = news.thumbnail?.safeURL {
                 AsyncImage(url: imageURL, content: { image in
                     image
                         .resizable()
@@ -83,7 +86,8 @@ struct NewsView: View {
                         .lineLimit(2)
                 }
                 
-                if let source = viewModel.extractSource(from: news.url) {
+                if let url = news.url?.safeURL,
+                   let source = viewModel.extractSource(from: url) {
                     HStack {
                         Text(source)
                         

@@ -8,9 +8,9 @@
 import Foundation
 
 struct AllNews: Codable, Equatable {
-    let coindesk: [News]?
-    let cointelegraph: [News]?
-    let cryptopotato: [News]?
     let bitcoinmagazine: [News]?
     let bitcoinist: [News]?
+    let cryptopotato: [News]?
+    let coindesk: [News]?
+    let cointelegraph: [News]?
 }

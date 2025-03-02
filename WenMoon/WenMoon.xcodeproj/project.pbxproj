@@ -47,6 +47,7 @@
 		19F254F92D69F783001867CC /* AccountServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F254F82D69F783001867CC /* AccountServiceMock.swift */; };
 		19F254FC2D6A28BF001867CC /* AccountFactoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F254FB2D6A28BF001867CC /* AccountFactoryMock.swift */; };
 		19F255032D6A2B79001867CC /* AccountServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19F255022D6A2B79001867CC /* AccountServiceTests.swift */; };
+		19FC947A2D74ADE10084DC24 /* SafeURL.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19FC94792D74ADE10084DC24 /* SafeURL.swift */; };
 		D21A57BE2CCA65AB00AC2D13 /* MarketData+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21A57BD2CCA65AB00AC2D13 /* MarketData+Assertions.swift */; };
 		D21A57C12CCAA8BC00AC2D13 /* ErrorFactoryMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21A57C02CCAA8BC00AC2D13 /* ErrorFactoryMock.swift */; };
 		D21A57C32CCAAB9400AC2D13 /* Error+Assertions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D21A57C22CCAAB9400AC2D13 /* Error+Assertions.swift */; };
@@ -192,6 +193,7 @@
 		19F254F82D69F783001867CC /* AccountServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountServiceMock.swift; sourceTree = "<group>"; };
 		19F254FB2D6A28BF001867CC /* AccountFactoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountFactoryMock.swift; sourceTree = "<group>"; };
 		19F255022D6A2B79001867CC /* AccountServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountServiceTests.swift; sourceTree = "<group>"; };
+		19FC94792D74ADE10084DC24 /* SafeURL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeURL.swift; sourceTree = "<group>"; };
 		D21A57BD2CCA65AB00AC2D13 /* MarketData+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MarketData+Assertions.swift"; sourceTree = "<group>"; };
 		D21A57C02CCAA8BC00AC2D13 /* ErrorFactoryMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorFactoryMock.swift; sourceTree = "<group>"; };
 		D21A57C22CCAAB9400AC2D13 /* Error+Assertions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Error+Assertions.swift"; sourceTree = "<group>"; };
@@ -568,6 +570,15 @@
 				D2F6DD632CC650D4009EF857 /* PriceAlertServiceTests.swift */,
 			);
 			path = PriceAlertService;
+			sourceTree = "<group>";
+		};
+		19FC94782D74ADD10084DC24 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				FA07AC2E29F93282008F6484 /* Extensions */,
+				19FC94792D74ADE10084DC24 /* SafeURL.swift */,
+			);
+			path = Helpers;
 			sourceTree = "<group>";
 		};
 		D21A57BF2CCAA7FB00AC2D13 /* MarketData */ = {
@@ -1046,7 +1057,7 @@
 			isa = PBXGroup;
 			children = (
 				FAB3622629F447F400A88050 /* Application */,
-				FA07AC2E29F93282008F6484 /* Extensions */,
+				19FC94782D74ADD10084DC24 /* Helpers */,
 				FAB3622829F4482B00A88050 /* DataLayer */,
 				FAB3622B29F4485500A88050 /* PresentationLayer */,
 				FAB3622729F4480F00A88050 /* Resources */,
@@ -1449,6 +1460,7 @@
 				FAB3623829F4514B00A88050 /* APIError.swift in Sources */,
 				FA07AC3029F93292008F6484 /* Double+Extensions.swift in Sources */,
 				194212A52D5A4930008DE753 /* String+Extensions.swift in Sources */,
+				19FC947A2D74ADE10084DC24 /* SafeURL.swift in Sources */,
 				1961B51F2D34407600D0CEBC /* PlaceholderView.swift in Sources */,
 				19F254F52D69EFF5001867CC /* Account.swift in Sources */,
 				D2D795742CFA292600950125 /* UnderlinedTextFieldStyle.swift in Sources */,

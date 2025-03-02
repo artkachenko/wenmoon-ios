@@ -11,20 +11,20 @@ struct News: Identifiable, Codable, Hashable {
     // MARK: - Properties
     let title: String?
     let description: String?
-    let thumbnail: URL?
-    let url: URL?
+    let thumbnail: SafeURL?
+    let url: SafeURL?
     let date: Date
     
     var id: String {
-        url?.absoluteString ?? UUID().uuidString
+        url?.safeURL?.absoluteString ?? UUID().uuidString
     }
     
     // MARK: - Initializers
     init(
         title: String? = nil,
         description: String? = nil,
-        thumbnail: URL? = nil,
-        url: URL? = nil,
+        thumbnail: SafeURL? = nil,
+        url: SafeURL? = nil,
         date: Date = .init()
     ) {
         self.title = title
@@ -43,8 +43,8 @@ struct News: Identifiable, Codable, Hashable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         title = try container.decodeIfPresent(String.self, forKey: .title)
         description = try container.decodeIfPresent(String.self, forKey: .description)
-        thumbnail = try container.decodeIfPresent(URL.self, forKey: .thumbnail)
-        url = try container.decodeIfPresent(URL.self, forKey: .url)
+        thumbnail = try container.decodeIfPresent(SafeURL.self, forKey: .thumbnail)
+        url = try container.decodeIfPresent(SafeURL.self, forKey: .url)
         
         if let dateString = try container.decodeIfPresent(String.self, forKey: .date) {
             let dateFormatter = DateFormatter()

@@ -212,7 +212,7 @@ final class CoinListViewModel: BaseViewModel {
     /// Inserts a new coin with optional image data.
     @MainActor
     private func insertCoin(_ coin: Coin) async {
-        let imageData = coin.image != nil ? await loadImage(from: coin.image!) : nil
+        let imageData = coin.image?.safeURL != nil ? await loadImage(from: coin.image!.safeURL!) : nil
         let newCoin = CoinData(from: coin, imageData: imageData)
         withAnimation {
             coins.append(newCoin)

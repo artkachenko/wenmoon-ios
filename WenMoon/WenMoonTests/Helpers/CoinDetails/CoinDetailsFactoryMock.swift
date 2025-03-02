@@ -79,21 +79,21 @@ struct CoinDetailsFactoryMock {
     
     static func makeCoinLinks() -> CoinDetails.Links {
         CoinDetails.Links(
-            homepage: [URL(string: "https://bitcoin.org")!],
-            whitepaper: URL(string: "https://bitcoin.org/bitcoin.pdf")!,
-            blockchainSite: [URL(string: "https://www.blockchain.com/explorer")!],
-            chatUrl: [URL(string: "https://discord.com/invite/bitcoin")!],
-            announcementUrl: [URL(string: "https://twitter.com/bitcoin")!],
+            homepage: [SafeURL(string: "https://bitcoin.org")!],
+            whitepaper: SafeURL(string: "https://bitcoin.org/bitcoin.pdf")!,
+            blockchainSite: [SafeURL(string: "https://www.blockchain.com/explorer")!],
+            chatUrl: [SafeURL(string: "https://discord.com/invite/bitcoin")!],
+            announcementUrl: [SafeURL(string: "https://twitter.com/bitcoin")!],
             twitterScreenName: "bitcoin",
             telegramChannelIdentifier: "bitcoin",
-            subredditUrl: URL(string: "https://www.reddit.com/r/bitcoin/")!,
+            subredditUrl: SafeURL(string: "https://www.reddit.com/r/bitcoin/")!,
             reposUrl: makeReposURL()
         )
     }
     
     static func makeReposURL() -> CoinDetails.Links.ReposURL {
         CoinDetails.Links.ReposURL(
-            github: [URL(string: "https://github.com/bitcoin")!]
+            github: [SafeURL(string: "https://github.com/bitcoin")!]
         )
     }
     
@@ -112,7 +112,7 @@ struct CoinDetailsFactoryMock {
                 convertedLast: .random(in: 0.01...100_000),
                 convertedVolume: .random(in: 100_000...100_000_000),
                 trustScore: [.green, .yellow, .red].randomElement(),
-                tradeUrl: URL(string: "https://\(marketIdentifiers[index % marketIdentifiers.count]).com/trade/SYM-\(index)")
+                tradeUrl: SafeURL(string: "https://\(marketIdentifiers[index % marketIdentifiers.count]).com/trade/SYM-\(index)")
             )
         }
     }

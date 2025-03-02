@@ -148,7 +148,7 @@ final class PortfolioViewModel: BaseViewModel {
     
     private func insertCoinIfNeeded(_ coin: Coin) async {
         guard fetchCoin(by: coin.id) == nil else { return }
-        let imageData = (coin.image != nil) ? await loadImage(from: coin.image!) : nil
+        let imageData = (coin.image?.safeURL != nil) ? await loadImage(from: coin.image!.safeURL!) : nil
         let coinData = CoinData(from: coin, imageData: imageData)
         insert(coinData)
     }

@@ -107,7 +107,7 @@ struct CoinMarketsView: View {
         .contentShape(Rectangle())
         .listRowBackground(Color.obsidian)
         .onTapGesture {
-            guard let url = ticker.tradeUrl else { return }
+            guard let url = ticker.tradeUrl?.safeURL else { return }
             openURL(url)
         }
     }

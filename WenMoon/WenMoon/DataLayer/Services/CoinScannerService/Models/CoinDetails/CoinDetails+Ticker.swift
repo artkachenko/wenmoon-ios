@@ -35,7 +35,7 @@ extension CoinDetails {
         let convertedLast: Double?
         let convertedVolume: Double?
         let trustScore: TrustScore?
-        let tradeUrl: URL?
+        let tradeUrl: SafeURL?
         
         // MARK: - Initializers
         init(
@@ -45,7 +45,7 @@ extension CoinDetails {
             convertedLast: Double?,
             convertedVolume: Double?,
             trustScore: TrustScore?,
-            tradeUrl: URL?
+            tradeUrl: SafeURL?
         ) {
             self.base = base
             self.target = target
@@ -75,7 +75,7 @@ extension CoinDetails {
             self.convertedVolume = convertedVolume?["usd"]
             
             trustScore = try container.decodeIfPresent(TrustScore.self, forKey: .trustScore)
-            tradeUrl = try container.decodeIfPresent(URL.self, forKey: .tradeUrl)
+            tradeUrl = try container.decodeIfPresent(SafeURL.self, forKey: .tradeUrl)
         }
         
         func encode(to encoder: Encoder) throws {

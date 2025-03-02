@@ -37,7 +37,7 @@ struct LinksView: View {
     private func generateLinkButtons() -> [AnyView] {
         var buttons: [AnyView] = []
         
-        if let urls = links.homepage {
+        if let urls = links.homepage?.compactMap(\.safeURL), !urls.isEmpty {
             appendMultiLinkButton(
                 to: &buttons,
                 title: "Website",
@@ -47,7 +47,7 @@ struct LinksView: View {
             )
         }
         
-        if let url = links.whitepaper {
+        if let url = links.whitepaper?.safeURL {
             buttons.append(
                 AnyView(
                     LinkButtonView(
@@ -72,8 +72,7 @@ struct LinksView: View {
             )
         }
         
-        if let url = links.subredditUrl,
-           url.absoluteString != "https://www.reddit.com" {
+        if let url = links.subredditUrl?.safeURL, url.absoluteString != "https://www.reddit.com" {
             buttons.append(
                 AnyView(
                     LinkButtonView(
@@ -98,16 +97,20 @@ struct LinksView: View {
             )
         }
         
-        let urls = (links.chatUrl ?? []) + (links.announcementUrl ?? [])
-        appendMultiLinkButton(
-            to: &buttons,
-            title: "Communication",
-            urls: urls,
-            showFullURL: false,
-            systemImageName: "message.fill"
-        )
+        let chatURLs = links.chatUrl ?? []
+        let announcementURLs = links.announcementUrl ?? []
+        let communicationURLs = (chatURLs + announcementURLs).compactMap(\.safeURL)
+        if !communicationURLs.isEmpty {
+            appendMultiLinkButton(
+                to: &buttons,
+                title: "Communication",
+                urls: communicationURLs,
+                showFullURL: false,
+                systemImageName: "message.fill"
+            )
+        }
         
-        if let urls = links.blockchainSite {
+        if let urls = links.blockchainSite?.compactMap(\.safeURL), !urls.isEmpty {
             appendMultiLinkButton(
                 to: &buttons,
                 title: "Explorer",
@@ -117,7 +120,7 @@ struct LinksView: View {
             )
         }
         
-        if let urls = links.reposUrl.github {
+        if let urls = links.reposUrl.github?.compactMap(\.safeURL), !urls.isEmpty {
             if urls.count == 1, let url = urls.first {
                 buttons.append(
                     AnyView(

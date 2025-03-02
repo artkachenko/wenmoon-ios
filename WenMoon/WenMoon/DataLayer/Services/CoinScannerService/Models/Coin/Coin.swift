@@ -11,7 +11,7 @@ protocol CoinProtocol {
     var id: String { get }
     var symbol: String { get }
     var name: String { get }
-    var image: URL? { get }
+    var image: SafeURL? { get }
     var currentPrice: Double? { get }
     var marketCap: Double? { get }
     var priceChangePercentage24H: Double? { get }
@@ -21,7 +21,7 @@ struct Coin: Codable {
     var id: String
     var symbol: String
     var name: String
-    var image: URL?
+    var image: SafeURL?
     var currentPrice: Double?
     var marketCap: Double?
     var marketCapRank: Int64?

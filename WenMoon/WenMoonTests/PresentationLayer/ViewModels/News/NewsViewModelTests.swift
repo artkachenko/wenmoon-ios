@@ -92,16 +92,13 @@ class NewsViewModelTests: XCTestCase {
         // Setup
         let unknownURL = URL(string: "https://unknown.com/article")!
         let malformedURL = URL(string: "https://com")!
-        let nilURL: URL? = nil
         
         // Action
         let unknownSource = viewModel.extractSource(from: unknownURL)
         let malformedSource = viewModel.extractSource(from: malformedURL)
-        let nilSource = viewModel.extractSource(from: nilURL)
         
         // Assertions
         XCTAssertNil(unknownSource)
         XCTAssertNil(malformedSource)
-        XCTAssertNil(nilSource)
     }
 }

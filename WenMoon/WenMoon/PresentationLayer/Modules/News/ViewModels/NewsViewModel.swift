@@ -52,11 +52,11 @@ final class NewsViewModel: BaseViewModel {
         do {
             let allNews = try await newsService.getAllNews()
             let mappedNews = [
-                allNews.coindesk,
-                allNews.cointelegraph,
-                allNews.cryptopotato,
                 allNews.bitcoinmagazine,
-                allNews.bitcoinist
+                allNews.bitcoinist,
+                allNews.cryptopotato,
+                allNews.coindesk,
+                allNews.cointelegraph
             ]
                 .compactMap { $0 }
                 .flatMap { $0 }
@@ -68,11 +68,8 @@ final class NewsViewModel: BaseViewModel {
         }
     }
     
-    func extractSource(from url: URL?) -> String? {
-        guard let url, let host = url.host else {
-            return nil
-        }
-        
+    func extractSource(from url: URL) -> String? {
+        guard let host = url.host else { return nil }
         let hostParts = host.split(separator: ".")
         if hostParts.count >= 2 {
             let domain = hostParts.suffix(2).joined(separator: ".")

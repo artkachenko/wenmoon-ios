@@ -14,7 +14,7 @@ final class CoinData {
     var id: String
     var symbol: String
     var name: String
-    var image: URL?
+    var image: SafeURL?
     var currentPrice: Double?
     var marketCap: Double?
     var priceChangePercentage24H: Double?
@@ -47,7 +47,7 @@ final class CoinData {
         id: String = "",
         symbol: String = "",
         name: String = "",
-        image: URL? = nil,
+        image: SafeURL? = nil,
         currentPrice: Double? = nil,
         marketCap: Double? = nil,
         priceChangePercentage24H: Double? = nil,
@@ -85,7 +85,7 @@ extension CoinData {
             id: "bitcoin",
             symbol: "BTC",
             name: "Bitcoin",
-            image: URL(string: "https://coin-images.coingecko.com/coins/images/1/large/bitcoin.png?1696501400"),
+            image: SafeURL(string: "https://coin-images.coingecko.com/coins/images/1/large/bitcoin.png?1696501400"),
             imageData: UIImage(named: "bitcoin.logo")?.pngData(),
             isPinned: true
         ),
@@ -93,7 +93,7 @@ extension CoinData {
             id: "ethereum",
             symbol: "ETH",
             name: "Ethereum",
-            image: URL(string: "https://coin-images.coingecko.com/coins/images/279/large/ethereum.png?1696501628"),
+            image: SafeURL(string: "https://coin-images.coingecko.com/coins/images/279/large/ethereum.png?1696501628"),
             imageData: UIImage(named: "ethereum.logo")?.pngData(),
             isPinned: true
         ),
@@ -101,28 +101,28 @@ extension CoinData {
             id: "ripple",
             symbol: "XRP",
             name: "XRP",
-            image: URL(string: "https://coin-images.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png?1696501442"),
+            image: SafeURL(string: "https://coin-images.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png?1696501442"),
             imageData: UIImage(named: "xrp.logo")?.pngData()
         ),
         CoinData(
             id: "binancecoin",
             symbol: "BNB",
             name: "BNB",
-            image: URL(string: "https://coin-images.coingecko.com/coins/images/825/large/bnb-icon2_2x.png?1696501970"),
+            image: SafeURL(string: "https://coin-images.coingecko.com/coins/images/825/large/bnb-icon2_2x.png?1696501970"),
             imageData: UIImage(named: "bnb.logo")?.pngData()
         ),
         CoinData(
             id: "solana",
             symbol: "SOL",
             name: "Solana",
-            image: URL(string: "https://coin-images.coingecko.com/coins/images/4128/large/solana.png?1718769756"),
+            image: SafeURL(string: "https://coin-images.coingecko.com/coins/images/4128/large/solana.png?1718769756"),
             imageData: UIImage(named: "solana.logo")?.pngData()
         ),
         CoinData(
             id: "dogecoin",
             symbol: "DOGE",
             name: "Dogecoin",
-            image: URL(string: "https://coin-images.coingecko.com/coins/images/5/large/dogecoin.png?1696501409"),
+            image: SafeURL(string: "https://coin-images.coingecko.com/coins/images/5/large/dogecoin.png?1696501409"),
             imageData: UIImage(named: "dogecoin.logo")?.pngData()
         )
     ]
