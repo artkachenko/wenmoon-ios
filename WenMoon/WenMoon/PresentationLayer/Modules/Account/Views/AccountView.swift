@@ -125,50 +125,79 @@ struct AccountView: View {
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 20)
                 
-                HStack(spacing: 16) {
-                    Button(action: {
-                        Task {
-                            await viewModel.signInWithGoogle()
-                        }
-                    }) {
-                        ZStack {
-                            if viewModel.isGoogleAuthInProgress {
-                                ProgressView()
-                            } else {
-                                Image("google.logo")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 24, height: 24)
-                            }
-                        }
-                        .frame(width: 48, height: 48)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(12)
-                    }
-                    Button(action: {
-                        Task {
-                            await viewModel.signInWithTwitter()
-                        }
-                    }) {
-                        ZStack {
-                            if viewModel.isTwitterAuthInProgress {
-                                ProgressView()
-                            } else {
-                                Image("x.logo")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 24, height: 24)
-                            }
-                        }
-                        .frame(width: 48, height: 48)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(12)
-                    }
-                }
+                makeSignInOptionsView()
             }
         }
         .padding(.top, 48)
         .padding(.bottom, 24)
+    }
+    
+    @ViewBuilder
+    private func makeSignInOptionsView() -> some View {
+        // Apple
+        HStack(spacing: 16) {
+            Button(action: {
+                Task {
+                    await viewModel.signInWithApple()
+                }
+            }) {
+                ZStack {
+                    if viewModel.isAppleAuthInProgress {
+                        ProgressView()
+                    } else {
+                        Image("apple.logo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                    }
+                }
+                .frame(width: 48, height: 48)
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+            }
+            
+            // Google
+            Button(action: {
+                Task {
+                    await viewModel.signInWithGoogle()
+                }
+            }) {
+                ZStack {
+                    if viewModel.isGoogleAuthInProgress {
+                        ProgressView()
+                    } else {
+                        Image("google.logo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                    }
+                }
+                .frame(width: 48, height: 48)
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+            }
+            
+            // X (Twitter)
+            Button(action: {
+                Task {
+                    await viewModel.signInWithTwitter()
+                }
+            }) {
+                ZStack {
+                    if viewModel.isTwitterAuthInProgress {
+                        ProgressView()
+                    } else {
+                        Image("x.logo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 16, height: 16)
+                    }
+                }
+                .frame(width: 48, height: 48)
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+            }
+        }
     }
     
     @ViewBuilder

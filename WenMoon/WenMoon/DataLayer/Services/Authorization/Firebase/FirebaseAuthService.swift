@@ -11,9 +11,9 @@ protocol FirebaseAuthService {
     var clientID: String? { get }
     var userID: String? { get }
     
-    func signIn(with credential: AuthCredential) async throws -> AuthDataResult?
+    func signIn(with credential: AuthCredential) async throws -> AuthDataResult
     func signOut() throws
-    func getIDToken() async throws -> String?
+    func getIDToken() async throws -> String
 }
 
 final class FirebaseAuthServiceImpl: FirebaseAuthService {
@@ -38,15 +38,17 @@ final class FirebaseAuthServiceImpl: FirebaseAuthService {
         auth.currentUser?.uid
     }
     
-    func signIn(with credential: AuthCredential) async throws -> AuthDataResult? {
+    func signIn(with credential: AuthCredential) async throws -> AuthDataResult {
         try await withCheckedThrowingContinuation { continuation in
             auth.signIn(with: credential) { result, error in
                 guard (error == nil) else {
                     continuation.resume(throwing: error!)
                     return
                 }
-                
-                let result = (result == nil) ? nil : result
+                guard let result else {
+                    continuation.resume(throwing: AuthError.failedToSignIn())
+                    return
+                }
                 continuation.resume(returning: result)
             }
         }
@@ -56,17 +58,20 @@ final class FirebaseAuthServiceImpl: FirebaseAuthService {
         try auth.signOut()
     }
     
-    func getIDToken() async throws -> String? {
-        guard let user = Auth.auth().currentUser else { return nil }
-        
+    func getIDToken() async throws -> String {
+        guard let user = Auth.auth().currentUser else {
+            throw AuthError.userNotSignedIn
+        }
         return try await withCheckedThrowingContinuation { continuation in
             user.getIDToken { token, error in
                 guard (error == nil) else {
                     continuation.resume(throwing: error!)
                     return
                 }
-                
-                let token = (token == nil) ? nil : token
+                guard let token else {
+                    continuation.resume(throwing: AuthError.failedToFetchFirebaseToken)
+                    return
+                }
                 continuation.resume(returning: token)
             }
         }

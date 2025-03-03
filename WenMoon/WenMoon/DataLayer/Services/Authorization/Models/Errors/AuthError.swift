@@ -8,10 +8,24 @@
 import Foundation
 
 enum AuthError: DescriptiveError, Equatable {
+    enum AuthProvider {
+        case apple
+        case google
+        case twitter
+        
+        var name: String {
+            switch self {
+            case .apple: return "Apple"
+            case .google: return "Google"
+            case .twitter: return "X"
+            }
+        }
+    }
+    
     case failedToFetchAccount
     case failedToDeleteAccount
     case failedToFetchFirebaseToken
-    case failedToSignIn
+    case failedToSignIn(provider: AuthProvider? = nil)
     case failedToSignOut
     case userNotSignedIn
     case unknownError
@@ -23,8 +37,11 @@ enum AuthError: DescriptiveError, Equatable {
             return "Failed to fetch account." + suffix
         case .failedToDeleteAccount:
             return "Failed to delete account." + suffix
-        case .failedToSignIn:
-            return "Failed to sign in." + suffix
+        case .failedToSignIn(let provider):
+            guard let provider else {
+                return "Failed to sign in." + suffix
+            }
+            return "Failed to sign in with \(provider.name)." + suffix
         case .failedToSignOut:
             return "Failed to sign out." + suffix
         case .failedToFetchFirebaseToken:

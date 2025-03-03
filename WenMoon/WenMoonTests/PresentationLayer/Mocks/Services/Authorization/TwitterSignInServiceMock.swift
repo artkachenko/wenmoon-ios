@@ -14,7 +14,7 @@ class TwitterSignInServiceMock: TwitterSignInService {
     var signInResult: Result<FirebaseAuth.AuthCredential, Error>!
     
     // MARK: - TwitterSignInService
-    func signIn() async throws -> AuthCredential? {
+    func signIn() async throws -> AuthCredential {
         switch signInResult {
         case .success(let result):
             return result
@@ -22,7 +22,7 @@ class TwitterSignInServiceMock: TwitterSignInService {
             throw error
         case .none:
             XCTFail("signInResult not set")
-            return nil
+            throw AuthError.failedToSignIn(provider: .twitter)
         }
     }
 }

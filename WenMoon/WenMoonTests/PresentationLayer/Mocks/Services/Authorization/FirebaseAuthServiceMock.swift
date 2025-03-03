@@ -19,7 +19,7 @@ class FirebaseAuthServiceMock: FirebaseAuthService {
     var idTokenResult: Result<String, Error>!
     
     // MARK: - FirebaseAuthService
-    func signIn(with credential: AuthCredential) async throws -> AuthDataResult? {
+    func signIn(with credential: AuthCredential) async throws -> AuthDataResult {
         switch signInResult {
         case .success(let result):
             return result
@@ -27,7 +27,7 @@ class FirebaseAuthServiceMock: FirebaseAuthService {
             throw error
         case .none:
             XCTFail("signInResult not set")
-            return nil
+            throw AuthError.failedToSignIn()
         }
     }
     
@@ -42,7 +42,7 @@ class FirebaseAuthServiceMock: FirebaseAuthService {
         }
     }
     
-    func getIDToken() async throws -> String? {
+    func getIDToken() async throws -> String {
         switch idTokenResult {
         case .success(let result):
             return result
@@ -50,7 +50,7 @@ class FirebaseAuthServiceMock: FirebaseAuthService {
             throw error
         case .none:
             XCTFail("idTokenResult not set")
-            return nil
+            throw AuthError.failedToFetchFirebaseToken
         }
     }
 }

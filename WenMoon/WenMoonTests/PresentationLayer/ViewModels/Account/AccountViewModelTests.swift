@@ -14,6 +14,7 @@ class AccountViewModelTests: XCTestCase {
     var viewModel: AccountViewModel!
     
     var firebaseAuthService: FirebaseAuthServiceMock!
+    var appleSignInService: AppleSignInServiceMock!
     var googleSignInService: GoogleSignInServiceMock!
     var twitterSignInService: TwitterSignInServiceMock!
     var accountService: AccountServiceMock!
@@ -24,6 +25,7 @@ class AccountViewModelTests: XCTestCase {
     override func setUp() {
         super.setUp()
         firebaseAuthService = FirebaseAuthServiceMock()
+        appleSignInService = AppleSignInServiceMock()
         googleSignInService = GoogleSignInServiceMock()
         twitterSignInService = TwitterSignInServiceMock()
         accountService = AccountServiceMock()
@@ -32,6 +34,7 @@ class AccountViewModelTests: XCTestCase {
         
         viewModel = AccountViewModel(
             firebaseAuthService: firebaseAuthService,
+            appleSignInService: appleSignInService,
             googleSignInService: googleSignInService,
             twitterSignInService: twitterSignInService,
             accountService: accountService,
@@ -43,6 +46,7 @@ class AccountViewModelTests: XCTestCase {
     override func tearDown() {
         viewModel = nil
         firebaseAuthService = nil
+        appleSignInService = nil
         googleSignInService = nil
         twitterSignInService = nil
         accountService = nil
@@ -82,7 +86,6 @@ class AccountViewModelTests: XCTestCase {
         // Setup
         let error: AuthError = .failedToFetchAccount
         accountService.getAccountResult = .failure(error)
-        firebaseAuthService.signOutResult = .success(())
         
         // Action
         await viewModel.fetchAccount(authToken: "test-auth-token")
@@ -100,7 +103,6 @@ class AccountViewModelTests: XCTestCase {
         
         let error: AuthError = .failedToFetchFirebaseToken
         firebaseAuthService.idTokenResult = .failure(error)
-        firebaseAuthService.signOutResult = .success(())
         
         // Action
         await viewModel.fetchAccount()

@@ -41,6 +41,7 @@ final class AccountViewModel: BaseViewModel {
     
     // MARK: - Properties
     private let firebaseAuthService: FirebaseAuthService
+    private let appleSignInService: AppleSignInService
     private let googleSignInService: GoogleSignInService
     private let twitterSignInService: TwitterSignInService
     private let accountService: AccountService
@@ -49,6 +50,7 @@ final class AccountViewModel: BaseViewModel {
     @Published var settings: [Setting] = []
     @Published var communityLinks = CommunityLinks.allCases
     
+    @Published private(set) var isAppleAuthInProgress = false
     @Published private(set) var isGoogleAuthInProgress = false
     @Published private(set) var isTwitterAuthInProgress = false
     
@@ -63,6 +65,7 @@ final class AccountViewModel: BaseViewModel {
     convenience init() {
         self.init(
             firebaseAuthService: FirebaseAuthServiceImpl(),
+            appleSignInService: AppleSignInServiceImpl(),
             googleSignInService: GoogleSignInServiceImpl(),
             twitterSignInService: TwitterSignInServiceImpl(),
             accountService: AccountServiceImpl()
@@ -71,6 +74,7 @@ final class AccountViewModel: BaseViewModel {
     
     init(
         firebaseAuthService: FirebaseAuthService,
+        appleSignInService: AppleSignInService,
         googleSignInService: GoogleSignInService,
         twitterSignInService: TwitterSignInService,
         accountService: AccountService,
@@ -80,6 +84,7 @@ final class AccountViewModel: BaseViewModel {
         self.firebaseAuthService = firebaseAuthService
         self.googleSignInService = googleSignInService
         self.twitterSignInService = twitterSignInService
+        self.appleSignInService = appleSignInService
         self.accountService = accountService
         super.init(appLaunchProvider: appLaunchProvider, userDefaultsManager: userDefaultsManager)
     }
@@ -88,46 +93,36 @@ final class AccountViewModel: BaseViewModel {
     @MainActor
     func fetchAccount(authToken: String? = nil) async {
         do {
-            guard firebaseAuthService.userID != nil else {
-                let error: AuthError = .userNotSignedIn
-                setError(error)
-                return
-            }
-            
-            let token: String
-            if let authToken {
-                token = authToken
-            } else if let authToken = await fetchAuthToken() {
-                token = authToken
-            } else {
-                signOut()
-                return
-            }
-            
+            let token = (authToken == nil) ? (try await firebaseAuthService.getIDToken()) : authToken!
             let account = try await accountService.getAccount(authToken: token)
             authState = .authenticated(account)
         } catch {
-            let error: AuthError = .failedToFetchAccount
             setError(error)
-            signOut()
         }
     }
     
     @MainActor
     func deleteAccount() async {
         do {
-            guard firebaseAuthService.userID != nil else {
-                let error: AuthError = .userNotSignedIn
-                setError(error)
-                return
-            }
-            
-            guard let authToken = await fetchAuthToken() else { return }
-            
+            let authToken = try await firebaseAuthService.getIDToken()
             try await accountService.deleteAccount(authToken: authToken)
             signOut()
         } catch {
-            let error: AuthError = .failedToDeleteAccount
+            setError(error)
+        }
+    }
+    
+    @MainActor
+    func signInWithApple() async {
+        isAppleAuthInProgress = true
+        defer { isAppleAuthInProgress = false }
+        
+        triggerImpactFeedback()
+        
+        do {
+            let credential = try await appleSignInService.singIn()
+            await signIn(with: credential)
+        } catch {
             setError(error)
         }
     }
@@ -139,33 +134,24 @@ final class AccountViewModel: BaseViewModel {
         
         triggerImpactFeedback()
         
-        guard
-            let clientID = firebaseAuthService.clientID,
-            let rootViewController = UIApplication.rootViewController
-        else {
-            return
-        }
-        
-        googleSignInService.configure(clientID: clientID)
-        
         do {
-            let signInResult = try await googleSignInService.signIn(withPresenting: rootViewController)
-            
-            guard
-                let user = signInResult?.user,
-                let idToken = user.idToken?.tokenString
-            else {
-                return
+            guard let clientID = firebaseAuthService.clientID,
+                  let rootViewController = UIApplication.rootViewController else {
+                throw AuthError.unknownError
             }
             
-            let credential = googleSignInService.credential(
-                withIDToken: idToken,
-                accessToken: user.accessToken.tokenString
-            )
+            googleSignInService.configure(clientID: clientID)
             
+            let signInResult = try await googleSignInService.signIn(withPresenting: rootViewController)
+            let user = signInResult.user
+            
+            guard let idToken = user.idToken?.tokenString else {
+                throw AuthError.failedToSignIn(provider: .google)
+            }
+            
+            let credential = googleSignInService.credential(withIDToken: idToken, accessToken: user.accessToken.tokenString)
             await signIn(with: credential)
         } catch {
-            let error: AuthError = .failedToSignIn
             setError(error)
         }
     }
@@ -178,10 +164,9 @@ final class AccountViewModel: BaseViewModel {
         triggerImpactFeedback()
         
         do {
-            guard let credential = try await twitterSignInService.signIn() else { return }
+            let credential = try await twitterSignInService.signIn()
             await signIn(with: credential)
         } catch {
-            let error: AuthError = .failedToSignIn
             setError(error)
         }
     }
@@ -196,7 +181,6 @@ final class AccountViewModel: BaseViewModel {
             try firebaseAuthService.signOut()
             authState = .unauthenticated
         } catch {
-            let error: AuthError = .failedToSignOut
             setError(error)
         }
     }
@@ -234,33 +218,12 @@ final class AccountViewModel: BaseViewModel {
     @MainActor
     private func signIn(with credential: AuthCredential) async {
         do {
-            guard let result = try await firebaseAuthService.signIn(with: credential) else {
-                let error: AuthError = .unknownError
-                setError(error)
-                return
-            }
-            
-            guard let authToken = try? await result.user.getIDToken() else {
-                let error: AuthError = .failedToFetchFirebaseToken
-                setError(error)
-                return
-            }
-            
+            let result = try await firebaseAuthService.signIn(with: credential)
+            let authToken = try await result.user.getIDToken()
             await fetchAccount(authToken: authToken)
         } catch {
-            let error: AuthError = .failedToSignIn
             setError(error)
         }
-    }
-    
-    @MainActor
-    private func fetchAuthToken() async -> String? {
-        guard let token = try? await firebaseAuthService.getIDToken() else {
-            let error: AuthError = .failedToFetchFirebaseToken
-            setError(error)
-            return nil
-        }
-        return token
     }
     
     private func getSavedSetting(of type: Setting.SettingType) -> Int {

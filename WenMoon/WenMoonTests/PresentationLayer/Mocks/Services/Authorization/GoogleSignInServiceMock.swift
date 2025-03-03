@@ -20,7 +20,7 @@ class GoogleSignInServiceMock: GoogleSignInService {
         self.clientID = clientID
     }
     
-    func signIn(withPresenting viewController: UIViewController) async throws -> GIDSignInResult? {
+    func signIn(withPresenting viewController: UIViewController) async throws -> GIDSignInResult {
         switch signInResult {
         case .success(let result):
             return result
@@ -28,11 +28,11 @@ class GoogleSignInServiceMock: GoogleSignInService {
             throw error
         case .none:
             XCTFail("signInResult not set")
-            return nil
+            throw AuthError.failedToSignIn(provider: .google)
         }
     }
     
     func credential(withIDToken idToken: String, accessToken: String) -> FirebaseAuth.AuthCredential {
-        GoogleAuthProvider.credential(withIDToken: "someIDToken", accessToken: "someAccessToken")
+        GoogleAuthProvider.credential(withIDToken: "test-id-token", accessToken: "test-access-token")
     }
 }

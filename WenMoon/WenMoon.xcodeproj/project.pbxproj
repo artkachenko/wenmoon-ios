@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		191DCD482D2805CC00892757 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 191DCD472D2805CC00892757 /* Release.xcconfig */; };
 		191DCD492D2805CC00892757 /* Release.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 191DCD472D2805CC00892757 /* Release.xcconfig */; };
+		19338EE72D75DDD200E5AA89 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 19338EE62D75DDD200E5AA89 /* GoogleService-Info.plist */; };
+		19338EE82D75DDD200E5AA89 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 19338EE62D75DDD200E5AA89 /* GoogleService-Info.plist */; };
+		19338EEB2D75DE8900E5AA89 /* AppleSignInService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19338EEA2D75DE8900E5AA89 /* AppleSignInService.swift */; };
+		19338EED2D75EE4900E5AA89 /* AppleSignInServiceMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19338EEC2D75EE4900E5AA89 /* AppleSignInServiceMock.swift */; };
 		194212A52D5A4930008DE753 /* String+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194212A42D5A4930008DE753 /* String+Extensions.swift */; };
 		194212A72D5BB250008DE753 /* LinksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194212A62D5BB250008DE753 /* LinksView.swift */; };
 		194212A92D5D0D37008DE753 /* ExpandableTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194212A82D5D0D37008DE753 /* ExpandableTextView.swift */; };
@@ -61,8 +65,6 @@
 		D220D7492CECF7AB004C8EAB /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = D220D7482CECF7AB004C8EAB /* FirebaseAuth */; };
 		D220D74B2CECFF16004C8EAB /* UIApplication+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D220D74A2CECFF16004C8EAB /* UIApplication+Extensions.swift */; };
 		D220D74D2CED04B6004C8EAB /* BaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D220D74C2CED04B6004C8EAB /* BaseView.swift */; };
-		D220D7522CEF3128004C8EAB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D220D7512CEF3128004C8EAB /* GoogleService-Info.plist */; };
-		D220D7532CEF3128004C8EAB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D220D7512CEF3128004C8EAB /* GoogleService-Info.plist */; };
 		D220D7552CF0B47F004C8EAB /* SelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D220D7542CF0B47F004C8EAB /* SelectionView.swift */; };
 		D220D75B2CF4DC2C004C8EAB /* FirebaseAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D220D75A2CF4DC2C004C8EAB /* FirebaseAuthService.swift */; };
 		D220D75D2CF4DC65004C8EAB /* GoogleSignInService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D220D75C2CF4DC65004C8EAB /* GoogleSignInService.swift */; };
@@ -156,6 +158,9 @@
 
 /* Begin PBXFileReference section */
 		191DCD472D2805CC00892757 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		19338EE62D75DDD200E5AA89 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		19338EEA2D75DE8900E5AA89 /* AppleSignInService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInService.swift; sourceTree = "<group>"; };
+		19338EEC2D75EE4900E5AA89 /* AppleSignInServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInServiceMock.swift; sourceTree = "<group>"; };
 		194212A42D5A4930008DE753 /* String+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extensions.swift"; sourceTree = "<group>"; };
 		194212A62D5BB250008DE753 /* LinksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinksView.swift; sourceTree = "<group>"; };
 		194212A82D5D0D37008DE753 /* ExpandableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandableTextView.swift; sourceTree = "<group>"; };
@@ -202,7 +207,6 @@
 		D220D7362CEC99DA004C8EAB /* AccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountViewModel.swift; sourceTree = "<group>"; };
 		D220D74A2CECFF16004C8EAB /* UIApplication+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Extensions.swift"; sourceTree = "<group>"; };
 		D220D74C2CED04B6004C8EAB /* BaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseView.swift; sourceTree = "<group>"; };
-		D220D7512CEF3128004C8EAB /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		D220D7542CF0B47F004C8EAB /* SelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionView.swift; sourceTree = "<group>"; };
 		D220D75A2CF4DC2C004C8EAB /* FirebaseAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseAuthService.swift; sourceTree = "<group>"; };
 		D220D75C2CF4DC65004C8EAB /* GoogleSignInService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInService.swift; sourceTree = "<group>"; };
@@ -311,6 +315,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		19338EE92D75DE6B00E5AA89 /* Apple */ = {
+			isa = PBXGroup;
+			children = (
+				19338EEA2D75DE8900E5AA89 /* AppleSignInService.swift */,
+			);
+			path = Apple;
+			sourceTree = "<group>";
+		};
 		194212B22D5FB2FC008DE753 /* CoinDetails */ = {
 			isa = PBXGroup;
 			children = (
@@ -658,6 +670,7 @@
 				19F254F02D6907A2001867CC /* Models */,
 				19F254F32D69EBBB001867CC /* Account */,
 				D220D7572CF4DC0E004C8EAB /* Firebase */,
+				19338EE92D75DE6B00E5AA89 /* Apple */,
 				D220D7582CF4DC14004C8EAB /* Google */,
 				D220D7592CF4DC19004C8EAB /* Twitter */,
 			);
@@ -748,7 +761,7 @@
 				191DCD472D2805CC00892757 /* Release.xcconfig */,
 				1950C8A02D73646900595401 /* Debug.xcconfig */,
 				D2AAC1F42CCFF3A900CBAFB0 /* Info.plist */,
-				D220D7512CEF3128004C8EAB /* GoogleService-Info.plist */,
+				19338EE62D75DDD200E5AA89 /* GoogleService-Info.plist */,
 			);
 			path = SupportingFiles;
 			sourceTree = "<group>";
@@ -800,6 +813,7 @@
 		D2D795752CFDC69100950125 /* Authorization */ = {
 			isa = PBXGroup;
 			children = (
+				19338EEC2D75EE4900E5AA89 /* AppleSignInServiceMock.swift */,
 				D2D7957C2CFDF91100950125 /* GoogleSignInServiceMock.swift */,
 				D2D7957E2CFDF91B00950125 /* TwitterSignInServiceMock.swift */,
 				D2D795762CFDC6AE00950125 /* FirebaseAuthServiceMock.swift */,
@@ -1383,9 +1397,9 @@
 			files = (
 				191DCD492D2805CC00892757 /* Release.xcconfig in Resources */,
 				FAB3620029F447DC00A88050 /* Icons.xcassets in Resources */,
+				19338EE72D75DDD200E5AA89 /* GoogleService-Info.plist in Resources */,
 				D2AAC1F62CCFF83B00CBAFB0 /* Colors.xcassets in Resources */,
 				1950C8A12D73646900595401 /* Debug.xcconfig in Resources */,
-				D220D7522CEF3128004C8EAB /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1394,8 +1408,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				191DCD482D2805CC00892757 /* Release.xcconfig in Resources */,
-				D220D7532CEF3128004C8EAB /* GoogleService-Info.plist in Resources */,
 				1950C8A22D73646900595401 /* Debug.xcconfig in Resources */,
+				19338EE82D75DDD200E5AA89 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1446,6 +1460,7 @@
 				19F254E92D67D373001867CC /* AppLaunchProvider.swift in Sources */,
 				D226A50A2D1F3A83008FB901 /* AddTransactionViewModel.swift in Sources */,
 				FA8A088D2A1CFAF90083B8DB /* PriceAlert.swift in Sources */,
+				19338EEB2D75DE8900E5AA89 /* AppleSignInService.swift in Sources */,
 				D220D71F2CEC8BD4004C8EAB /* ContentView.swift in Sources */,
 				FAB3623629F4513B00A88050 /* HTTPRequest.swift in Sources */,
 				D22D33A32CB958A5007997DD /* DescriptiveError.swift in Sources */,
@@ -1513,6 +1528,7 @@
 				D21A57C32CCAAB9400AC2D13 /* Error+Assertions.swift in Sources */,
 				D2D795772CFDC6AE00950125 /* FirebaseAuthServiceMock.swift in Sources */,
 				1950C8A82D737B2100595401 /* NewsViewModelTests.swift in Sources */,
+				19338EED2D75EE4900E5AA89 /* AppleSignInServiceMock.swift in Sources */,
 				D2F6DD682CC6514E009EF857 /* PriceAlertFactoryMock.swift in Sources */,
 				198655122D32E4A700216097 /* PortfolioViewModelTests.swift in Sources */,
 				FAB3626229F4598F00A88050 /* CoinSelectionViewModelTests.swift in Sources */,
