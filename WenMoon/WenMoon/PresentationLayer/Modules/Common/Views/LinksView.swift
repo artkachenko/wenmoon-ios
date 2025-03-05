@@ -37,7 +37,7 @@ struct LinksView: View {
     private func generateLinkButtons() -> [AnyView] {
         var buttons: [AnyView] = []
         
-        if let urls = links.homepage?.compactMap(\.safeURL), !urls.isEmpty {
+        if let urls = links.homepage, !urls.isEmpty {
             appendMultiLinkButton(
                 to: &buttons,
                 title: "Website",
@@ -47,7 +47,7 @@ struct LinksView: View {
             )
         }
         
-        if let url = links.whitepaper?.safeURL {
+        if let url = links.whitepaper {
             buttons.append(
                 AnyView(
                     LinkButtonView(
@@ -72,7 +72,7 @@ struct LinksView: View {
             )
         }
         
-        if let url = links.subredditUrl?.safeURL, url.absoluteString != "https://www.reddit.com" {
+        if let url = links.subredditUrl, url.absoluteString != "https://www.reddit.com" {
             buttons.append(
                 AnyView(
                     LinkButtonView(
@@ -99,7 +99,7 @@ struct LinksView: View {
         
         let chatURLs = links.chatUrl ?? []
         let announcementURLs = links.announcementUrl ?? []
-        let communicationURLs = (chatURLs + announcementURLs).compactMap(\.safeURL)
+        let communicationURLs = (chatURLs + announcementURLs)
         if !communicationURLs.isEmpty {
             appendMultiLinkButton(
                 to: &buttons,
@@ -110,7 +110,7 @@ struct LinksView: View {
             )
         }
         
-        if let urls = links.blockchainSite?.compactMap(\.safeURL), !urls.isEmpty {
+        if let urls = links.blockchainSite, !urls.isEmpty {
             appendMultiLinkButton(
                 to: &buttons,
                 title: "Explorer",
@@ -120,7 +120,7 @@ struct LinksView: View {
             )
         }
         
-        if let urls = links.reposUrl.github?.compactMap(\.safeURL), !urls.isEmpty {
+        if let urls = links.reposUrl.github, !urls.isEmpty {
             if urls.count == 1, let url = urls.first {
                 buttons.append(
                     AnyView(

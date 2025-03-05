@@ -8,18 +8,21 @@
 import Foundation
 
 protocol PriceAlertService {
-    func getPriceAlerts(username: String, deviceToken: String) async throws -> [PriceAlert]
-    func createPriceAlert(_ priceAlert: PriceAlert, username: String, deviceToken: String) async throws -> PriceAlert
-    func deletePriceAlert(_ priceAlert: PriceAlert, username: String, deviceToken: String) async throws -> PriceAlert
+    func getPriceAlerts(authToken: String, deviceToken: String) async throws -> [PriceAlert]
+    func createPriceAlert(_ priceAlert: PriceAlert, authToken: String, deviceToken: String) async throws -> PriceAlert
+    func deletePriceAlert(_ priceAlert: PriceAlert, authToken: String, deviceToken: String) async throws -> PriceAlert
 }
 
 final class PriceAlertServiceImpl: BaseBackendService, PriceAlertService {
     // MARK: - PriceAlertService
-    func getPriceAlerts(username: String, deviceToken: String) async throws -> [PriceAlert] {
+    func getPriceAlerts(authToken: String, deviceToken: String) async throws -> [PriceAlert] {
         do {
             let data = try await httpClient.get(
-                path: "users/\(username)/price-alerts",
-                headers: ["X-Device-ID": deviceToken]
+                path: "price-alerts",
+                headers: [
+                    "Authorization": "Bearer \(authToken)",
+                    "X-Device-ID": deviceToken
+                ]
             )
             let priceAlerts = try decoder.decode([PriceAlert].self, from: data)
             return priceAlerts
@@ -28,12 +31,16 @@ final class PriceAlertServiceImpl: BaseBackendService, PriceAlertService {
         }
     }
     
-    func createPriceAlert(_ priceAlert: PriceAlert, username: String, deviceToken: String) async throws -> PriceAlert {
+    func createPriceAlert(_ priceAlert: PriceAlert, authToken: String, deviceToken: String) async throws -> PriceAlert {
         do {
             let body = try encoder.encode(priceAlert)
             let data = try await httpClient.post(
-                path: "users/\(username)/price-alert",
-                headers: ["X-Device-ID": deviceToken], body: body
+                path: "price-alerts",
+                headers: [
+                    "Authorization": "Bearer \(authToken)",
+                    "X-Device-ID": deviceToken
+                ],
+                body: body
             )
             let priceAlert = try decoder.decode(PriceAlert.self, from: data)
             return priceAlert
@@ -42,11 +49,14 @@ final class PriceAlertServiceImpl: BaseBackendService, PriceAlertService {
         }
     }
     
-    func deletePriceAlert(_ priceAlert: PriceAlert, username: String, deviceToken: String) async throws -> PriceAlert {
+    func deletePriceAlert(_ priceAlert: PriceAlert, authToken: String, deviceToken: String) async throws -> PriceAlert {
         do {
             let data = try await httpClient.delete(
-                path: "users/\(username)/price-alert/\(priceAlert.id)",
-                headers: ["X-Device-ID": deviceToken]
+                path: "price-alerts/\(priceAlert.id)",
+                headers: [
+                    "Authorization": "Bearer \(authToken)",
+                    "X-Device-ID": deviceToken
+                ]
             )
             let priceAlert = try decoder.decode(PriceAlert.self, from: data)
             return priceAlert

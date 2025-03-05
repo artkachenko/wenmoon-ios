@@ -107,7 +107,7 @@ class CoinScannerServiceTests: XCTestCase {
     
     func testSearchCoinsByQuery_networkError() async throws {
         // Setup
-        let error = ErrorFactoryMock.makeNoNetworkConnectionError()
+        let error: APIError = .noNetworkConnection
         httpClient.getResponse = .failure(error)
         
         // Action & Assertions
@@ -135,7 +135,7 @@ class CoinScannerServiceTests: XCTestCase {
     
     func testGetMarketDataForCoins_decodingError() async throws {
         // Setup
-        let error = ErrorFactoryMock.makeFailedToDecodeResponseError()
+        let error: APIError = .failedToDecodeResponse
         httpClient.getResponse = .failure(error)
         
         // Action & Assertions
@@ -174,30 +174,28 @@ class CoinScannerServiceTests: XCTestCase {
         )
     }
     
-    // Get Global Crypto Market Data
-    func testGetGlobalCryptoMarketData_success() async throws {
+    // Get Crypto Global Market Data
+    func testGetCryptoGlobalMarketData_success() async throws {
         // Setup
-        let response = GlobalCryptoMarketData(
-            marketCapPercentage: ["btc": 56.5, "eth": 12.8, "others": 30.7]
-        )
+        let response = CryptoGlobalMarketData(data: .init(marketCapPercentage: ["btc": 56.5, "eth": 12.8, "others": 30.7]))
         httpClient.getResponse = .success(try! JSONEncoder().encode(response))
         
         // Action
-        let data = try await service.getGlobalCryptoMarketData()
+        let receivedResponse = try await service.getCryptoGlobalMarketData()
         
         // Assertions
-        XCTAssertEqual(data.marketCapPercentage, response.marketCapPercentage)
+        XCTAssertEqual(receivedResponse, response)
     }
 
     func testGetGlobalCryptoMarketData_networkError() async throws {
         // Setup
-        let error = ErrorFactoryMock.makeNoNetworkConnectionError()
+        let error: APIError = .noNetworkConnection
         httpClient.getResponse = .failure(error)
         
         // Action & Assertions
         await assertFailure(
             for: { [weak self] in
-                try await self!.service.getGlobalCryptoMarketData()
+                try await self!.service.getCryptoGlobalMarketData()
             },
             expectedError: error
         )
@@ -227,7 +225,7 @@ class CoinScannerServiceTests: XCTestCase {
 
     func testGetGlobalMarketData_decodingError() async throws {
         // Setup
-        let error = ErrorFactoryMock.makeFailedToDecodeResponseError()
+        let error: APIError = .failedToDecodeResponse
         httpClient.getResponse = .failure(error)
         
         // Action & Assertions

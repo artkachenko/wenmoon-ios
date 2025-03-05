@@ -11,9 +11,9 @@ extension CoinDetails {
     struct Ticker: Codable, Hashable {
         // MARK: - Nested Types
         struct Market: Codable, Hashable {
-            var name: String? = nil
-            var identifier: String? = nil
-            var hasTradingIncentive: Bool? = nil
+            let name: String?
+            let identifier: String?
+            let hasTradingIncentive: Bool?
         }
         
         enum TrustScore: String, Codable, Hashable {
@@ -35,7 +35,20 @@ extension CoinDetails {
         let convertedLast: Double?
         let convertedVolume: Double?
         let trustScore: TrustScore?
-        let tradeUrl: SafeURL?
+        let tradeUrl: URL?
+        
+        // MARK: - Coding Keys
+        private enum CodingKeys: String, CodingKey {
+            case base
+            case target
+            case market
+            case convertedLast
+            case convertedVolume
+            case trustScore
+            case tradeUrl
+        }
+        
+        private enum CurrencyKeys: String, CodingKey { case usd }
         
         // MARK: - Initializers
         init(
@@ -45,7 +58,7 @@ extension CoinDetails {
             convertedLast: Double?,
             convertedVolume: Double?,
             trustScore: TrustScore?,
-            tradeUrl: SafeURL?
+            tradeUrl: URL?
         ) {
             self.base = base
             self.target = target
@@ -55,12 +68,6 @@ extension CoinDetails {
             self.trustScore = trustScore
             self.tradeUrl = tradeUrl
         }
-        
-        // MARK: - Codable
-        private enum CodingKeys: String, CodingKey {
-            case base, target, market, convertedLast, convertedVolume, trustScore, tradeUrl
-        }
-        enum CurrencyKeys: String, CodingKey { case usd }
         
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -75,9 +82,10 @@ extension CoinDetails {
             self.convertedVolume = convertedVolume?["usd"]
             
             trustScore = try container.decodeIfPresent(TrustScore.self, forKey: .trustScore)
-            tradeUrl = try container.decodeIfPresent(SafeURL.self, forKey: .tradeUrl)
+            tradeUrl = try container.decodeIfPresent(SafeURL.self, forKey: .tradeUrl)?.url
         }
         
+        // MARK: - Encodable
         func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             

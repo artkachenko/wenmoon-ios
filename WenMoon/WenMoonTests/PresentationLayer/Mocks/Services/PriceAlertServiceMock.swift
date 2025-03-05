@@ -15,7 +15,7 @@ class PriceAlertServiceMock: PriceAlertService {
     var deletePriceAlertResult: Result<PriceAlert, APIError>!
     
     // MARK: - PriceAlertService
-    func getPriceAlerts(username: String, deviceToken: String) async throws -> [PriceAlert] {
+    func getPriceAlerts(authToken: String, deviceToken: String) async throws -> [PriceAlert] {
         switch getPriceAlertsResult {
         case .success(let priceAlerts):
             return priceAlerts
@@ -27,7 +27,7 @@ class PriceAlertServiceMock: PriceAlertService {
         }
     }
     
-    func createPriceAlert(_ priceAlert: PriceAlert, username: String, deviceToken: String) async throws -> PriceAlert {
+    func createPriceAlert(_ priceAlert: PriceAlert, authToken: String, deviceToken: String) async throws -> PriceAlert {
         switch createPriceAlertResult {
         case .success(let priceAlert):
             return priceAlert
@@ -39,7 +39,7 @@ class PriceAlertServiceMock: PriceAlertService {
         }
     }
     
-    func deletePriceAlert(_ priceAlert: PriceAlert, username: String, deviceToken: String) async throws -> PriceAlert {
+    func deletePriceAlert(_ priceAlert: PriceAlert, authToken: String, deviceToken: String) async throws -> PriceAlert {
         switch deletePriceAlertResult {
         case .success(let priceAlert):
             return priceAlert

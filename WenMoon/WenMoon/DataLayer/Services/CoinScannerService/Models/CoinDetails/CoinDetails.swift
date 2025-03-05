@@ -22,6 +22,24 @@ struct CoinDetails: Codable, Equatable {
     let watchlistPortfolioUsers: Int?
     let tickers: [Ticker]
     
+    // MARK: - Coding Keys
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case marketData
+        case categories
+        case publicNotice
+        case description
+        case links
+        case countryOrigin
+        case genesisDate
+        case sentimentVotesUpPercentage
+        case sentimentVotesDownPercentage
+        case watchlistPortfolioUsers
+        case tickers
+    }
+    
+    private enum DescriptionKeys: String, CodingKey { case en }
+    
     // MARK: - Initializers
     init(
         id: String = "",
@@ -51,12 +69,6 @@ struct CoinDetails: Codable, Equatable {
         self.tickers = tickers
     }
     
-    // MARK: - Codable
-    private enum CodingKeys: String, CodingKey {
-        case id, marketData, categories, publicNotice, description, links, countryOrigin, genesisDate, sentimentVotesUpPercentage, sentimentVotesDownPercentage, watchlistPortfolioUsers, tickers
-    }
-    private enum DescriptionKeys: String, CodingKey { case en }
-    
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
@@ -79,6 +91,7 @@ struct CoinDetails: Codable, Equatable {
         tickers = try container.decode([Ticker].self, forKey: .tickers)
     }
     
+    // MARK: - Encodable
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)

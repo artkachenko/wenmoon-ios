@@ -11,20 +11,29 @@ struct News: Identifiable, Codable, Hashable {
     // MARK: - Properties
     let title: String?
     let description: String?
-    let thumbnail: SafeURL?
-    let url: SafeURL?
+    let thumbnail: URL?
+    let url: URL?
     let date: Date
     
     var id: String {
-        url?.safeURL?.absoluteString ?? UUID().uuidString
+        url?.absoluteString ?? UUID().uuidString
+    }
+    
+    // MARK: - Coding Keys
+    private enum CodingKeys: String, CodingKey {
+        case title
+        case description
+        case thumbnail
+        case url
+        case date
     }
     
     // MARK: - Initializers
     init(
         title: String? = nil,
         description: String? = nil,
-        thumbnail: SafeURL? = nil,
-        url: SafeURL? = nil,
+        thumbnail: URL? = nil,
+        url: URL? = nil,
         date: Date = .init()
     ) {
         self.title = title
@@ -34,17 +43,12 @@ struct News: Identifiable, Codable, Hashable {
         self.date = date
     }
     
-    // MARK: - Codable
-    private enum CodingKeys: String, CodingKey {
-        case title, description, thumbnail, url, date
-    }
-    
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         title = try container.decodeIfPresent(String.self, forKey: .title)
         description = try container.decodeIfPresent(String.self, forKey: .description)
-        thumbnail = try container.decodeIfPresent(SafeURL.self, forKey: .thumbnail)
-        url = try container.decodeIfPresent(SafeURL.self, forKey: .url)
+        thumbnail = try container.decodeIfPresent(SafeURL.self, forKey: .thumbnail)?.url
+        url = try container.decodeIfPresent(SafeURL.self, forKey: .url)?.url
         
         if let dateString = try container.decodeIfPresent(String.self, forKey: .date) {
             let dateFormatter = DateFormatter()
@@ -55,6 +59,7 @@ struct News: Identifiable, Codable, Hashable {
         }
     }
     
+    // MARK: - Encodable
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encodeIfPresent(title, forKey: .title)

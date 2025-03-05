@@ -10,31 +10,51 @@ import Foundation
 final class PriceAlertsViewModel: BaseViewModel {
     // MARK: - Properties
     private let priceAlertService: PriceAlertService
-
-    @Published var coin: CoinData
+    private let firebaseAuthService: FirebaseAuthService
+    
     @Published private(set) var isCreatingPriceAlert = false
     @Published private(set) var deletingPriceAlertIDs: [String] = []
     
     // MARK: - Initializers
-    convenience init(coin: CoinData) {
-        self.init(coin: coin, priceAlertService: PriceAlertServiceImpl())
+    convenience init() {
+        self.init(
+            priceAlertService: PriceAlertServiceImpl(),
+            firebaseAuthService: FirebaseAuthServiceImpl()
+        )
     }
     
     init(
-        coin: CoinData,
         priceAlertService: PriceAlertService,
+        firebaseAuthService: FirebaseAuthService,
         userDefaultsManager: UserDefaultsManager? = nil
     ) {
-        self.coin = coin
         self.priceAlertService = priceAlertService
+        self.firebaseAuthService = firebaseAuthService
         super.init(userDefaultsManager: userDefaultsManager)
     }
     
     // MARK: - Internal Methods
     @MainActor
-    func createPriceAlert(for account: Account?, targetPrice: Double) async {
-        guard let account, let deviceToken else {
-            setErrorMessage("User ID, or device token is nil")
+    func fetchPriceAlerts() async -> [PriceAlert] {
+        guard let deviceToken else {
+            setErrorMessage("Device token is missing")
+            return []
+        }
+        
+        do {
+            let authToken = try await firebaseAuthService.getIDToken()
+            let priceAlerts = try await priceAlertService.getPriceAlerts(authToken: authToken, deviceToken: deviceToken)
+            return priceAlerts
+        } catch {
+            setError(error)
+            return []
+        }
+    }
+    
+    @MainActor
+    func createPriceAlert(for coin: CoinData, targetPrice: Double) async {
+        guard let deviceToken else {
+            setErrorMessage("Device token is missing")
             return
         }
         
@@ -43,14 +63,17 @@ final class PriceAlertsViewModel: BaseViewModel {
         
         do {
             let priceAlert = PriceAlert(
-                id: coin.id + "_" + UUID().uuidString,
+                id: UUID().uuidString,
+                coinID: coin.id,
                 symbol: coin.symbol,
                 targetPrice: targetPrice,
                 targetDirection: (coin.currentPrice ?? .zero) < targetPrice ? .above : .below
             )
+            
+            let authToken = try await firebaseAuthService.getIDToken()
             let createdPriceAlert = try await priceAlertService.createPriceAlert(
                 priceAlert,
-                username: account.username,
+                authToken: authToken,
                 deviceToken: deviceToken
             )
             coin.priceAlerts.append(createdPriceAlert)
@@ -62,9 +85,9 @@ final class PriceAlertsViewModel: BaseViewModel {
     }
     
     @MainActor
-    func deletePriceAlert(_ priceAlert: PriceAlert, for account: Account?) async {
-        guard let account, let deviceToken else {
-            setErrorMessage("User ID, or device token is nil")
+    func deletePriceAlert(_ priceAlert: PriceAlert, for coin: CoinData) async {
+        guard let deviceToken else {
+            setErrorMessage("Device token is missing")
             return
         }
         
@@ -76,9 +99,10 @@ final class PriceAlertsViewModel: BaseViewModel {
         }
         
         do {
+            let authToken = try await firebaseAuthService.getIDToken()
             let deletedPriceAlert = try await priceAlertService.deletePriceAlert(
                 priceAlert,
-                username: account.username,
+                authToken: authToken,
                 deviceToken: deviceToken
             )
             if let index = coin.priceAlerts.firstIndex(where: { $0.id == deletedPriceAlert.id }) {
@@ -89,13 +113,13 @@ final class PriceAlertsViewModel: BaseViewModel {
         }
     }
     
-    func shouldDisableCreateButton(targetPrice: Double?) -> Bool {
+    func shouldDisableCreateButton(priceAlerts: [PriceAlert], targetPrice: Double?) -> Bool {
         targetPrice == nil ||
         targetPrice == .zero ||
-        coin.priceAlerts.map(\.targetPrice).contains(targetPrice)
+        priceAlerts.map(\.targetPrice).contains(targetPrice)
     }
     
-    func getTargetDirection(for targetPrice: Double) -> PriceAlert.TargetDirection {
-        targetPrice >= (coin.currentPrice ?? .zero) ? .above : .below
+    func getTargetDirection(for targetPrice: Double, price: Double?) -> PriceAlert.TargetDirection {
+        targetPrice >= (price ?? .zero) ? .above : .below
     }
 }

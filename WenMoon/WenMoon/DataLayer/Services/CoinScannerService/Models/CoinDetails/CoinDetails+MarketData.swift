@@ -27,6 +27,28 @@ extension CoinDetails {
         let atlChangePercentage: Double?
         let atlDate: String?
         
+        // MARK: - Coding Keys
+        private enum CodingKeys: String, CodingKey {
+            case marketCapRank
+            case fullyDilutedValuation
+            case totalVolume
+            case high24H
+            case low24H
+            case marketCapChange24H
+            case marketCapChangePercentage24H
+            case circulatingSupply
+            case totalSupply
+            case maxSupply
+            case ath
+            case athChangePercentage
+            case athDate
+            case atl
+            case atlChangePercentage
+            case atlDate
+        }
+        
+        private enum CurrencyKeys: String, CodingKey { case usd }
+        
         // MARK: - Initializers
         init(
             marketCapRank: Int64? = nil,
@@ -63,12 +85,6 @@ extension CoinDetails {
             self.atlChangePercentage = atlChangePercentage
             self.atlDate = atlDate
         }
-        
-        // MARK: - Codable
-        private enum CodingKeys: String, CodingKey {
-            case marketCapRank, fullyDilutedValuation, totalVolume, high24H, low24H, marketCapChange24H, marketCapChangePercentage24H, circulatingSupply, totalSupply, maxSupply, ath, athChangePercentage, athDate, atl, atlChangePercentage, atlDate
-        }
-        enum CurrencyKeys: String, CodingKey { case usd }
         
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -108,6 +124,7 @@ extension CoinDetails {
             atlDate = extractString(.atlDate)
         }
         
+        // MARK: - Encodable
         func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: CodingKeys.self)
             try container.encodeIfPresent(marketCapRank, forKey: .marketCapRank)

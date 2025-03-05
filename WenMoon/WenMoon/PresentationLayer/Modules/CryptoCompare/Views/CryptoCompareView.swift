@@ -215,7 +215,7 @@ struct CryptoCompareView: View {
     
     // MARK: - Helper Methods
     private func loadAndCacheCoinImage(for coin: Coin) {
-        if let url = coin.image?.safeURL {
+        if let url = coin.image {
             Task {
                 if let data = await viewModel.loadImage(from: url),
                    let uiImage = UIImage(data: data) {

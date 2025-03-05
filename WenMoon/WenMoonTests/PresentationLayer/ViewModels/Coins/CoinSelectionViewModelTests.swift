@@ -75,7 +75,7 @@ class CoinSelectionViewModelTests: XCTestCase {
     
     func testFetchCoins_networkError() async {
         // Setup
-        let error = ErrorFactoryMock.makeNoNetworkConnectionError()
+        let error: APIError = .noNetworkConnection
         service.getCoinsAtPageResult = .failure(error)
         
         // Action
@@ -139,7 +139,7 @@ class CoinSelectionViewModelTests: XCTestCase {
     
     func testSearchCoinsByQuery_decodingError() async {
         // Setup
-        let error = ErrorFactoryMock.makeFailedToDecodeResponseError()
+        let error: APIError = .failedToDecodeResponse
         service.searchCoinsByQueryResult = .failure(error)
         
         // Action

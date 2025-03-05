@@ -11,9 +11,11 @@ import XCTest
 class CoinListViewModelTests: XCTestCase {
     // MARK: - Properties
     var viewModel: CoinListViewModel!
-
+    var priceAlertsViewModel: PriceAlertsViewModel!
+    
     var coinScannerService: CoinScannerServiceMock!
     var priceAlertService: PriceAlertServiceMock!
+    var firebaseAuthService: FirebaseAuthServiceMock!
     var appLaunchProvider: AppLaunchProviderMock!
     var userDefaultsManager: UserDefaultsManagerMock!
     var swiftDataManager: SwiftDataManagerMock!
@@ -23,15 +25,23 @@ class CoinListViewModelTests: XCTestCase {
     // MARK: - Setup
     override func setUp() {
         super.setUp()
-        coinScannerService = CoinScannerServiceMock()
         priceAlertService = PriceAlertServiceMock()
-        appLaunchProvider = AppLaunchProviderMock()
+        firebaseAuthService = FirebaseAuthServiceMock()
         userDefaultsManager = UserDefaultsManagerMock()
+        
+        priceAlertsViewModel = PriceAlertsViewModel(
+            priceAlertService: priceAlertService,
+            firebaseAuthService: firebaseAuthService,
+            userDefaultsManager: userDefaultsManager
+        )
+        
+        coinScannerService = CoinScannerServiceMock()
+        appLaunchProvider = AppLaunchProviderMock()
         swiftDataManager = SwiftDataManagerMock()
         
         viewModel = CoinListViewModel(
+            priceAlertsViewModel: priceAlertsViewModel,
             coinScannerService: coinScannerService,
-            priceAlertService: priceAlertService,
             appLaunchProvider: appLaunchProvider,
             userDefaultsManager: userDefaultsManager,
             swiftDataManager: swiftDataManager
@@ -42,8 +52,8 @@ class CoinListViewModelTests: XCTestCase {
     
     override func tearDown() {
         viewModel = nil
+        priceAlertsViewModel = nil
         coinScannerService = nil
-        priceAlertService = nil
         appLaunchProvider = nil
         userDefaultsManager = nil
         swiftDataManager = nil
@@ -275,6 +285,7 @@ class CoinListViewModelTests: XCTestCase {
     func testFetchPriceAlerts_success() async {
         // Setup
         userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
+        firebaseAuthService.idTokenResult = .success("test-id-token")
         
         let coin = CoinFactoryMock.makeCoinData()
         viewModel.coins.append(coin)
@@ -283,7 +294,7 @@ class CoinListViewModelTests: XCTestCase {
         priceAlertService.getPriceAlertsResult = .success(priceAlerts)
         
         // Action
-        await viewModel.fetchPriceAlerts(for: AccountFactoryMock.makeAccount())
+        await viewModel.fetchPriceAlerts()
         
         // Assertions
         let priceAlert = priceAlerts.first(where: { $0.id == coin.id })!
@@ -292,31 +303,13 @@ class CoinListViewModelTests: XCTestCase {
         
         // Test after alerts are cleared
         priceAlertService.getPriceAlertsResult = .success([])
-        await viewModel.fetchPriceAlerts(for: AccountFactoryMock.makeAccount())
+        await viewModel.fetchPriceAlerts()
         
         assertCoinHasNoAlert(viewModel.coins.first!)
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testFetchPriceAlerts_invalidEndpoint() async {
-        // Setup
-        userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
-        
-        let coin = CoinFactoryMock.makeCoinData()
-        viewModel.coins.append(coin)
-        
-        let error = ErrorFactoryMock.makeInvalidEndpointError()
-        priceAlertService.getPriceAlertsResult = .failure(error)
-        
-        // Action
-        await viewModel.fetchPriceAlerts(for: AccountFactoryMock.makeAccount())
-        
-        // Assertions
-        XCTAssertNotNil(viewModel.errorMessage)
-        XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
-    }
-    
-    func testToggleOffPriceAlert() {
+    func testRemovePriceAlert() {
         // Setup
         let coin = CoinFactoryMock.makeCoinData()
         let priceAlert = PriceAlertFactoryMock.makePriceAlert()
@@ -327,7 +320,7 @@ class CoinListViewModelTests: XCTestCase {
         assertCoinHasAlert(coin, priceAlert)
         
         // Action
-        viewModel.toggleOffPriceAlert(for: coin.id)
+        viewModel.removePriceAlert(for: priceAlert.id)
         
         // Assertions after deleting the price alert
         assertCoinHasNoAlert(coin)

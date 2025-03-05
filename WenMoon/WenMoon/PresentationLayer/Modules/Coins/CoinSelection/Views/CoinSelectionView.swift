@@ -112,7 +112,7 @@ struct CoinSelectionView: View {
             ZStack(alignment: .trailing) {
                 HStack(spacing: 12) {
                     CoinImageView(
-                        imageURL: coin.image?.safeURL,
+                        imageURL: coin.image,
                         placeholderText: coin.symbol,
                         size: 36
                     )

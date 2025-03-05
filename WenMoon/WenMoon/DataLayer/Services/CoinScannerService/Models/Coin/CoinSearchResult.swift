@@ -7,6 +7,6 @@
 
 import Foundation
 
-struct CoinSearchResult: Decodable {
+struct CoinSearchResult: Codable {
     let coins: [Coin]
 }

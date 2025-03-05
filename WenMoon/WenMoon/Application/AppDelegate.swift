@@ -14,21 +14,14 @@ class AppDelegate: NSObject, UIApplicationDelegate {
     private var userDefaultsManager: UserDefaultsManager?
     
     // MARK: - Methods
-    func application(
-        _ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
-    ) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        FirebaseApp.configure()
         userDefaultsManager = UserDefaultsManagerImpl()
         registerForPushNotifications()
-        FirebaseApp.configure()
         return true
     }
     
-    func application(
-        _ app: UIApplication,
-        open url: URL,
-        options: [UIApplication.OpenURLOptionsKey: Any] = [:]
-    ) -> Bool {
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
         GIDSignIn.sharedInstance.handle(url)
     }
     
@@ -36,7 +29,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         UNUserNotificationCenter.current().setBadgeCount(.zero)
     }
     
-    // MARK: - Private
+    // MARK: - Helpers
     private func registerForPushNotifications() {
         let notificationCenter = UNUserNotificationCenter.current()
         notificationCenter.delegate = self
@@ -49,8 +42,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         }
     }
     
-    private func sendTargetPriceNotification(for coinID: String) {
-        let userInfo: [String: Any] = ["coinID": coinID]
+    private func sendTargetPriceNotification(for id: String) {
+        let userInfo: [String: Any] = ["id": id]
         NotificationCenter.default.post(name: .targetPriceReached, object: nil, userInfo: userInfo)
     }
 }
@@ -75,8 +68,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions
         ) -> Void) {
         let userInfo = notification.request.content.userInfo
-        if let coinID = userInfo["coinID"] as? String {
-            sendTargetPriceNotification(for: coinID)
+        if let id = userInfo["id"] as? String {
+            sendTargetPriceNotification(for: id)
             resetBadgeNumber()
         }
         completionHandler([.banner, .badge, .sound])

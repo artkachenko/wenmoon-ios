@@ -106,8 +106,8 @@ struct CoinListView: View {
             )
         }
         .onReceive(NotificationCenter.default.publisher(for: .targetPriceReached)) { notification in
-            if let priceAlertID = notification.userInfo?["priceAlertID"] as? String {
-                coinListViewModel.toggleOffPriceAlert(for: priceAlertID)
+            if let id = notification.userInfo?["id"] as? String {
+                coinListViewModel.removePriceAlert(for: id)
             }
         }
         .task {
@@ -214,7 +214,7 @@ struct CoinListView: View {
     // MARK: - Private Methods
     private func fetchCoinsAndPriceAlerts() async {
         await coinListViewModel.fetchCoins()
-        await coinListViewModel.fetchPriceAlerts(for: accountViewModel.account)
+        await coinListViewModel.fetchPriceAlerts()
     }
     
     private func deletePinnedCoin(at offsets: IndexSet) {

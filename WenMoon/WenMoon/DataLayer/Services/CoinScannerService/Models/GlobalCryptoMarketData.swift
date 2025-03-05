@@ -7,6 +7,10 @@
 
 import Foundation
 
-struct GlobalCryptoMarketData: Codable {
-    let marketCapPercentage: [String: Double]
+struct CryptoGlobalMarketData: Codable, Equatable {
+    struct MarketData: Codable, Equatable {
+        let marketCapPercentage: [String: Double]
+    }
+    
+    let data: MarketData
 }

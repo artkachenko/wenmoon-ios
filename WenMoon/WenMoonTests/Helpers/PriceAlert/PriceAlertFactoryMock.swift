@@ -10,13 +10,15 @@ import Foundation
 
 struct PriceAlertFactoryMock {
     static func makePriceAlert(
-        id: String = "coin-1",
+        id: String = UUID().uuidString,
+        coinID: String = "coin-1",
         symbol: String = "SYM-1",
         targetPrice: Double = .random(in: 0.01...100_000),
         targetDirection: PriceAlert.TargetDirection = Bool.random() ? .above : .below
     ) -> PriceAlert {
         .init(
             id: id,
+            coinID: coinID,
             symbol: symbol,
             targetPrice: targetPrice,
             targetDirection: targetDirection

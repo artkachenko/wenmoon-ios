@@ -123,7 +123,7 @@ struct AddTransactionView: View {
                     if let coin = selectedCoin {
                         HStack(spacing: 12) {
                             CoinImageView(
-                                imageURL: coin.image?.safeURL,
+                                imageURL: coin.image,
                                 placeholderText: coin.symbol,
                                 size: 36
                             )

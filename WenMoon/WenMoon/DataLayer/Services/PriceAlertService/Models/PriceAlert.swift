@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct PriceAlert: Codable, Hashable {
+    // MARK: - Nested Types
     enum TargetDirection: String, Codable {
         case above = "ABOVE"
         case below = "BELOW"
@@ -27,8 +28,19 @@ struct PriceAlert: Codable, Hashable {
         }
     }
     
+    // MARK: - Properties
     let id: String
+    let coinID: String
     let symbol: String
     let targetPrice: Double
     let targetDirection: TargetDirection
+    
+    // MARK: - Coding Keys
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case coinID = "coinId"
+        case symbol
+        case targetPrice
+        case targetDirection
+    }
 }

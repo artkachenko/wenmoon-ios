@@ -51,7 +51,7 @@ struct NewsView: View {
             }
         }
         .sheet(item: $selectedNews) { news in
-            if let url = news.url?.safeURL {
+            if let url = news.url {
                 SFSafariView(url: url)
             }
         }
@@ -66,7 +66,7 @@ struct NewsView: View {
     @ViewBuilder
     private func makeNewsRow(_ news: News) -> some View {
         HStack(spacing: 16) {
-            if let imageURL = news.thumbnail?.safeURL {
+            if let imageURL = news.thumbnail {
                 AsyncImage(url: imageURL, content: { image in
                     image
                         .resizable()
@@ -86,7 +86,7 @@ struct NewsView: View {
                         .lineLimit(2)
                 }
                 
-                if let url = news.url?.safeURL,
+                if let url = news.url,
                    let source = viewModel.extractSource(from: url) {
                     HStack {
                         Text(source)

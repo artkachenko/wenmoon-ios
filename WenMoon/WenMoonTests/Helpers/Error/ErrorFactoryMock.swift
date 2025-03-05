@@ -21,18 +21,6 @@ struct ErrorFactoryMock {
         .invalidParameter(parameter: parameter)
     }
     
-    static func makeNoNetworkConnectionError() -> APIError {
-        .noNetworkConnection
-    }
-    
-    static func makeFailedToEncodeBodyError() -> APIError {
-        .failedToEncodeBody
-    }
-    
-    static func makeFailedToDecodeResponseError() -> APIError {
-        .failedToDecodeResponse
-    }
-    
     static func makeUnknownError(response: URLResponse = URLResponse()) -> APIError {
         .unknown(response: response)
     }

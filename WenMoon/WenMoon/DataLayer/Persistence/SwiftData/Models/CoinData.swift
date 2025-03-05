@@ -9,12 +9,13 @@ import UIKit
 import SwiftData
 
 @Model
-final class CoinData {
+final class CoinData: CoinProtocol {
+    // MARK: - Properties
     @Attribute(.unique)
     var id: String
     var symbol: String
     var name: String
-    var image: SafeURL?
+    var image: URL?
     var currentPrice: Double?
     var marketCap: Double?
     var priceChangePercentage24H: Double?
@@ -23,6 +24,7 @@ final class CoinData {
     var isPinned: Bool
     var isArchived: Bool
     
+    // MARK: - Initializers
     convenience init(
         from coin: Coin,
         imageData: Data? = nil,
@@ -47,7 +49,7 @@ final class CoinData {
         id: String = "",
         symbol: String = "",
         name: String = "",
-        image: SafeURL? = nil,
+        image: URL? = nil,
         currentPrice: Double? = nil,
         marketCap: Double? = nil,
         priceChangePercentage24H: Double? = nil,
@@ -69,14 +71,13 @@ final class CoinData {
         self.isArchived = isArchived
     }
     
+    // MARK: - Helpers
     func updateMarketData(from marketData: MarketData) {
         currentPrice = marketData.currentPrice
         marketCap = marketData.marketCap
         priceChangePercentage24H = marketData.priceChangePercentage24H
     }
 }
-
-extension CoinData: CoinProtocol {}
 
 // MARK: - Predefined Coins
 extension CoinData {
@@ -85,7 +86,7 @@ extension CoinData {
             id: "bitcoin",
             symbol: "BTC",
             name: "Bitcoin",
-            image: SafeURL(string: "https://coin-images.coingecko.com/coins/images/1/large/bitcoin.png?1696501400"),
+            image: URL(string: "https://coin-images.coingecko.com/coins/images/1/large/bitcoin.png?1696501400"),
             imageData: UIImage(named: "bitcoin.logo")?.pngData(),
             isPinned: true
         ),
@@ -93,7 +94,7 @@ extension CoinData {
             id: "ethereum",
             symbol: "ETH",
             name: "Ethereum",
-            image: SafeURL(string: "https://coin-images.coingecko.com/coins/images/279/large/ethereum.png?1696501628"),
+            image: URL(string: "https://coin-images.coingecko.com/coins/images/279/large/ethereum.png?1696501628"),
             imageData: UIImage(named: "ethereum.logo")?.pngData(),
             isPinned: true
         ),
@@ -101,28 +102,28 @@ extension CoinData {
             id: "ripple",
             symbol: "XRP",
             name: "XRP",
-            image: SafeURL(string: "https://coin-images.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png?1696501442"),
+            image: URL(string: "https://coin-images.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png?1696501442"),
             imageData: UIImage(named: "xrp.logo")?.pngData()
         ),
         CoinData(
             id: "binancecoin",
             symbol: "BNB",
             name: "BNB",
-            image: SafeURL(string: "https://coin-images.coingecko.com/coins/images/825/large/bnb-icon2_2x.png?1696501970"),
+            image: URL(string: "https://coin-images.coingecko.com/coins/images/825/large/bnb-icon2_2x.png?1696501970"),
             imageData: UIImage(named: "bnb.logo")?.pngData()
         ),
         CoinData(
             id: "solana",
             symbol: "SOL",
             name: "Solana",
-            image: SafeURL(string: "https://coin-images.coingecko.com/coins/images/4128/large/solana.png?1718769756"),
+            image: URL(string: "https://coin-images.coingecko.com/coins/images/4128/large/solana.png?1718769756"),
             imageData: UIImage(named: "solana.logo")?.pngData()
         ),
         CoinData(
             id: "dogecoin",
             symbol: "DOGE",
             name: "Dogecoin",
-            image: SafeURL(string: "https://coin-images.coingecko.com/coins/images/5/large/dogecoin.png?1696501409"),
+            image: URL(string: "https://coin-images.coingecko.com/coins/images/5/large/dogecoin.png?1696501409"),
             imageData: UIImage(named: "dogecoin.logo")?.pngData()
         )
     ]

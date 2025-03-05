@@ -161,6 +161,7 @@
 		19338EE62D75DDD200E5AA89 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		19338EEA2D75DE8900E5AA89 /* AppleSignInService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInService.swift; sourceTree = "<group>"; };
 		19338EEC2D75EE4900E5AA89 /* AppleSignInServiceMock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInServiceMock.swift; sourceTree = "<group>"; };
+		19338EEF2D76238F00E5AA89 /* WenMoon.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WenMoon.entitlements; sourceTree = "<group>"; };
 		194212A42D5A4930008DE753 /* String+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extensions.swift"; sourceTree = "<group>"; };
 		194212A62D5BB250008DE753 /* LinksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinksView.swift; sourceTree = "<group>"; };
 		194212A82D5D0D37008DE753 /* ExpandableTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpandableTextView.swift; sourceTree = "<group>"; };
@@ -271,7 +272,6 @@
 		FAB361F629F447DB00A88050 /* WenMoonApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WenMoonApp.swift; sourceTree = "<group>"; };
 		FAB361FD29F447DB00A88050 /* CoinListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinListView.swift; sourceTree = "<group>"; };
 		FAB361FF29F447DC00A88050 /* Icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icons.xcassets; sourceTree = "<group>"; };
-		FAB3620129F447DC00A88050 /* WenMoon.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WenMoon.entitlements; sourceTree = "<group>"; };
 		FAB3620929F447DC00A88050 /* WenMoonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WenMoonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FAB3623529F4513B00A88050 /* HTTPRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPRequest.swift; sourceTree = "<group>"; };
 		FAB3623729F4514B00A88050 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
@@ -1096,7 +1096,7 @@
 				FAB361F629F447DB00A88050 /* WenMoonApp.swift */,
 				D2A52FDC2CEBC415003C1275 /* AppConfig.swift */,
 				FA8A08842A1CF8500083B8DB /* AppDelegate.swift */,
-				FAB3620129F447DC00A88050 /* WenMoon.entitlements */,
+				19338EEF2D76238F00E5AA89 /* WenMoon.entitlements */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -1782,10 +1782,11 @@
 				PRODUCT_BUNDLE_IDENTIFIER = arturtkachenko.WenMoonTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WenMoon.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WenMoon";
 			};
 			name = Debug;
@@ -1806,10 +1807,11 @@
 				PRODUCT_BUNDLE_IDENTIFIER = arturtkachenko.WenMoonTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/WenMoon.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/WenMoon";
 			};
 			name = Release;

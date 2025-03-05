@@ -11,18 +11,17 @@ struct PriceAlertsView: View {
     // MARK: - Properties
     @Environment(\.dismiss) var dismiss
     
-    @EnvironmentObject private var accountViewModel: AccountViewModel
-    @StateObject private var priceAlertsViewModel: PriceAlertsViewModel
+    @StateObject private var priceAlertsViewModel = PriceAlertsViewModel()
 
     @FocusState private var isTextFieldFocused: Bool
 
     @State private var targetPrice: Double?
     
-    private var coin: CoinData { priceAlertsViewModel.coin }
+    private let coin: CoinData
 
     // MARK: - Initializers
     init(coin: CoinData) {
-        _priceAlertsViewModel = StateObject(wrappedValue: PriceAlertsViewModel(coin: coin))
+        self.coin = coin
     }
     
     // MARK: - Body
@@ -55,7 +54,7 @@ struct PriceAlertsView: View {
                 VStack(spacing: .zero) {
                     HStack(spacing: .zero) {
                         if let targetPrice {
-                            let targetDirection = priceAlertsViewModel.getTargetDirection(for: targetPrice)
+                            let targetDirection = priceAlertsViewModel.getTargetDirection(for: targetPrice, price: coin.currentPrice)
                             Image(targetDirection.iconName)
                                 .resizable()
                                 .scaledToFit()
@@ -80,11 +79,11 @@ struct PriceAlertsView: View {
                         if priceAlertsViewModel.isCreatingPriceAlert {
                             ProgressView()
                         } else {
-                            let isCreateButtonDisabled = priceAlertsViewModel.shouldDisableCreateButton(targetPrice: targetPrice)
+                            let isCreateButtonDisabled = priceAlertsViewModel.shouldDisableCreateButton(priceAlerts: coin.priceAlerts, targetPrice: targetPrice)
                             Button(action: {
                                 if let targetPrice {
                                     Task {
-                                        await priceAlertsViewModel.createPriceAlert(for: accountViewModel.account, targetPrice: targetPrice)
+                                        await priceAlertsViewModel.createPriceAlert(for: coin, targetPrice: targetPrice)
                                     }
                                 }
                             }) {
@@ -143,12 +142,12 @@ struct PriceAlertsView: View {
                     .font(.body)
                 
                 HStack(spacing: 8) {
-                    let targetDirection = priceAlertsViewModel.getTargetDirection(for: priceAlert.targetPrice)
+                    let targetDirection = priceAlertsViewModel.getTargetDirection(for: priceAlert.targetPrice, price: coin.currentPrice)
                     Image(targetDirection.iconName)
                         .resizable()
                         .scaledToFit()
                         .frame(width: 16, height: 16)
-                        .foregroundColor(.neonPink)
+                        .foregroundColor(targetDirection.color)
                     
                     Text(priceAlert.targetPrice.formattedAsCurrency())
                         .font(.subheadline)
@@ -163,7 +162,7 @@ struct PriceAlertsView: View {
             } else {
                 Button(action: {
                     Task {
-                        await priceAlertsViewModel.deletePriceAlert(priceAlert, for: accountViewModel.account)
+                        await priceAlertsViewModel.deletePriceAlert(priceAlert, for: coin)
                     }
                 }) {
                     Image("trash")
@@ -175,5 +174,6 @@ struct PriceAlertsView: View {
                 .buttonStyle(.plain)
             }
         }
+        .listRowBackground(Color.obsidian)
     }
 }

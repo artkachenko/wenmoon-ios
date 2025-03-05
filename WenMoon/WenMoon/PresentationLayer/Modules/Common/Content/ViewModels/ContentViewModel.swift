@@ -42,10 +42,10 @@ final class ContentViewModel: BaseViewModel {
             globalMarketDataItems.removeAll()
             
             async let fearAndGreedTask = coinScannerService.getFearAndGreedIndex()
-            async let cryptoMarketTask = coinScannerService.getGlobalCryptoMarketData()
+            async let cryptoMarketTask = coinScannerService.getCryptoGlobalMarketData()
             async let globalMarketTask = coinScannerService.getGlobalMarketData()
             
-            let (fearAndGreedIndex, globalCryptoMarketData, globalMarketData) = try await (
+            let (fearAndGreedIndex, cryptoGlobalMarketData, globalMarketData) = try await (
                 fearAndGreedTask,
                 cryptoMarketTask,
                 globalMarketTask
@@ -57,7 +57,7 @@ final class ContentViewModel: BaseViewModel {
                 value: "\(fearAndGreedData.value) \(fearAndGreedData.valueClassification)"
             )
             
-            guard let btcDominance = globalCryptoMarketData.marketCapPercentage["btc"] else { return }
+            guard let btcDominance = cryptoGlobalMarketData.data.marketCapPercentage["btc"] else { return }
             let btcDominanceItem = GlobalMarketDataItem(
                 type: .btcDominance,
                 value: btcDominance.formattedAsPercentage(includePlusSign: false)

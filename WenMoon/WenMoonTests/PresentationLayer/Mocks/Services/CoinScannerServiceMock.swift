@@ -16,7 +16,7 @@ class CoinScannerServiceMock: CoinScannerService {
     var searchCoinsByQueryResult: Result<[Coin], APIError>!
     var getMarketDataResult: Result<[String: MarketData], APIError>!
     var getFearAndGreedIndexResult: Result<FearAndGreedIndex, APIError>!
-    var getGlobalCryptoMarketDataResult: Result<GlobalCryptoMarketData, APIError>!
+    var getCryptoGlobalMarketDataResult: Result<CryptoGlobalMarketData, APIError>!
     var getGlobalMarketDataResult: Result<GlobalMarketData, APIError>!
     
     // MARK: - CoinScannerService
@@ -92,14 +92,14 @@ class CoinScannerServiceMock: CoinScannerService {
         }
     }
     
-    func getGlobalCryptoMarketData() async throws -> GlobalCryptoMarketData {
-        switch getGlobalCryptoMarketDataResult {
+    func getCryptoGlobalMarketData() async throws -> CryptoGlobalMarketData {
+        switch getCryptoGlobalMarketDataResult {
         case .success(let data):
             return data
         case .failure(let error):
             throw error
         case .none:
-            XCTFail("getGlobalCryptoMarketDataResult not set")
+            XCTFail("getCryptoGlobalMarketDataResult not set")
             throw APIError.unknown(response: URLResponse())
         }
     }

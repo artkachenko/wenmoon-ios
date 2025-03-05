@@ -98,9 +98,6 @@ class AccountViewModelTests: XCTestCase {
     
     func testFetchAccount_failedToFetchFirebaseToken() async {
         // Setup
-        let account = AccountFactoryMock.makeAccount()
-        accountService.getAccountResult = .success(account)
-        
         let error: AuthError = .failedToFetchFirebaseToken
         firebaseAuthService.idTokenResult = .failure(error)
         

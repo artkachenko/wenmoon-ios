@@ -9,27 +9,27 @@ import Foundation
 
 struct SafeURL: Codable, Hashable {
     // MARK: - Properties
-    let safeURL: URL?
+    let url: URL?
     
     // MARK: - Initializers
     init?(string: String) {
-        safeURL = Self.createURL(from: string)
+        url = Self.createURL(from: string)
     }
     
     // MARK: - Codable
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let url = try? container.decode(URL.self) {
-            self.safeURL = url
+            self.url = url
         } else {
             let urlString = try container.decode(String.self)
-            safeURL = Self.createURL(from: urlString)
+            url = Self.createURL(from: urlString)
         }
     }
     
     func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
-        try container.encode(safeURL?.absoluteString)
+        try container.encode(url?.absoluteString)
     }
     
     // MARK: - Helpers

@@ -14,6 +14,14 @@ struct GlobalMarketData: Codable {
     let interestRatePercentage: Double
     let nextFOMCMeetingDate: Date
     
+    // MARK: - Coding Keys
+    private enum CodingKeys: String, CodingKey {
+        case cpiPercentage
+        case nextCPITimestamp = "nextCpiTimestamp"
+        case interestRatePercentage
+        case nextFOMCMeetingTimestamp = "nextFomcMeetingTimestamp"
+    }
+    
     // MARK: - Initializers
     init(
         cpiPercentage: Double,
@@ -27,11 +35,6 @@ struct GlobalMarketData: Codable {
         self.nextFOMCMeetingDate = nextFOMCMeetingDate
     }
     
-    // MARK: - Codable
-    private enum CodingKeys: String, CodingKey {
-        case cpiPercentage, nextCPITimestamp, interestRatePercentage, nextFOMCMeetingTimestamp
-    }
-    
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let nextCPITimestamp = try container.decode(Int.self, forKey: .nextCPITimestamp)
@@ -42,6 +45,7 @@ struct GlobalMarketData: Codable {
         nextFOMCMeetingDate = Date(timeIntervalSince1970: TimeInterval(nextFOMCMeetingTimestamp))
     }
     
+    // MARK: - Encodable
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(cpiPercentage, forKey: .cpiPercentage)

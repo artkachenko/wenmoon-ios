@@ -36,7 +36,7 @@ class ContentViewModelTests: XCTestCase {
     func testFetchAllGlobalMarketData_success() async {
         // Setup
         let fearAndGreedIndex = FearAndGreedIndex(data: [.init(value: "75", valueClassification: "Greed")])
-        let globalCryptoMarketData = GlobalCryptoMarketData(marketCapPercentage: ["btc": 56.5, "eth": 12.8, "usdt": 2.63])
+        let cryptoGlobalMarketData = CryptoGlobalMarketData(data: .init(marketCapPercentage: ["btc": 56.5, "eth": 12.8, "usdt": 2.63]))
         let dateFormatter = ISO8601DateFormatter()
         let globalMarketData = GlobalMarketData(
             cpiPercentage: 2.7,
@@ -45,7 +45,7 @@ class ContentViewModelTests: XCTestCase {
             nextFOMCMeetingDate: dateFormatter.date(from: "2025-02-01T00:00:00Z")!
         )
         coinScannerService.getFearAndGreedIndexResult = .success(fearAndGreedIndex)
-        coinScannerService.getGlobalCryptoMarketDataResult = .success(globalCryptoMarketData)
+        coinScannerService.getCryptoGlobalMarketDataResult = .success(cryptoGlobalMarketData)
         coinScannerService.getGlobalMarketDataResult = .success(globalMarketData)
         
         // Action
@@ -75,7 +75,7 @@ class ContentViewModelTests: XCTestCase {
             nextFOMCMeetingDate: Date()
         )
         coinScannerService.getFearAndGreedIndexResult = .success(fearAndGreedIndex)
-        coinScannerService.getGlobalCryptoMarketDataResult = .failure(error)
+        coinScannerService.getCryptoGlobalMarketDataResult = .failure(error)
         coinScannerService.getGlobalMarketDataResult = .success(globalMarketData)
         
         // Action
@@ -90,7 +90,7 @@ class ContentViewModelTests: XCTestCase {
     func testFetchAllGlobalMarketData_missingFearAndGreedData() async {
         // Setup
         let fearAndGreedIndex = FearAndGreedIndex(data: [])
-        let globalCryptoMarketData = GlobalCryptoMarketData(marketCapPercentage: ["btc": 56.5])
+        let cryptoGlobalMarketData = CryptoGlobalMarketData(data: .init(marketCapPercentage: ["btc": 56.5]))
         let globalMarketData = GlobalMarketData(
             cpiPercentage: 2.7,
             nextCPIDate: Date(),
@@ -98,7 +98,7 @@ class ContentViewModelTests: XCTestCase {
             nextFOMCMeetingDate: Date()
         )
         coinScannerService.getFearAndGreedIndexResult = .success(fearAndGreedIndex)
-        coinScannerService.getGlobalCryptoMarketDataResult = .success(globalCryptoMarketData)
+        coinScannerService.getCryptoGlobalMarketDataResult = .success(cryptoGlobalMarketData)
         coinScannerService.getGlobalMarketDataResult = .success(globalMarketData)
         
         // Action
@@ -112,7 +112,7 @@ class ContentViewModelTests: XCTestCase {
     func testFetchAllGlobalMarketData_missingBTCDominance() async {
         // Setup
         let fearAndGreedIndex = FearAndGreedIndex(data: [.init(value: "75", valueClassification: "Greed")])
-        let globalCryptoMarketData = GlobalCryptoMarketData(marketCapPercentage: ["eth": 12.8])
+        let cryptoGlobalMarketData = CryptoGlobalMarketData(data: .init(marketCapPercentage: ["eth": 12.8]))
         let globalMarketData = GlobalMarketData(
             cpiPercentage: 2.7,
             nextCPIDate: Date(),
@@ -120,7 +120,7 @@ class ContentViewModelTests: XCTestCase {
             nextFOMCMeetingDate: Date()
         )
         coinScannerService.getFearAndGreedIndexResult = .success(fearAndGreedIndex)
-        coinScannerService.getGlobalCryptoMarketDataResult = .success(globalCryptoMarketData)
+        coinScannerService.getCryptoGlobalMarketDataResult = .success(cryptoGlobalMarketData)
         coinScannerService.getGlobalMarketDataResult = .success(globalMarketData)
         
         // Action

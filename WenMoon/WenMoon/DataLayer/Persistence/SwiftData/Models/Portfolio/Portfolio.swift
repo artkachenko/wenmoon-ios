@@ -10,12 +10,14 @@ import SwiftData
 
 @Model
 final class Portfolio {
+    // MARK: - Properties
     @Attribute(.unique)
     var id: String
     var name: String
     @Relationship(deleteRule: .cascade)
     var transactions: [Transaction]
     
+    // MARK: - Initializers
     init(id: String = UUID().uuidString, name: String = "Main", transactions: [Transaction] = []) {
         self.id = id
         self.name = name

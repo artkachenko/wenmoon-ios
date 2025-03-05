@@ -12,15 +12,16 @@ struct ChartData: Codable {
     let date: Date
     let price: Double
     
+    // MARK: - Coding Keys
+    private enum CodingKeys: String, CodingKey {
+        case timestamp
+        case close
+    }
+    
     // MARK: - Initializers
     init(date: Date, price: Double) {
         self.date = date
         self.price = price
-    }
-    
-    // MARK: - Codable
-    private enum CodingKeys: String, CodingKey {
-        case timestamp, close
     }
     
     init(from decoder: Decoder) throws {
@@ -30,6 +31,7 @@ struct ChartData: Codable {
         price = try container.decode(Double.self, forKey: .close)
     }
     
+    // MARK: - Encodable
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(Int(date.timeIntervalSince1970), forKey: .timestamp)

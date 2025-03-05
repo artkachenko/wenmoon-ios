@@ -12,7 +12,7 @@ class PriceAlertServiceTests: XCTestCase {
     // MARK: - Properties
     var service: PriceAlertService!
     var httpClient: HTTPClientMock!
-    var username: String!
+    var authToken: String!
     var deviceToken: String!
     
     // MARK: - Setup
@@ -20,14 +20,14 @@ class PriceAlertServiceTests: XCTestCase {
         super.setUp()
         httpClient = HTTPClientMock()
         service = PriceAlertServiceImpl(httpClient: httpClient)
-        username = "test-username"
+        authToken = "test-auth-token"
         deviceToken = "test-device-token"
     }
     
     override func tearDown() {
         service = nil
         httpClient = nil
-        username = nil
+        authToken = nil
         deviceToken = nil
         super.tearDown()
     }
@@ -40,7 +40,7 @@ class PriceAlertServiceTests: XCTestCase {
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
         
         // Action
-        let priceAlerts = try await service.getPriceAlerts(username: username, deviceToken: deviceToken)
+        let priceAlerts = try await service.getPriceAlerts(authToken: authToken, deviceToken: deviceToken)
         
         // Assertions
         assertPriceAlertsEqual(priceAlerts, response)
@@ -52,7 +52,7 @@ class PriceAlertServiceTests: XCTestCase {
         httpClient.getResponse = .success(try! httpClient.encoder.encode(response))
         
         // Action
-        let priceAlerts = try await service.getPriceAlerts(username: username, deviceToken: deviceToken)
+        let priceAlerts = try await service.getPriceAlerts(authToken: authToken, deviceToken: deviceToken)
         
         // Assertions
         XCTAssertTrue(priceAlerts.isEmpty)
@@ -60,13 +60,13 @@ class PriceAlertServiceTests: XCTestCase {
     
     func testGetPriceAlerts_decodingError() async throws {
         // Setup
-        let error = ErrorFactoryMock.makeFailedToDecodeResponseError()
+        let error: APIError = .failedToDecodeResponse
         httpClient.getResponse = .failure(error)
         
         // Action & Assertions
         await assertFailure(
             for: { [weak self] in
-                try await self!.service.getPriceAlerts(username: self!.username, deviceToken: self!.deviceToken)
+                try await self!.service.getPriceAlerts(authToken: self!.authToken, deviceToken: self!.deviceToken)
             },
             expectedError: error
         )
@@ -81,7 +81,7 @@ class PriceAlertServiceTests: XCTestCase {
         // Action
         let priceAlert = try await service.createPriceAlert(
             PriceAlertFactoryMock.makePriceAlert(),
-            username: username,
+            authToken: authToken,
             deviceToken: deviceToken
         )
         
@@ -91,7 +91,7 @@ class PriceAlertServiceTests: XCTestCase {
     
     func testSetPriceAlert_encodingError() async throws {
         // Setup
-        let error = ErrorFactoryMock.makeFailedToEncodeBodyError()
+        let error: APIError = .failedToEncodeBody
         httpClient.postResponse = .failure(error)
         
         // Action & Assertions
@@ -99,7 +99,7 @@ class PriceAlertServiceTests: XCTestCase {
             for: { [weak self] in
                 try await self!.service.createPriceAlert(
                     PriceAlertFactoryMock.makePriceAlert(),
-                    username: self!.username,
+                    authToken: self!.authToken,
                     deviceToken: self!.deviceToken
                 )
             },
@@ -116,7 +116,7 @@ class PriceAlertServiceTests: XCTestCase {
         // Action
         let priceAlert = try await service.deletePriceAlert(
             PriceAlertFactoryMock.makePriceAlert(),
-            username: username,
+            authToken: authToken,
             deviceToken: deviceToken
         )
         
@@ -134,7 +134,7 @@ class PriceAlertServiceTests: XCTestCase {
             for: { [weak self] in
                 try await self!.service.deletePriceAlert(
                     PriceAlertFactoryMock.makePriceAlert(),
-                    username: self!.username,
+                    authToken: self!.authToken,
                     deviceToken: self!.deviceToken
                 )
             },
