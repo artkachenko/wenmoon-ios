@@ -13,7 +13,6 @@ final class PriceAlertsViewModel: BaseViewModel {
     private let firebaseAuthService: FirebaseAuthService
     
     @Published private(set) var isCreatingPriceAlert = false
-    @Published private(set) var deletingPriceAlertIDs: [String] = []
     
     // MARK: - Initializers
     convenience init() {
@@ -67,7 +66,8 @@ final class PriceAlertsViewModel: BaseViewModel {
                 coinID: coin.id,
                 symbol: coin.symbol,
                 targetPrice: targetPrice,
-                targetDirection: (coin.currentPrice ?? .zero) < targetPrice ? .above : .below
+                targetDirection: (coin.currentPrice ?? .zero) < targetPrice ? .above : .below,
+                isActive: true
             )
             
             let authToken = try await firebaseAuthService.getIDToken()
@@ -76,7 +76,9 @@ final class PriceAlertsViewModel: BaseViewModel {
                 authToken: authToken,
                 deviceToken: deviceToken
             )
+            
             coin.priceAlerts.append(createdPriceAlert)
+            save()
         } catch {
             setError(error)
         }
@@ -85,29 +87,36 @@ final class PriceAlertsViewModel: BaseViewModel {
     }
     
     @MainActor
-    func deletePriceAlert(_ priceAlert: PriceAlert, for coin: CoinData) async {
-        guard let deviceToken else {
-            setErrorMessage("Device token is missing")
-            return
-        }
-        
-        deletingPriceAlertIDs.append(priceAlert.id)
-        defer {
-            if let index  = deletingPriceAlertIDs.firstIndex(of: priceAlert.id) {
-                deletingPriceAlertIDs.remove(at: index)
-            }
-        }
-        
+    func updatePriceAlert(_ id: String, isActive: Bool, for coin: CoinData) async {
         do {
             let authToken = try await firebaseAuthService.getIDToken()
-            let deletedPriceAlert = try await priceAlertService.deletePriceAlert(
-                priceAlert,
-                authToken: authToken,
-                deviceToken: deviceToken
+            let updatedPriceAlert = try await priceAlertService.updatePriceAlert(
+                id,
+                isActive: isActive,
+                authToken: authToken
             )
+            
+            if let index = coin.priceAlerts.firstIndex(where: { $0.id == updatedPriceAlert.id }) {
+                coin.priceAlerts[index].isActive = updatedPriceAlert.isActive
+            }
+            
+            save()
+        } catch {
+            setError(error)
+        }
+    }
+    
+    @MainActor
+    func deletePriceAlert(_ id: String, for coin: CoinData) async {
+        do {
+            let authToken = try await firebaseAuthService.getIDToken()
+            let deletedPriceAlert = try await priceAlertService.deletePriceAlert(id, authToken: authToken)
+            
             if let index = coin.priceAlerts.firstIndex(where: { $0.id == deletedPriceAlert.id }) {
                 coin.priceAlerts.remove(at: index)
             }
+            
+            save()
         } catch {
             setError(error)
         }

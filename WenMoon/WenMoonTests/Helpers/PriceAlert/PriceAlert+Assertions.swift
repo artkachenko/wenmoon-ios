@@ -18,9 +18,13 @@ func assertPriceAlertsEqual(_ priceAlerts: [PriceAlert], _ expectedPriceAlerts: 
     }
 }
 
-func assertCoinHasAlert(_ coin: CoinData, _ priceAlert: PriceAlert) {
+func assertCoinHasActiveAlert(_ coin: CoinData, _ priceAlert: PriceAlert) {
     XCTAssertFalse(coin.priceAlerts.isEmpty)
     XCTAssertTrue(coin.priceAlerts.contains(priceAlert))
+}
+
+func assertCoinHasNoActiveAlert(_ coin: CoinData) {
+    XCTAssertTrue(coin.priceAlerts.filter(\.isActive).isEmpty)
 }
 
 func assertCoinHasNoAlert(_ coin: CoinData) {

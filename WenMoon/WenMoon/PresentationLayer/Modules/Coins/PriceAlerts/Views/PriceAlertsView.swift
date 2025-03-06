@@ -16,12 +16,11 @@ struct PriceAlertsView: View {
     @FocusState private var isTextFieldFocused: Bool
 
     @State private var targetPrice: Double?
-    
-    private let coin: CoinData
+    @State private var coin: CoinData
 
     // MARK: - Initializers
     init(coin: CoinData) {
-        self.coin = coin
+        self._coin = State(initialValue: coin)
     }
     
     // MARK: - Body
@@ -111,7 +110,7 @@ struct PriceAlertsView: View {
                         Spacer()
                     } else {
                         List {
-                            ForEach(priceAlerts, id: \.self) { priceAlert in
+                            ForEach(priceAlerts, id: \.id) { priceAlert in
                                 makePriceAlertCell(priceAlert)
                             }
                         }
@@ -142,7 +141,7 @@ struct PriceAlertsView: View {
                     .font(.body)
                 
                 HStack(spacing: 8) {
-                    let targetDirection = priceAlertsViewModel.getTargetDirection(for: priceAlert.targetPrice, price: coin.currentPrice)
+                    let targetDirection = priceAlert.targetDirection
                     Image(targetDirection.iconName)
                         .resizable()
                         .scaledToFit()
@@ -157,23 +156,28 @@ struct PriceAlertsView: View {
             
             Spacer()
             
-            if priceAlertsViewModel.deletingPriceAlertIDs.contains(priceAlert.id) {
-                ProgressView()
-            } else {
-                Button(action: {
+            Toggle("", isOn: Binding<Bool>(
+                get: { priceAlert.isActive },
+                set: { isActive in
                     Task {
-                        await priceAlertsViewModel.deletePriceAlert(priceAlert, for: coin)
+                        await priceAlertsViewModel.updatePriceAlert(priceAlert.id, isActive: isActive, for: coin)
                     }
-                }) {
-                    Image("trash")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 20, height: 20)
-                        .foregroundColor(.gray)
                 }
-                .buttonStyle(.plain)
-            }
+            ))
+            .tint(.neonGreen)
+            .scaleEffect(0.9)
+            .padding(.trailing, -16)
         }
         .listRowBackground(Color.obsidian)
+        .swipeActions {
+            Button(role: .destructive) {
+                Task {
+                    await priceAlertsViewModel.deletePriceAlert(priceAlert.id, for: coin)
+                }
+            } label: {
+                Image("trash")
+            }
+            .tint(.neonPink)
+        }
     }
 }

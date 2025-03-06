@@ -19,7 +19,7 @@ class CoinListViewModelTests: XCTestCase {
     var appLaunchProvider: AppLaunchProviderMock!
     var userDefaultsManager: UserDefaultsManagerMock!
     var swiftDataManager: SwiftDataManagerMock!
-
+    
     var deviceToken: String!
     
     // MARK: - Setup
@@ -298,7 +298,7 @@ class CoinListViewModelTests: XCTestCase {
         
         // Assertions
         let priceAlert = priceAlerts.first(where: { $0.id == coin.id })!
-        assertCoinHasAlert(viewModel.coins.first!, priceAlert)
+        assertCoinHasActiveAlert(viewModel.coins.first!, priceAlert)
         XCTAssertNil(viewModel.errorMessage)
         
         // Test after alerts are cleared
@@ -309,7 +309,7 @@ class CoinListViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
     
-    func testRemovePriceAlert() {
+    func testDeactivatePriceAlert() {
         // Setup
         let coin = CoinFactoryMock.makeCoinData()
         let priceAlert = PriceAlertFactoryMock.makePriceAlert()
@@ -317,13 +317,13 @@ class CoinListViewModelTests: XCTestCase {
         viewModel.coins.append(coin)
         
         // Assertions after setting the price alert
-        assertCoinHasAlert(coin, priceAlert)
+        assertCoinHasActiveAlert(coin, priceAlert)
         
         // Action
-        viewModel.removePriceAlert(for: priceAlert.id)
+        viewModel.deactivatePriceAlert(priceAlert.id)
         
         // Assertions after deleting the price alert
-        assertCoinHasNoAlert(coin)
+        assertCoinHasNoActiveAlert(coin)
     }
     
     // Pin & Unpin

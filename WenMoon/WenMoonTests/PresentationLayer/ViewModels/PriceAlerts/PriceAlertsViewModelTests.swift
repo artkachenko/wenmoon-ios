@@ -118,7 +118,7 @@ class PriceAlertsViewModelTests: XCTestCase {
         await viewModel.createPriceAlert(for: coin, targetPrice: 70_000)
         
         // Assertions
-        assertCoinHasAlert(coin, priceAlert)
+        assertCoinHasActiveAlert(coin, priceAlert)
         XCTAssertNil(viewModel.errorMessage)
     }
     
@@ -140,6 +140,49 @@ class PriceAlertsViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }
     
+    // Update Price Alert
+    func testUpdatePriceAlert_success() async {
+        // Setup
+        userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
+        
+        let coin = CoinFactoryMock.makeCoinData()
+        
+        let priceAlert = PriceAlertFactoryMock.makePriceAlert()
+        coin.priceAlerts.append(priceAlert)
+        
+        var updatedPriceAlert = priceAlert
+        updatedPriceAlert.isActive = false
+        priceAlertService.updatePriceAlertResult = .success(updatedPriceAlert)
+        
+        // Action
+        await viewModel.updatePriceAlert(priceAlert.id, isActive: false, for: coin)
+        
+        // Assertions
+        assertCoinHasNoActiveAlert(coin)
+        XCTAssertNil(viewModel.errorMessage)
+    }
+    
+    func testUpdatePriceAlert_invalidEndpoint() async {
+        // Setup
+        userDefaultsManager.getObjectReturnValue = [.deviceToken: deviceToken!]
+        
+        let coin = CoinFactoryMock.makeCoinData()
+        
+        let priceAlert = PriceAlertFactoryMock.makePriceAlert()
+        coin.priceAlerts.append(priceAlert)
+        
+        let error = ErrorFactoryMock.makeInvalidEndpointError()
+        priceAlertService.updatePriceAlertResult = .failure(error)
+        
+        // Action
+        await viewModel.updatePriceAlert(priceAlert.id, isActive: false, for: coin)
+        
+        // Assertions
+        assertCoinHasActiveAlert(coin, priceAlert)
+        XCTAssertNotNil(viewModel.errorMessage)
+        XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
+    }
+    
     // Delete Price Alert
     func testDeletePriceAlert_success() async {
         // Setup
@@ -153,7 +196,7 @@ class PriceAlertsViewModelTests: XCTestCase {
         priceAlertService.deletePriceAlertResult = .success(priceAlert)
         
         // Action
-        await viewModel.deletePriceAlert(priceAlert, for: coin)
+        await viewModel.deletePriceAlert(priceAlert.id, for: coin)
         
         // Assertions
         assertCoinHasNoAlert(coin)
@@ -173,10 +216,10 @@ class PriceAlertsViewModelTests: XCTestCase {
         priceAlertService.deletePriceAlertResult = .failure(error)
         
         // Action
-        await viewModel.deletePriceAlert(priceAlert, for: coin)
+        await viewModel.deletePriceAlert(priceAlert.id, for: coin)
         
         // Assertions
-        assertCoinHasAlert(coin, priceAlert)
+        assertCoinHasActiveAlert(coin, priceAlert)
         XCTAssertNotNil(viewModel.errorMessage)
         XCTAssertEqual(viewModel.errorMessage, error.errorDescription)
     }

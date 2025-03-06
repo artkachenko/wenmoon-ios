@@ -107,6 +107,41 @@ class PriceAlertServiceTests: XCTestCase {
         )
     }
     
+    // Update Price Alert
+    func testUpdatePriceAlert_success() async throws {
+        // Setup
+        let response = PriceAlertFactoryMock.makePriceAlert()
+        httpClient.putResponse = .success(try! httpClient.encoder.encode(response))
+        
+        // Action
+        let priceAlert = try await service.updatePriceAlert(
+            PriceAlertFactoryMock.makePriceAlert().id,
+            isActive: false,
+            authToken: authToken
+        )
+        
+        // Assertions
+        assertPriceAlertsEqual([priceAlert], [response])
+    }
+    
+    func testUpdatePriceAlert_invalidEndpoint() async throws {
+        // Setup
+        let error = ErrorFactoryMock.makeInvalidEndpointError()
+        httpClient.putResponse = .failure(error)
+        
+        // Action & Assertions
+        await assertFailure(
+            for: { [weak self] in
+                try await self!.service.updatePriceAlert(
+                    PriceAlertFactoryMock.makePriceAlert().id,
+                    isActive: false,
+                    authToken: self!.authToken
+                )
+            },
+            expectedError: error
+        )
+    }
+    
     // Delete Price Alert
     func testDeletePriceAlert_success() async throws {
         // Setup
@@ -115,9 +150,8 @@ class PriceAlertServiceTests: XCTestCase {
         
         // Action
         let priceAlert = try await service.deletePriceAlert(
-            PriceAlertFactoryMock.makePriceAlert(),
-            authToken: authToken,
-            deviceToken: deviceToken
+            PriceAlertFactoryMock.makePriceAlert().id,
+            authToken: authToken
         )
         
         // Assertions
@@ -133,9 +167,8 @@ class PriceAlertServiceTests: XCTestCase {
         await assertFailure(
             for: { [weak self] in
                 try await self!.service.deletePriceAlert(
-                    PriceAlertFactoryMock.makePriceAlert(),
-                    authToken: self!.authToken,
-                    deviceToken: self!.deviceToken
+                    PriceAlertFactoryMock.makePriceAlert().id,
+                    authToken: self!.authToken
                 )
             },
             expectedError: error

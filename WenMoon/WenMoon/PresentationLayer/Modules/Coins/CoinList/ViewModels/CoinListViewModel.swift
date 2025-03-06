@@ -42,14 +42,14 @@ final class CoinListViewModel: BaseViewModel {
             userDefaultsManager: userDefaultsManager,
             swiftDataManager: swiftDataManager
         )
-        startCacheTimer { [weak self] in
+        startCacheTimer(interval: 180) { [weak self] in
             self?.clearCacheIfNeeded()
         }
     }
     
     // MARK: - Internal Methods
     @MainActor
-    func fetchCoins() async {
+    func fetchCoins(_ isRefreshing: Bool = false) async {
         if isFirstLaunch {
             let predefinedCoins = CoinData.predefinedCoins
             coins = predefinedCoins
@@ -75,11 +75,11 @@ final class CoinListViewModel: BaseViewModel {
             }
         }
         
-        await fetchMarketData()
+        await fetchMarketData(isRefreshing)
     }
     
     @MainActor
-    func fetchMarketData() async {
+    func fetchMarketData(_ isRefreshing: Bool = false) async {
         let coinIDs = coins.map { $0.id }
         let existingMarketData = coinIDs.compactMap { marketData[$0] }
         
@@ -94,6 +94,10 @@ final class CoinListViewModel: BaseViewModel {
                 }
             }
             save()
+            
+            if !isRefreshing {
+                triggerImpactFeedback()
+            }
         } catch {
             setError(error)
         }
@@ -146,14 +150,14 @@ final class CoinListViewModel: BaseViewModel {
         }
     }
     
-    func removePriceAlert(for id: String) {
-        for index in coins.indices {
-            if let alertIndex = coins[index].priceAlerts.firstIndex(where: { $0.id == id }) {
-                coins[index].priceAlerts.remove(at: alertIndex)
-                break
+    func deactivatePriceAlert(_ id: String) {
+        coins.forEach { coin in
+            if let alertIndex = coin.priceAlerts.firstIndex(where: { $0.id == id }) {
+                coin.priceAlerts[alertIndex].isActive = false
+                save()
+                return
             }
         }
-        save()
     }
     
     func pinCoin(_ coin: CoinData) {

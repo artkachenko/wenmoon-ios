@@ -13,6 +13,7 @@ protocol HTTPClient {
     
     func get(path: String, parameters: [String: String]?, headers: [String: String]?) async throws -> Data
     func post(path: String, parameters: [String: String]?, headers: [String: String]?, body: Data?) async throws -> Data
+    func put(path: String, parameters: [String: String]?, headers: [String: String]?, body: Data?) async throws -> Data
     func delete(path: String, parameters: [String: String]?, headers: [String: String]?) async throws -> Data
 }
 
@@ -23,6 +24,10 @@ extension HTTPClient {
     
     func post(path: String, parameters: [String: String]? = nil, headers: [String: String]? = nil, body: Data? = nil) async throws -> Data {
         try await post(path: path, parameters: parameters, headers: headers, body: body)
+    }
+    
+    func put(path: String, parameters: [String: String]? = nil, headers: [String: String]?, body: Data?) async throws -> Data {
+        try await put(path: path, parameters: parameters, headers: headers, body: body)
     }
     
     func delete(path: String, parameters: [String: String]? = nil, headers: [String: String]? = nil) async throws -> Data {
@@ -41,7 +46,13 @@ final class HTTPClientImpl: HTTPClient {
     
     // MARK: - Initializers
     convenience init(baseURL: URL = API.baseURL, apiKey: String = API.key) {
-        self.init(baseURL: baseURL, apiKey: apiKey, session: .shared, encoder: .init(), decoder: .init())
+        self.init(
+            baseURL: baseURL,
+            apiKey: apiKey,
+            session: .shared,
+            encoder: .init(),
+            decoder: .init()
+        )
     }
     
     init(
@@ -66,6 +77,11 @@ final class HTTPClientImpl: HTTPClient {
     
     func post(path: String, parameters: [String: String]?, headers: [String: String]?, body: Data?) async throws -> Data {
         let httpRequest = HTTPRequest(httpMethod: .post, path: path, parameters: parameters, headers: headers, body: body)
+        return try await execute(httpRequest)
+    }
+    
+    func put(path: String, parameters: [String: String]?, headers: [String: String]?, body: Data?) async throws -> Data {
+        let httpRequest = HTTPRequest(httpMethod: .put, path: path, parameters: parameters, headers: headers, body: body)
         return try await execute(httpRequest)
     }
     

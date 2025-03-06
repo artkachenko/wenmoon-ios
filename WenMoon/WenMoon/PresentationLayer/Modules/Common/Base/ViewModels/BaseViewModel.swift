@@ -64,7 +64,7 @@ class BaseViewModel: ObservableObject {
     }
     
     // MARK: - Cache Handling
-    func startCacheTimer(interval: TimeInterval = 60, completion: @escaping (() -> Void)) {
+    func startCacheTimer(interval: TimeInterval, completion: @escaping (() -> Void)) {
         let newCacheTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
             completion()
         }

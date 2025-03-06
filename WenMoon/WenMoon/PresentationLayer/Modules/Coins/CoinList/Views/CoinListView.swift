@@ -17,7 +17,6 @@ struct CoinListView: View {
     
     @State private var showCoinSelectionView = false
     @State private var showAuthAlert = false
-    @State private var viewDidLoad = false
     
     private var coins: [CoinData] { coinListViewModel.coins }
     
@@ -59,9 +58,7 @@ struct CoinListView: View {
                         }
                         .listStyle(.plain)
                         .refreshable {
-                            Task {
-                                await fetchCoinsAndPriceAlerts()
-                            }
+                            fetchCoinsAndPriceAlerts(isRefreshing: true)
                         }
                     }
                 }
@@ -81,7 +78,14 @@ struct CoinListView: View {
                 }
             }
         }
-        .sheet(isPresented: $showCoinSelectionView) {
+        .onReceive(NotificationCenter.default.publisher(for: .targetPriceReached)) { notification in
+            if let id = notification.userInfo?["id"] as? String {
+                coinListViewModel.deactivatePriceAlert(id)
+            }
+        }
+        .sheet(isPresented: $showCoinSelectionView, onDismiss: {
+            fetchCoinsAndPriceAlerts()
+        }) {
             CoinSelectionView(didToggleCoin: handleCoinSelection)
         }
         .sheet(item: $selectedCoin, onDismiss: {
@@ -105,18 +109,8 @@ struct CoinListView: View {
                 dismissButton: .default(Text("OK"))
             )
         }
-        .onReceive(NotificationCenter.default.publisher(for: .targetPriceReached)) { notification in
-            if let id = notification.userInfo?["id"] as? String {
-                coinListViewModel.removePriceAlert(for: id)
-            }
-        }
-        .task {
-            guard !viewDidLoad else { return }
-            
-            await fetchCoinsAndPriceAlerts()
-            coinListViewModel.triggerImpactFeedback()
-            
-            viewDidLoad = true
+        .onAppear {
+            fetchCoinsAndPriceAlerts()
         }
     }
     
@@ -132,7 +126,7 @@ struct CoinListView: View {
                         size: 48
                     )
                     
-                    if !coin.priceAlerts.isEmpty {
+                    if !coin.priceAlerts.filter(\.isActive).isEmpty {
                         Image("bell.fill")
                             .resizable()
                             .scaledToFit()
@@ -212,9 +206,11 @@ struct CoinListView: View {
     }
     
     // MARK: - Private Methods
-    private func fetchCoinsAndPriceAlerts() async {
-        await coinListViewModel.fetchCoins()
-        await coinListViewModel.fetchPriceAlerts()
+    private func fetchCoinsAndPriceAlerts(isRefreshing: Bool = false) {
+        Task {
+            await coinListViewModel.fetchCoins(isRefreshing)
+            await coinListViewModel.fetchPriceAlerts()
+        }
     }
     
     private func deletePinnedCoin(at offsets: IndexSet) {

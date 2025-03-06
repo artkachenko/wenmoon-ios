@@ -12,6 +12,7 @@ class PriceAlertServiceMock: PriceAlertService {
     // MARK: - Properties
     var getPriceAlertsResult: Result<[PriceAlert], APIError>!
     var createPriceAlertResult: Result<PriceAlert, APIError>!
+    var updatePriceAlertResult: Result<PriceAlert, APIError>!
     var deletePriceAlertResult: Result<PriceAlert, APIError>!
     
     // MARK: - PriceAlertService
@@ -39,7 +40,19 @@ class PriceAlertServiceMock: PriceAlertService {
         }
     }
     
-    func deletePriceAlert(_ priceAlert: PriceAlert, authToken: String, deviceToken: String) async throws -> PriceAlert {
+    func updatePriceAlert(_ id: String, isActive: Bool, authToken: String) async throws -> PriceAlert {
+        switch updatePriceAlertResult {
+        case .success(let priceAlert):
+            return priceAlert
+        case .failure(let error):
+            throw error
+        case .none:
+            XCTFail("updatePriceAlertResult not set")
+            throw APIError.unknown(response: URLResponse())
+        }
+    }
+    
+    func deletePriceAlert(_ id: String, authToken: String) async throws -> PriceAlert {
         switch deletePriceAlertResult {
         case .success(let priceAlert):
             return priceAlert

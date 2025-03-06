@@ -11,7 +11,7 @@ import FirebaseAuth
 
 final class AccountViewModel: BaseViewModel {
     // MARK: - Nested Types
-    enum AuthState {
+    enum AuthState: Equatable {
         case authenticated(_ account: Account?)
         case unauthenticated
     }

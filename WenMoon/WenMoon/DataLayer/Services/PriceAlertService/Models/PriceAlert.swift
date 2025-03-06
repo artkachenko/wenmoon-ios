@@ -34,6 +34,7 @@ struct PriceAlert: Codable, Hashable {
     let symbol: String
     let targetPrice: Double
     let targetDirection: TargetDirection
+    var isActive: Bool
     
     // MARK: - Coding Keys
     private enum CodingKeys: String, CodingKey {
@@ -42,5 +43,6 @@ struct PriceAlert: Codable, Hashable {
         case symbol
         case targetPrice
         case targetDirection
+        case isActive
     }
 }

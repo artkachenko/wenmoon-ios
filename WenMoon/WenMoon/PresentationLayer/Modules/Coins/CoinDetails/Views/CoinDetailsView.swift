@@ -81,7 +81,7 @@ struct CoinDetailsView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 20, height: 20)
-                                .foregroundColor(coin.priceAlerts.isEmpty ? .gray : .white)
+                                .foregroundColor(coin.priceAlerts.filter(\.isActive).isEmpty ? .gray : .white)
                         }
                         
                         Button(action: {

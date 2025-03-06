@@ -10,7 +10,8 @@ import Foundation
 protocol PriceAlertService {
     func getPriceAlerts(authToken: String, deviceToken: String) async throws -> [PriceAlert]
     func createPriceAlert(_ priceAlert: PriceAlert, authToken: String, deviceToken: String) async throws -> PriceAlert
-    func deletePriceAlert(_ priceAlert: PriceAlert, authToken: String, deviceToken: String) async throws -> PriceAlert
+    func updatePriceAlert(_ id: String, isActive: Bool, authToken: String) async throws -> PriceAlert
+    func deletePriceAlert(_ id: String, authToken: String) async throws -> PriceAlert
 }
 
 final class PriceAlertServiceImpl: BaseBackendService, PriceAlertService {
@@ -49,14 +50,27 @@ final class PriceAlertServiceImpl: BaseBackendService, PriceAlertService {
         }
     }
     
-    func deletePriceAlert(_ priceAlert: PriceAlert, authToken: String, deviceToken: String) async throws -> PriceAlert {
+    func updatePriceAlert(_ id: String, isActive: Bool, authToken: String) async throws -> PriceAlert {
+        do {
+            let request = PriceAlertStateRequest(isActive: isActive)
+            let body = try encoder.encode(request)
+            let data = try await httpClient.put(
+                path: "price-alerts/\(id)/state",
+                headers: ["Authorization": "Bearer \(authToken)"],
+                body: body
+            )
+            let priceAlert = try decoder.decode(PriceAlert.self, from: data)
+            return priceAlert
+        } catch {
+            throw mapToAPIError(error)
+        }
+    }
+    
+    func deletePriceAlert(_ id: String, authToken: String) async throws -> PriceAlert {
         do {
             let data = try await httpClient.delete(
-                path: "price-alerts/\(priceAlert.id)",
-                headers: [
-                    "Authorization": "Bearer \(authToken)",
-                    "X-Device-ID": deviceToken
-                ]
+                path: "price-alerts/\(id)",
+                headers: ["Authorization": "Bearer \(authToken)"]
             )
             let priceAlert = try decoder.decode(PriceAlert.self, from: data)
             return priceAlert
